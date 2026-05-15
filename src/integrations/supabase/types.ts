@@ -14,16 +14,324 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      campaigns: {
+        Row: {
+          created_at: string
+          description: string | null
+          ends_at: string
+          id: string
+          price_per_quota: number
+          sold_quotas: number
+          status: Database["public"]["Enums"]["campaign_status"]
+          tattoo_value: number
+          title: string | null
+          total_quotas: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          ends_at: string
+          id?: string
+          price_per_quota: number
+          sold_quotas?: number
+          status?: Database["public"]["Enums"]["campaign_status"]
+          tattoo_value: number
+          title?: string | null
+          total_quotas: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          ends_at?: string
+          id?: string
+          price_per_quota?: number
+          sold_quotas?: number
+          status?: Database["public"]["Enums"]["campaign_status"]
+          tattoo_value?: number
+          title?: string | null
+          total_quotas?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cart_items: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          quantity: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          quantity: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          quantity?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credits: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          source_order_id: string | null
+          used_amount: number
+          user_id: string
+          valid_until: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          source_order_id?: string | null
+          used_amount?: number
+          user_id: string
+          valid_until?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          source_order_id?: string | null
+          used_amount?: number
+          user_id?: string
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credits_source_order_id_fkey"
+            columns: ["source_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          order_id: string
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          order_id: string
+          quantity: number
+          unit_price: number
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          order_id?: string
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          paid_at: string | null
+          pix_copy_paste: string | null
+          pix_qr_code: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          stripe_payment_intent_id: string | null
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          paid_at?: string | null
+          pix_copy_paste?: string | null
+          pix_qr_code?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          stripe_payment_intent_id?: string | null
+          total_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          paid_at?: string | null
+          pix_copy_paste?: string | null
+          pix_qr_code?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          stripe_payment_intent_id?: string | null
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      participations: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          lucky_number: number
+          order_id: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          lucky_number: number
+          order_id: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          lucky_number?: number
+          order_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participations_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participations_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          cidade: string | null
+          cpf: string | null
+          created_at: string
+          email: string | null
+          id: string
+          nome_completo: string | null
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          cidade?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id: string
+          nome_completo?: string | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cidade?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome_completo?: string | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      allocate_lucky_numbers: {
+        Args: {
+          _campaign_id: string
+          _order_id: string
+          _quantity: number
+          _user_id: string
+        }
+        Returns: number[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "client"
+      campaign_status: "active" | "closed" | "drawn"
+      order_status: "pending" | "paid" | "expired" | "canceled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +458,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "client"],
+      campaign_status: ["active", "closed", "drawn"],
+      order_status: ["pending", "paid", "expired", "canceled"],
+    },
   },
 } as const
