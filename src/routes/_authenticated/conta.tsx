@@ -50,7 +50,7 @@ function AccountPage() {
             </div>
             <div className="text-right">
               <div className="text-xs text-muted-foreground">Seu número</div>
-              <div className="font-display text-2xl font-bold text-primary tabular-nums">{String(p.lucky_number).padStart(4, "0")}</div>
+              <div className="font-display text-2xl font-bold text-primary tabular-nums">{String(p.lucky_number).padStart(3, "0")}</div>
             </div>
           </Card>
         ))}
