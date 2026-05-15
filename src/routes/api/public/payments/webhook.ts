@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { verifyWebhook, type StripeEnv } from "@/lib/stripe.server";
 
 function admin() {
   return createClient<Database>(
@@ -14,9 +15,20 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = await request.text();
+        const rawEnv = new URL(request.url).searchParams.get("env");
+        if (rawEnv !== "sandbox" && rawEnv !== "live") {
+          console.error("[webhook] invalid env query param", rawEnv);
+          return new Response("invalid env", { status: 400 });
+        }
+        const env: StripeEnv = rawEnv;
+
         let event: any;
-        try { event = JSON.parse(body); } catch { return new Response("invalid json", { status: 400 }); }
+        try {
+          event = await verifyWebhook(request, env);
+        } catch (e) {
+          console.error("[webhook] signature verification failed", e);
+          return new Response("invalid signature", { status: 400 });
+        }
 
         const type = event.type as string | undefined;
         if (!type) return new Response("no type", { status: 400 });
