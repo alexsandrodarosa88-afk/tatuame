@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
 
 function adminClient() {
   return createClient<Database>(
@@ -13,7 +14,13 @@ function adminClient() {
 
 export const createPixCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((data: { environment: StripeEnv; returnUrl: string }) => {
+    if (data.environment !== "sandbox" && data.environment !== "live")
+      throw new Error("Invalid environment");
+    if (!/^https?:\/\//.test(data.returnUrl)) throw new Error("Invalid returnUrl");
+    return data;
+  })
+  .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
 
     // Load cart
@@ -60,41 +67,27 @@ export const createPixCheckout = createServerFn({ method: "POST" })
     const { error: itemsErr } = await admin.from("order_items").insert(itemsPayload);
     if (itemsErr) throw itemsErr;
 
-    // Create Stripe Checkout Session with PIX
-    const stripeKey = process.env.STRIPE_SANDBOX_API_KEY ?? process.env.STRIPE_API_KEY;
-    if (!stripeKey) throw new Error("Stripe não configurado");
-
-    const baseUrl =
-      process.env.LOVABLE_APP_URL ||
-      `https://project--f870966e-4064-4b40-9e98-a8f3aef0b837-dev.lovable.app`;
-
-    const params = new URLSearchParams();
-    params.append("mode", "payment");
-    params.append("payment_method_types[]", "pix");
-    params.append("success_url", `${baseUrl}/checkout/${order.id}?status=success`);
-    params.append("cancel_url", `${baseUrl}/carrinho`);
-    params.append("client_reference_id", order.id);
-    params.append("metadata[order_id]", order.id);
-    params.append("metadata[user_id]", userId);
-    params.append("payment_intent_data[metadata][order_id]", order.id);
-    params.append("payment_intent_data[metadata][user_id]", userId);
-    rows.forEach((r, i) => {
-      params.append(`line_items[${i}][price_data][currency]`, "brl");
-      params.append(`line_items[${i}][price_data][product_data][name]`, `Cota Tatua.me — campanha ${r.campaign_id.slice(0, 8)}`);
-      params.append(`line_items[${i}][price_data][unit_amount]`, String(Math.round(Number(r.campaigns.price_per_quota) * 100)));
-      params.append(`line_items[${i}][quantity]`, String(r.quantity));
+    // Create Stripe Embedded Checkout Session with PIX
+    const stripe = createStripeClient(data.environment);
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      ui_mode: "embedded",
+      payment_method_types: ["pix"],
+      return_url: `${data.returnUrl}?order_id=${order.id}&session_id={CHECKOUT_SESSION_ID}`,
+      client_reference_id: order.id,
+      metadata: { order_id: order.id, user_id: userId },
+      payment_intent_data: { metadata: { order_id: order.id, user_id: userId } },
+      line_items: rows.map((r) => ({
+        price_data: {
+          currency: "brl",
+          product_data: { name: `Cota Tatua.me — campanha ${r.campaign_id.slice(0, 8)}` },
+          unit_amount: Math.round(Number(r.campaigns.price_per_quota) * 100),
+        },
+        quantity: r.quantity,
+      })),
     });
 
-    const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${stripeKey}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: params.toString(),
-    });
-    const session = (await res.json()) as { id?: string; url?: string; error?: { message: string } };
-    if (!res.ok || !session.url) throw new Error(session.error?.message ?? "Falha no Stripe");
+    if (!session.client_secret) throw new Error("Falha ao criar sessão Stripe");
 
     await admin
       .from("orders")
@@ -104,5 +97,5 @@ export const createPixCheckout = createServerFn({ method: "POST" })
     // Clear cart
     await admin.from("cart_items").delete().eq("user_id", userId);
 
-    return { orderId: order.id, checkoutUrl: session.url };
+    return { orderId: order.id, clientSecret: session.client_secret };
   });
