@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export function FinalCTA() {
   return (
@@ -18,9 +19,9 @@ export function FinalCTA() {
               Entre agora, garanta seu número e transforme cada real em arte.
             </p>
             <Button asChild size="lg" className="mt-8 bg-background text-foreground hover:bg-background/90 font-semibold">
-              <a href="#campanhas">
+              <Link to="/cadastro">
                 Entrar agora <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
+              </Link>
             </Button>
           </div>
         </div>

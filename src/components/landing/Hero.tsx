@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import heroImage from "@/assets/hero-tattoo.jpg";
 
 export function Hero() {
@@ -27,9 +28,9 @@ export function Hero() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Button asChild size="lg" className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold shadow-[var(--shadow-elegant)] transition-[var(--transition-smooth)]">
-              <a href="#campanhas">
+              <Link to="/cadastro">
                 Garantir minha vaga <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
+              </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="border-border bg-card/60 backdrop-blur hover:bg-card">
               <a href="#como-funciona">Como funciona</a>
