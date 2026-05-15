@@ -3,11 +3,13 @@ import { Clock, Flame } from "lucide-react";
 import { campaigns } from "@/data/campaigns";
 
 function useCountdown(target: string) {
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
+    setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
+  if (now === null) return { d: 0, h: 0, m: 0, s: 0 };
   const diff = Math.max(0, new Date(target).getTime() - now);
   const d = Math.floor(diff / 86400000);
   const h = Math.floor((diff / 3600000) % 24);

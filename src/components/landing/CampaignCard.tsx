@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { type Campaign, formatBRL } from "@/data/campaigns";
@@ -50,8 +51,8 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
         </div>
       </div>
 
-      <Button className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold w-full mt-auto">
-        Participar agora
+      <Button asChild className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold w-full mt-auto">
+        <Link to="/cadastro">Participar agora</Link>
       </Button>
     </Card>
   );
