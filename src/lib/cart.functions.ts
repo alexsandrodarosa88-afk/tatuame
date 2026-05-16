@@ -10,7 +10,10 @@ export const getCart = createServerFn({ method: "GET" })
       .from("cart_items")
       .select("id, quantity, campaign_id, campaigns(id, tattoo_value, price_per_quota, total_quotas, sold_quotas, title)")
       .eq("user_id", userId);
-    if (error) throw error;
+    if (error) {
+      console.error("getCart error:", error);
+      throw new Error("Não foi possível carregar o carrinho.");
+    }
     return data ?? [];
   });
 
@@ -24,7 +27,10 @@ export const upsertCartItem = createServerFn({ method: "POST" })
     const { error } = await supabase
       .from("cart_items")
       .upsert({ user_id: userId, campaign_id: data.campaign_id, quantity: data.quantity }, { onConflict: "user_id,campaign_id" });
-    if (error) throw error;
+    if (error) {
+      console.error("upsertCartItem error:", error);
+      throw new Error("Não foi possível atualizar o carrinho.");
+    }
     return { ok: true };
   });
 
@@ -34,7 +40,10 @@ export const removeCartItem = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { error } = await supabase.from("cart_items").delete().eq("id", data.id).eq("user_id", userId);
-    if (error) throw error;
+    if (error) {
+      console.error("removeCartItem error:", error);
+      throw new Error("Não foi possível remover o item.");
+    }
     return { ok: true };
   });
 
@@ -47,7 +56,10 @@ export const getMyParticipations = createServerFn({ method: "GET" })
       .select("id, lucky_number, created_at, campaigns(id, tattoo_value, title, ends_at, status)")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
-    if (error) throw error;
+    if (error) {
+      console.error("getMyParticipations error:", error);
+      throw new Error("Não foi possível carregar suas participações.");
+    }
     return data ?? [];
   });
 
@@ -61,7 +73,10 @@ export const getMyCredits = createServerFn({ method: "GET" })
       .eq("user_id", userId)
       .gt("valid_until", new Date().toISOString())
       .order("created_at", { ascending: false });
-    if (error) throw error;
+    if (error) {
+      console.error("getMyCredits error:", error);
+      throw new Error("Não foi possível carregar seus créditos.");
+    }
     return data ?? [];
   });
 
@@ -76,6 +91,9 @@ export const getMyOrder = createServerFn({ method: "GET" })
       .eq("id", data.id)
       .eq("user_id", userId)
       .single();
-    if (error) throw error;
+    if (error) {
+      console.error("getMyOrder error:", error);
+      throw new Error("Não foi possível carregar o pedido.");
+    }
     return order;
   });
