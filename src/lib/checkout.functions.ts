@@ -28,7 +28,10 @@ export const createPixCheckout = createServerFn({ method: "POST" })
       .from("cart_items")
       .select("quantity, campaign_id, campaigns(id, price_per_quota, total_quotas, sold_quotas, status)")
       .eq("user_id", userId);
-    if (cartErr) throw cartErr;
+    if (cartErr) {
+      console.error("createPixCheckout cart error:", cartErr);
+      throw new Error("Não foi possível carregar o carrinho.");
+    }
     if (!cart || cart.length === 0) throw new Error("Carrinho vazio");
 
     type Row = (typeof cart)[number] & { campaigns: { id: string; price_per_quota: number; total_quotas: number; sold_quotas: number; status: string } };
@@ -55,7 +58,10 @@ export const createPixCheckout = createServerFn({ method: "POST" })
       })
       .select("id")
       .single();
-    if (orderErr || !order) throw orderErr ?? new Error("Falha ao criar pedido");
+    if (orderErr || !order) {
+      if (orderErr) console.error("createPixCheckout order error:", orderErr);
+      throw new Error("Falha ao criar pedido. Tente novamente.");
+    }
 
     // Create order items
     const itemsPayload = rows.map((r) => ({
@@ -65,7 +71,10 @@ export const createPixCheckout = createServerFn({ method: "POST" })
       unit_price: r.campaigns.price_per_quota,
     }));
     const { error: itemsErr } = await admin.from("order_items").insert(itemsPayload);
-    if (itemsErr) throw itemsErr;
+    if (itemsErr) {
+      console.error("createPixCheckout items error:", itemsErr);
+      throw new Error("Falha ao registrar itens do pedido.");
+    }
 
     // Create Stripe Embedded Checkout Session with PIX
     const stripe = createStripeClient(data.environment);
