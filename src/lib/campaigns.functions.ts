@@ -13,6 +13,9 @@ export const listActiveCampaigns = createServerFn({ method: "GET" }).handler(asy
     .select("id, tattoo_value, price_per_quota, total_quotas, sold_quotas, ends_at, status, title")
     .eq("status", "active")
     .order("tattoo_value", { ascending: true });
-  if (error) throw error;
+  if (error) {
+    console.error("listActiveCampaigns error:", error);
+    throw new Error("Não foi possível carregar as campanhas. Tente novamente.");
+  }
   return data ?? [];
 });
