@@ -76,10 +76,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Compre créditos, receba números promocionais e desbloqueie upgrades exclusivos. Seu dinheiro nunca se perde — vira crédito de tatuagem." },
       { name: "author", content: "Tatua.me" },
       { property: "og:title", content: "Tatua.me — Sua próxima tatuagem por muito menos" },
-      { property: "og:description", content: "Marketplace de tatuagem com sistema de créditos. Garanta seu upgrade." },
+      { property: "og:description", content: "Compre créditos, receba números promocionais e desbloqueie upgrades exclusivos. Seu dinheiro nunca se perde — vira crédito de tatuagem." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@tatuame" },
+      { name: "twitter:title", content: "Tatua.me — Sua próxima tatuagem por muito menos" },
+      { name: "twitter:description", content: "Compre créditos, receba números promocionais e desbloqueie upgrades exclusivos. Seu dinheiro nunca se perde — vira crédito de tatuagem." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/26e522aa-12d8-43a3-8d80-892e545beebb/id-preview-22f59a63--f870966e-4064-4b40-9e98-a8f3aef0b837.lovable.app-1778947858695.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/26e522aa-12d8-43a3-8d80-892e545beebb/id-preview-22f59a63--f870966e-4064-4b40-9e98-a8f3aef0b837.lovable.app-1778947858695.png" },
     ],
     links: [
       {
