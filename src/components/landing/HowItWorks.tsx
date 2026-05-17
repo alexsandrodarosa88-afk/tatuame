@@ -17,9 +17,14 @@ export function HowItWorks() {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {steps.map((s, i) => (
-            <div key={s.title} className="relative rounded-2xl border border-border bg-background/60 backdrop-blur p-7 transition-[var(--transition-smooth)] hover:border-foreground/30 hover:-translate-y-0.5">
-              <div className="text-xs text-muted-foreground tabular-nums mb-4">0{i + 1}</div>
-              <s.icon className="h-6 w-6 text-foreground mb-4" strokeWidth={1.5} />
+            <div key={s.title} className="group relative overflow-hidden rounded-2xl border border-border bg-background/60 backdrop-blur p-7 transition-[var(--transition-smooth)] hover:border-foreground/30 hover:-translate-y-0.5">
+              <div
+                aria-hidden
+                className="absolute -top-12 -right-12 h-32 w-32 rounded-full blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-500"
+                style={{ background: "var(--gradient-accent)" }}
+              />
+              <div className="text-xs text-[var(--accent-blue-glow)] tabular-nums mb-4 font-medium">0{i + 1}</div>
+              <s.icon className="h-6 w-6 text-foreground mb-4 group-hover:text-[var(--accent-blue-glow)] transition-colors" strokeWidth={1.5} />
               <h3 className="font-display text-xl font-semibold mb-2">{s.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
             </div>
