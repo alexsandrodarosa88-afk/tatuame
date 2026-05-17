@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Clock, Flame } from "lucide-react";
+import { Clock } from "lucide-react";
 import { campaigns } from "@/data/campaigns";
 
 function useCountdown(target: string) {
@@ -24,16 +24,16 @@ export function Urgency() {
   const { d, h, m, s } = useCountdown(next.endsAt);
 
   return (
-    <section className="py-20 border-t border-border">
+    <section className="py-24 border-t border-border">
       <div className="container mx-auto px-4">
-        <div className="rounded-2xl border border-primary/30 bg-gradient-to-br from-card/80 to-background p-8 md:p-12">
+        <div className="rounded-3xl border border-border bg-card/60 backdrop-blur p-10 md:p-14">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div>
-              <div className="inline-flex items-center gap-2 text-primary text-xs uppercase tracking-[0.2em] font-bold mb-3">
-                <Flame className="h-4 w-4" /> Próxima campanha fechando
+              <div className="inline-flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-[0.2em] font-medium mb-3">
+                Próxima campanha fechando
               </div>
-              <h3 className="font-display text-3xl md:text-4xl font-bold">
-                Restam <span className="text-primary">{remaining}</span> cotas
+              <h3 className="font-display text-3xl md:text-4xl font-semibold">
+                Restam <span className="tabular-nums">{remaining}</span> cotas
               </h3>
               <p className="text-muted-foreground mt-2">Não deixe sua vaga escapar.</p>
             </div>
@@ -45,8 +45,8 @@ export function Urgency() {
                 { v: m, l: "min" },
                 { v: s, l: "seg" },
               ].map((u) => (
-                <div key={u.l} className="min-w-16 text-center rounded-lg border border-border bg-card/80 backdrop-blur px-3 py-2">
-                  <div className="font-display text-2xl md:text-3xl font-bold tabular-nums">
+                <div key={u.l} className="min-w-16 text-center rounded-xl border border-border bg-background/60 backdrop-blur px-3 py-2">
+                  <div className="font-display text-2xl md:text-3xl font-semibold tabular-nums">
                     {String(u.v).padStart(2, "0")}
                   </div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{u.l}</div>
