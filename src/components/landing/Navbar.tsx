@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Flame, ShoppingCart, User as UserIcon } from "lucide-react";
+import { ShoppingCart, User as UserIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,13 +7,11 @@ import { supabase } from "@/integrations/supabase/client";
 export function Navbar() {
   const { user } = useAuth();
   return (
-    <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border">
+    <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold tracking-tight">
-          <span className="grid place-items-center h-8 w-8 rounded-lg bg-[image:var(--gradient-primary)] shadow-[var(--shadow-elegant)]">
-            <Flame className="h-4 w-4 text-primary-foreground" />
-          </span>
-          Tatua<span className="text-primary">.me</span>
+        <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
+          <span className="grid place-items-center h-7 w-7 rounded-md bg-foreground text-background text-[11px] font-bold">T</span>
+          Tatua<span className="text-muted-foreground">.me</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <Link to="/" hash="campanhas" className="hover:text-foreground transition-colors">Campanhas</Link>
@@ -29,7 +27,7 @@ export function Navbar() {
         ) : (
           <div className="flex items-center gap-2">
             <Button asChild size="sm" variant="ghost"><Link to="/login">Entrar</Link></Button>
-            <Button asChild size="sm" className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold">
+            <Button asChild size="sm" className="rounded-full font-medium">
               <Link to="/cadastro">Garantir minha vaga</Link>
             </Button>
           </div>

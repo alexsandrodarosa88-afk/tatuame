@@ -5,9 +5,9 @@ export function Campaigns() {
   return (
     <section id="campanhas" className="py-24 border-t border-border">
       <div className="container mx-auto px-4">
-        <div className="max-w-2xl mb-12">
-          <div className="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-3">Campanhas ativas</div>
-          <h2 className="font-display text-4xl md:text-5xl font-bold leading-tight">
+        <div className="max-w-2xl mb-14">
+          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-medium mb-3">Campanhas ativas</div>
+          <h2 className="font-display text-4xl md:text-5xl font-semibold leading-[1.05]">
             Escolha sua campanha e garanta seu número.
           </h2>
           <p className="text-muted-foreground mt-4 text-lg">
