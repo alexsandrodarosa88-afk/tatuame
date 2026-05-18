@@ -60,8 +60,6 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-success: var(--success);
-  --color-accent-blue: var(--accent-blue);
-  --color-accent-blue-glow: var(--accent-blue-glow);
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Inter Tight", "Inter", ui-sans-serif, system-ui, sans-serif;
 }
@@ -87,9 +85,6 @@
   --destructive: oklch(0.55 0.20 27);
   --destructive-foreground: oklch(1 0 0);
   --success: oklch(0.72 0.15 150);
-  /* Subtle electric accent — Stripe/Tesla blue, used sparingly */
-  --accent-blue: oklch(0.72 0.16 250);
-  --accent-blue-glow: oklch(0.82 0.14 245);
   --border: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.97 0 0);
@@ -109,14 +104,9 @@
 
   /* Subtle monochrome gradients — no color, only luminance */
   --gradient-primary: linear-gradient(135deg, oklch(0.97 0 0), oklch(0.82 0 0));
-  --gradient-hero: radial-gradient(ellipse 80% 60% at 70% 20%, oklch(0.72 0.16 250 / 0.18), transparent 55%), radial-gradient(ellipse 60% 50% at 10% 90%, oklch(1 0 0 / 0.05), transparent 60%);
-  --gradient-surface: linear-gradient(180deg, oklch(0.18 0 0), oklch(0.14 0 0));
-  --gradient-accent: linear-gradient(135deg, oklch(0.72 0.16 250), oklch(0.62 0.20 280));
-  --gradient-mesh: radial-gradient(at 20% 30%, oklch(0.72 0.16 250 / 0.12), transparent 50%), radial-gradient(at 80% 70%, oklch(0.62 0.20 280 / 0.10), transparent 50%), radial-gradient(at 50% 100%, oklch(0.97 0 0 / 0.04), transparent 60%);
-  --noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --gradient-hero: radial-gradient(ellipse at top right, oklch(1 0 0 / 0.06), transparent 60%);
   --shadow-elegant: 0 20px 60px -20px oklch(0 0 0 / 0.7);
   --shadow-card: 0 10px 40px -10px oklch(0 0 0 / 0.6);
-  --shadow-glow: 0 0 40px -8px oklch(0.72 0.16 250 / 0.35);
   --transition-smooth: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -135,10 +125,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "cv11", "ss01";
-    background-image:
-      radial-gradient(ellipse 100% 80% at 50% -10%, oklch(0.72 0.16 250 / 0.08), transparent 60%),
-      radial-gradient(ellipse 60% 40% at 90% 50%, oklch(0.62 0.20 280 / 0.06), transparent 60%);
-    background-attachment: fixed;
   }
 
   h1, h2, h3, h4 {
@@ -154,62 +140,3 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .lv-fade-up { animation: lv-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
-
-@keyframes lv-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes lv-pulse-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
-}
-
-@keyframes lv-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
-}
-
-/* Utility classes for richer surfaces */
-.lv-grid-bg {
-  background-image:
-    linear-gradient(oklch(1 0 0 / 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(1 0 0 / 0.04) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse 70% 50% at 50% 50%, black, transparent 80%);
-}
-
-.lv-noise::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: var(--noise);
-  opacity: 0.5;
-  pointer-events: none;
-  mix-blend-mode: overlay;
-}
-
-.lv-gradient-text {
-  background: linear-gradient(135deg, oklch(0.97 0 0) 0%, oklch(0.72 0.16 250) 50%, oklch(0.97 0 0) 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: lv-shimmer 8s linear infinite;
-}
-
-.lv-glow-ring {
-  position: relative;
-}
-.lv-glow-ring::after {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, oklch(0.72 0.16 250 / 0.6), transparent 40%, transparent 60%, oklch(0.97 0 0 / 0.2));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
