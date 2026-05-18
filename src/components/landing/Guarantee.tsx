@@ -12,15 +12,18 @@ export function Guarantee() {
     <section id="garantia" className="py-24 border-t border-border">
       <div className="container mx-auto px-4">
         <div className="relative overflow-hidden rounded-3xl border border-border bg-card/60 backdrop-blur p-10 md:p-16">
+          <div aria-hidden className="absolute -top-32 -right-32 h-80 w-80 rounded-full bg-[image:var(--gradient-primary)] opacity-20 blur-3xl" />
           <div className="grid lg:grid-cols-2 gap-10 items-center relative">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-success/30 bg-success/10 px-3 py-1 text-xs text-success font-semibold mb-5">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Garantia Tatua.me
               </div>
-              <h2 className="font-display text-4xl md:text-5xl font-semibold leading-[1.05]">
+              <h2 className="font-display text-4xl md:text-5xl font-bold leading-tight">
                 Você nunca perde.{" "}
-                <span className="text-muted-foreground">Seu dinheiro vira tatuagem.</span>
+                <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">
+                  Seu dinheiro vira tatuagem.
+                </span>
               </h2>
             </div>
             <ul className="space-y-4">

@@ -15,14 +15,14 @@ export function SocialProof() {
     <section id="depoimentos" className="py-24 border-t border-border bg-card/30">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-medium mb-3">Quem já tatuou</div>
-          <h2 className="font-display text-4xl md:text-5xl font-semibold">Histórias reais, tinta de verdade.</h2>
+          <div className="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-3">Quem já tatuou</div>
+          <h2 className="font-display text-4xl md:text-5xl font-bold">Histórias reais, tinta de verdade.</h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4 mb-12">
+        <div className="grid md:grid-cols-3 gap-5 mb-10">
           {testimonials.map((t) => (
-            <Card key={t.name} className="bg-background/60 backdrop-blur border-border p-7 rounded-2xl transition-[var(--transition-smooth)] hover:border-foreground/30">
-              <div className="flex gap-0.5 mb-3 text-foreground">
+            <Card key={t.name} className="bg-background/60 backdrop-blur border-border p-6 transition-[var(--transition-smooth)] hover:border-primary/40">
+              <div className="flex gap-0.5 mb-3 text-primary">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-current" />
                 ))}
@@ -36,7 +36,7 @@ export function SocialProof() {
           ))}
         </div>
 
-        <div className="grid grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-3 gap-3 md:gap-5">
           {[t1, t2, t3].map((src, i) => (
             <img
               key={i}
@@ -45,7 +45,7 @@ export function SocialProof() {
               loading="lazy"
               width={768}
               height={768}
-              className="rounded-2xl border border-border object-cover aspect-square w-full grayscale hover:grayscale-0 transition-all duration-500"
+              className="rounded-xl border border-border object-cover aspect-square w-full"
             />
           ))}
         </div>
