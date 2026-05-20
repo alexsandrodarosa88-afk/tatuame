@@ -288,6 +288,57 @@ export type Database = {
         }
         Relationships: []
       }
+      tattoo_artists: {
+        Row: {
+          address: string | null
+          bio: string | null
+          city: string | null
+          created_at: string
+          id: string
+          instagram: string | null
+          is_active: boolean
+          name: string
+          photo_url: string | null
+          state: string | null
+          styles: string[]
+          updated_at: string
+          user_id: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          bio?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          instagram?: string | null
+          is_active?: boolean
+          name: string
+          photo_url?: string | null
+          state?: string | null
+          styles?: string[]
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string | null
+          bio?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          instagram?: string | null
+          is_active?: boolean
+          name?: string
+          photo_url?: string | null
+          state?: string | null
+          styles?: string[]
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -329,7 +380,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "client"
+      app_role: "admin" | "client" | "tattoo_artist"
       campaign_status: "active" | "closed" | "drawn"
       order_status: "pending" | "paid" | "expired" | "canceled"
     }
@@ -459,7 +510,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "client"],
+      app_role: ["admin", "client", "tattoo_artist"],
       campaign_status: ["active", "closed", "drawn"],
       order_status: ["pending", "paid", "expired", "canceled"],
     },
