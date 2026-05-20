@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Flame, ShoppingCart, User as UserIcon } from "lucide-react";
+import { Flame, ShoppingCart, User as UserIcon, Palette } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,12 +23,14 @@ export function Navbar() {
         </nav>
         {user ? (
           <div className="flex items-center gap-2">
+            <Button asChild size="sm" variant="ghost" className="md:hidden"><Link to="/tatuadores"><Palette className="h-4 w-4" /></Link></Button>
             <Button asChild size="sm" variant="ghost"><Link to="/carrinho"><ShoppingCart className="h-4 w-4" /></Link></Button>
             <Button asChild size="sm" variant="outline"><Link to="/conta"><UserIcon className="h-4 w-4 mr-1" /> Conta</Link></Button>
             <Button size="sm" variant="ghost" onClick={() => supabase.auth.signOut()}>Sair</Button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
+            <Button asChild size="sm" variant="ghost" className="md:hidden"><Link to="/tatuadores">Tatuadores</Link></Button>
             <Button asChild size="sm" variant="ghost"><Link to="/login">Entrar</Link></Button>
             <Button asChild size="sm" className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold">
               <Link to="/cadastro">Garantir minha vaga</Link>
