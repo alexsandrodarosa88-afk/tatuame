@@ -47,7 +47,8 @@ function AdminCampanhas() {
     const payload = {
       title: form.title, description: form.description,
       tattoo_value: Number(form.tattoo_value), price_per_quota: Number(form.price_per_quota),
-      total_quotas: Number(form.total_quotas), ends_at: form.ends_at ? new Date(form.ends_at).toISOString() : null,
+      total_quotas: Number(form.total_quotas),
+      ends_at: form.ends_at ? new Date(form.ends_at).toISOString() : undefined,
       status: form.status,
     };
     if (!payload.title || !payload.ends_at) { toast.error("Preencha título e data de encerramento."); return; }
