@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Flame, ShoppingCart, User as UserIcon, Palette } from "lucide-react";
+import { Flame, ShoppingCart, User as UserIcon, Palette, ShieldCheck } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
+import { useIsAdmin } from "@/hooks/use-admin";
 import { supabase } from "@/integrations/supabase/client";
 
 export function Navbar() {
   const { user } = useAuth();
+  const { isAdmin } = useIsAdmin();
   return (
     <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -23,6 +25,9 @@ export function Navbar() {
         </nav>
         {user ? (
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Button asChild size="sm" variant="outline"><Link to="/admin"><ShieldCheck className="h-4 w-4 mr-1" /> Admin</Link></Button>
+            )}
             <Button asChild size="sm" variant="ghost" className="md:hidden"><Link to="/tatuadores"><Palette className="h-4 w-4" /></Link></Button>
             <Button asChild size="sm" variant="ghost"><Link to="/carrinho"><ShoppingCart className="h-4 w-4" /></Link></Button>
             <Button asChild size="sm" variant="outline"><Link to="/conta"><UserIcon className="h-4 w-4 mr-1" /> Conta</Link></Button>
