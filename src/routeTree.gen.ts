@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminVendasRouteImport } from './routes/_authenticated/admin.vendas'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
+import { Route as AuthenticatedAdminCampanhasRouteImport } from './routes/_authenticated/admin.campanhas'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const TatuadoresRoute = TatuadoresRouteImport.update({
@@ -96,6 +97,12 @@ const AuthenticatedAdminClientesRoute =
     path: '/clientes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminCampanhasRoute =
+  AuthenticatedAdminCampanhasRouteImport.update({
+    id: '/campanhas',
+    path: '/campanhas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/conta': typeof AuthenticatedContaRoute
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/vendas': typeof AuthenticatedAdminVendasRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -129,6 +137,7 @@ export interface FileRoutesByTo {
   '/conta': typeof AuthenticatedContaRoute
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/vendas': typeof AuthenticatedAdminVendasRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -147,6 +156,7 @@ export interface FileRoutesById {
   '/_authenticated/conta': typeof AuthenticatedContaRoute
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/_authenticated/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/vendas': typeof AuthenticatedAdminVendasRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/checkout/$orderId'
     | '/checkout/return'
+    | '/admin/campanhas'
     | '/admin/clientes'
     | '/admin/vendas'
     | '/admin/'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/checkout/$orderId'
     | '/checkout/return'
+    | '/admin/campanhas'
     | '/admin/clientes'
     | '/admin/vendas'
     | '/admin'
@@ -197,6 +209,7 @@ export interface FileRouteTypes {
     | '/_authenticated/conta'
     | '/checkout/$orderId'
     | '/checkout/return'
+    | '/_authenticated/admin/campanhas'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/vendas'
     | '/_authenticated/admin/'
@@ -314,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/campanhas': {
+      id: '/_authenticated/admin/campanhas'
+      path: '/campanhas'
+      fullPath: '/admin/campanhas'
+      preLoaderRoute: typeof AuthenticatedAdminCampanhasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -325,12 +345,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminCampanhasRoute: typeof AuthenticatedAdminCampanhasRoute
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
   AuthenticatedAdminVendasRoute: typeof AuthenticatedAdminVendasRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminCampanhasRoute: AuthenticatedAdminCampanhasRoute,
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
   AuthenticatedAdminVendasRoute: AuthenticatedAdminVendasRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
