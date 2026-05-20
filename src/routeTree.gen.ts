@@ -21,6 +21,7 @@ import { Route as AuthenticatedCarrinhoRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCampanhasRouteImport } from './routes/_authenticated/campanhas'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const TatuadoresRoute = TatuadoresRouteImport.update({
@@ -82,6 +83,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminClientesRoute =
+  AuthenticatedAdminClientesRouteImport.update({
+    id: '/clientes',
+    path: '/clientes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/conta': typeof AuthenticatedContaRoute
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -113,6 +121,7 @@ export interface FileRoutesByTo {
   '/conta': typeof AuthenticatedContaRoute
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -129,6 +138,7 @@ export interface FileRoutesById {
   '/_authenticated/conta': typeof AuthenticatedContaRoute
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/checkout/$orderId'
     | '/checkout/return'
+    | '/admin/clientes'
     | '/admin/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/checkout/$orderId'
     | '/checkout/return'
+    | '/admin/clientes'
     | '/admin'
     | '/api/public/payments/webhook'
   id:
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
     | '/_authenticated/conta'
     | '/checkout/$orderId'
     | '/checkout/return'
+    | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/clientes': {
+      id: '/_authenticated/admin/clientes'
+      path: '/clientes'
+      fullPath: '/admin/clientes'
+      preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -285,10 +305,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
