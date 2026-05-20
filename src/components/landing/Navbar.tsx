@@ -17,6 +17,7 @@ export function Navbar() {
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <Link to="/" hash="campanhas" className="hover:text-foreground transition-colors">Campanhas</Link>
+          <Link to="/tatuadores" className="hover:text-foreground transition-colors">Tatuadores</Link>
           <Link to="/" hash="como-funciona" className="hover:text-foreground transition-colors">Como funciona</Link>
           <Link to="/" hash="garantia" className="hover:text-foreground transition-colors">Garantia</Link>
         </nav>
