@@ -10,14 +10,14 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: AdminLayout });
 
-const nav = [
+const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "Visão geral", icon: LayoutDashboard, exact: true },
   { to: "/admin/clientes", label: "Clientes", icon: Users },
   { to: "/admin/vendas", label: "Vendas", icon: ShoppingBag },
   { to: "/admin/campanhas", label: "Campanhas", icon: Megaphone },
   { to: "/admin/tatuadores", label: "Tatuadores", icon: Palette },
   { to: "/admin/mensalidades", label: "Mensalidades", icon: CreditCard },
-] as const;
+];
 
 function AdminLayout() {
   const { isAdmin, loading } = useIsAdmin();
@@ -67,7 +67,7 @@ function AdminLayout() {
               return (
                 <Link
                   key={item.to}
-                  to={item.to}
+                  to={item.to as any}
                   className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm whitespace-nowrap transition-colors ${
                     active ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
