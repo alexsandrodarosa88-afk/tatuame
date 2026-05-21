@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, UserCircle, Wallet, Palette } from "lucide-react";
+import { LayoutDashboard, UserCircle, Wallet, Palette, CreditCard, FileText } from "lucide-react";
 import { useArtist } from "@/hooks/use-artist";
 
 export const Route = createFileRoute("/_authenticated/tatuador")({ component: TatuadorLayout });
@@ -7,6 +7,8 @@ export const Route = createFileRoute("/_authenticated/tatuador")({ component: Ta
 const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/tatuador", label: "Visão geral", icon: LayoutDashboard, exact: true },
   { to: "/tatuador/perfil", label: "Meu perfil", icon: UserCircle },
+  { to: "/tatuador/dados", label: "Meus dados", icon: FileText },
+  { to: "/tatuador/mensalidade", label: "Mensalidade", icon: CreditCard },
   { to: "/tatuador/rateio", label: "Meus rateios", icon: Wallet },
 ];
 
