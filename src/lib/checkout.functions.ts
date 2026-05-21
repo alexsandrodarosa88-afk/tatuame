@@ -76,27 +76,33 @@ export const createPixCheckout = createServerFn({ method: "POST" })
       throw new Error("Falha ao registrar itens do pedido.");
     }
 
-    // Create Stripe Embedded Checkout Session with PIX
+    // Create Stripe Hosted Checkout Session with PIX (redirect-based — most reliable for PIX in BR)
     const stripe = createStripeClient(data.environment);
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      ui_mode: "embedded_page",
-      payment_method_types: ["pix"],
-      return_url: `${data.returnUrl}?order_id=${order.id}&session_id={CHECKOUT_SESSION_ID}`,
-      client_reference_id: order.id,
-      metadata: { order_id: order.id, user_id: userId },
-      payment_intent_data: { metadata: { order_id: order.id, user_id: userId } },
-      line_items: rows.map((r) => ({
-        price_data: {
-          currency: "brl",
-          product_data: { name: `Cota TATUAME — campanha ${r.campaign_id.slice(0, 8)}` },
-          unit_amount: Math.round(Number(r.campaigns.price_per_quota) * 100),
-        },
-        quantity: r.quantity,
-      })),
-    });
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        payment_method_types: ["pix"],
+        success_url: `${data.returnUrl}?order_id=${order.id}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${data.returnUrl}?order_id=${order.id}&canceled=1`,
+        client_reference_id: order.id,
+        metadata: { order_id: order.id, user_id: userId },
+        payment_intent_data: { metadata: { order_id: order.id, user_id: userId } },
+        line_items: rows.map((r) => ({
+          price_data: {
+            currency: "brl",
+            product_data: { name: `Cota TATUAME — campanha ${r.campaign_id.slice(0, 8)}` },
+            unit_amount: Math.round(Number(r.campaigns.price_per_quota) * 100),
+          },
+          quantity: r.quantity,
+        })),
+      });
+    } catch (e: any) {
+      console.error("createPixCheckout stripe error:", e?.message, e?.raw);
+      throw new Error("Falha ao criar sessão de pagamento: " + (e?.message ?? "erro desconhecido"));
+    }
 
-    if (!session.client_secret) throw new Error("Falha ao criar sessão Stripe");
+    if (!session.url) throw new Error("Stripe não retornou URL de checkout");
 
     await admin
       .from("orders")
@@ -106,5 +112,5 @@ export const createPixCheckout = createServerFn({ method: "POST" })
     // Clear cart
     await admin.from("cart_items").delete().eq("user_id", userId);
 
-    return { orderId: order.id, clientSecret: session.client_secret };
+    return { orderId: order.id, checkoutUrl: session.url };
   });
