@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getStripeEnvironment } from "@/lib/stripe";
 import { getCart, removeCartItem, upsertCartItem } from "@/lib/cart.functions";
 import { createPixCheckout } from "@/lib/checkout.functions";
 import { Card } from "@/components/ui/card";
@@ -34,7 +33,6 @@ function CartPage() {
     mutationFn: () =>
       checkoutFn({
         data: {
-          environment: getStripeEnvironment(),
           returnUrl: `${window.location.origin}/checkout/return`,
         },
       }),
@@ -42,7 +40,7 @@ function CartPage() {
       if (r?.checkoutUrl) {
         window.location.href = r.checkoutUrl;
       } else {
-        toast.error("Não foi possível abrir o checkout.");
+        toast.error("Não foi possível abrir o pagamento.");
       }
     },
     onError: (e: Error) => toast.error(e.message),
@@ -88,9 +86,9 @@ function CartPage() {
             <span className="font-display text-2xl font-bold">{formatBRL(total)}</span>
           </div>
           <Button onClick={() => checkout.mutate()} disabled={checkout.isPending} className="w-full bg-primary hover:bg-[var(--primary-glow)] h-12 text-base font-semibold">
-            {checkout.isPending ? "Gerando PIX..." : "Pagar com PIX"}
+            {checkout.isPending ? "Gerando pagamento..." : "Pagar (PIX, cartão ou boleto)"}
           </Button>
-          <p className="text-xs text-muted-foreground text-center">Você será redirecionado para a página segura de pagamento.</p>
+          <p className="text-xs text-muted-foreground text-center">Você será redirecionado para a página segura de pagamento e poderá escolher PIX, cartão ou boleto.</p>
         </Card>
       )}
     </div>
