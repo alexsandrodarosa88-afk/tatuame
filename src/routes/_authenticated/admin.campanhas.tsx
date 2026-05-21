@@ -55,7 +55,7 @@ function AdminCampanhas() {
     const { error } = editing
       ? await supabase.from("campaigns").update(payload).eq("id", editing.id)
       : await supabase.from("campaigns").insert(payload as any);
-    if (error) { toast.error("Erro ao salvar campanha."); return; }
+    if (error) { toast.error("Erro ao salvar campanha: " + error.message); return; }
     toast.success(editing ? "Campanha atualizada." : "Campanha criada.");
     setOpen(false); load();
   };
