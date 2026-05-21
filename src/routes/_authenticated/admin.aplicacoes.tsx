@@ -39,7 +39,7 @@ function AdminAplicacoes() {
   };
   const reject = async (id: string) => {
     setBusyId(id);
-    const { error } = await supabase.rpc("reject_artist_application", { _application_id: id, _reason: reason[id] || null });
+    const { error } = await supabase.rpc("reject_artist_application", { _application_id: id, _reason: reason[id] || undefined });
     setBusyId(null);
     if (error) { toast.error("Erro ao reprovar: " + error.message); return; }
     toast.success("Cadastro reprovado.");
