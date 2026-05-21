@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Flame, ShoppingCart, User as UserIcon, Palette, ShieldCheck } from "lucide-react";
+import { ShoppingCart, User as UserIcon, Palette, ShieldCheck } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import logoTatuame from "@/assets/tatuame-logo.png";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,11 +12,8 @@ export function Navbar() {
   return (
     <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold tracking-tight">
-          <span className="grid place-items-center h-8 w-8 rounded-lg bg-[image:var(--gradient-primary)] shadow-[var(--shadow-elegant)]">
-            <Flame className="h-4 w-4 text-primary-foreground" />
-          </span>
-          Tatua<span className="text-primary">.me</span>
+        <Link to="/" className="flex items-center gap-2" aria-label="TATUAME — página inicial">
+          <img src={logoTatuame} alt="TATUAME" className="h-8 w-auto" width={1536} height={1024} />
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <Link to="/" hash="campanhas" className="hover:text-foreground transition-colors">Campanhas</Link>

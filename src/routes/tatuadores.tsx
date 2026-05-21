@@ -10,10 +10,10 @@ import { Instagram, MapPin, MessageCircle, Search } from "lucide-react";
 export const Route = createFileRoute("/tatuadores")({
   head: () => ({
     meta: [
-      { title: "Tatuadores — Tatua.me" },
-      { name: "description", content: "Conheça os tatuadores parceiros do Tatua.me. Filtre por estilo, cidade ou estado e encontre o artista ideal para sua próxima tatuagem." },
-      { property: "og:title", content: "Tatuadores — Tatua.me" },
-      { property: "og:description", content: "Portfólio dos tatuadores parceiros do Tatua.me." },
+      { title: "Tatuadores — TATUAME" },
+      { name: "description", content: "Conheça os tatuadores parceiros do TATUAME. Filtre por estilo, cidade ou estado e encontre o artista ideal para sua próxima tatuagem." },
+      { property: "og:title", content: "Tatuadores — TATUAME" },
+      { property: "og:description", content: "Portfólio dos tatuadores parceiros do TATUAME." },
     ],
   }),
   component: TatuadoresPage,
@@ -80,7 +80,7 @@ function TatuadoresPage() {
           <header className="mb-8 max-w-2xl">
             <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight">Tatuadores</h1>
             <p className="mt-2 text-muted-foreground">
-              Conheça os artistas parceiros do Tatua.me. Filtre por estilo, cidade ou estado.
+              Conheça os artistas parceiros do TATUAME. Filtre por estilo, cidade ou estado.
             </p>
           </header>
 
@@ -127,7 +127,7 @@ function TatuadoresPage() {
           ) : filtered.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border p-10 text-center text-muted-foreground">
               <p className="mb-1">Nenhum tatuador encontrado.</p>
-              <p className="text-sm">Em breve novos artistas chegam ao Tatua.me.</p>
+              <p className="text-sm">Em breve novos artistas chegam ao TATUAME.</p>
             </div>
           ) : (
             <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

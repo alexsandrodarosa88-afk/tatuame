@@ -89,7 +89,7 @@ export const createPixCheckout = createServerFn({ method: "POST" })
       line_items: rows.map((r) => ({
         price_data: {
           currency: "brl",
-          product_data: { name: `Cota Tatua.me — campanha ${r.campaign_id.slice(0, 8)}` },
+          product_data: { name: `Cota TATUAME — campanha ${r.campaign_id.slice(0, 8)}` },
           unit_amount: Math.round(Number(r.campaigns.price_per_quota) * 100),
         },
         quantity: r.quantity,
