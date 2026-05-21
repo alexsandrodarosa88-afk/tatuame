@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, UserCircle, Wallet, Palette } from "lucide-react";
+import { useArtist } from "@/hooks/use-artist";
 
 export const Route = createFileRoute("/_authenticated/tatuador")({ component: TatuadorLayout });
 
@@ -11,6 +12,18 @@ const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
 
 function TatuadorLayout() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const { application } = useArtist();
+  const approved = application?.status === "approved";
+
+  if (!approved) {
+    // Antes da aprovação não mostramos a navegação interna — apenas o formulário/estado.
+    return (
+      <div className="container mx-auto px-4 py-6 max-w-2xl">
+        <Outlet />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-6 grid gap-6 md:grid-cols-[220px,1fr]">
       <aside>
