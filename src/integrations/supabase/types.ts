@@ -14,6 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      artist_applications: {
+        Row: {
+          address: string
+          cpf: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["artist_application_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          cpf: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["artist_application_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          cpf?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["artist_application_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      artist_payouts: {
+        Row: {
+          amount: number
+          artist_id: string
+          campaign_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          paid_at: string | null
+          reference_period: string
+          status: Database["public"]["Enums"]["payout_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          artist_id: string
+          campaign_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          reference_period: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          artist_id?: string
+          campaign_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          reference_period?: string
+          status?: Database["public"]["Enums"]["payout_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_payouts_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "tattoo_artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_payouts_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_subscriptions: {
         Row: {
           amount: number
@@ -383,6 +482,33 @@ export type Database = {
         }
         Relationships: []
       }
+      tattoo_styles: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -415,6 +541,10 @@ export type Database = {
         }
         Returns: number[]
       }
+      approve_artist_application: {
+        Args: { _application_id: string }
+        Returns: string
+      }
       bootstrap_first_admin: { Args: never; Returns: boolean }
       has_role: {
         Args: {
@@ -423,11 +553,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      reject_artist_application: {
+        Args: { _application_id: string; _reason?: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "client" | "tattoo_artist"
+      artist_application_status: "pending" | "approved" | "rejected"
       campaign_status: "active" | "closed" | "drawn"
       order_status: "pending" | "paid" | "expired" | "canceled"
+      payout_status: "pending" | "paid" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -556,8 +692,10 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "client", "tattoo_artist"],
+      artist_application_status: ["pending", "approved", "rejected"],
       campaign_status: ["active", "closed", "drawn"],
       order_status: ["pending", "paid", "expired", "canceled"],
+      payout_status: ["pending", "paid", "cancelled"],
     },
   },
 } as const
