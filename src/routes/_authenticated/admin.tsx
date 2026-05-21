@@ -53,7 +53,7 @@ function AdminLayout() {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/admin" className="flex items-center gap-2 font-semibold">
-            <ShieldCheck className="h-5 w-5 text-primary" /> Admin · Tatua.me
+            <ShieldCheck className="h-5 w-5 text-primary" /> Admin · TATUAME
           </Link>
           <Button asChild size="sm" variant="ghost"><Link to="/">Voltar ao site</Link></Button>
         </div>

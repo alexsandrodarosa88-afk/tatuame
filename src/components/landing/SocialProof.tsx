@@ -41,7 +41,7 @@ export function SocialProof() {
             <img
               key={i}
               src={src}
-              alt={`Tatuagem em preto e cinza realizada por parceiro Tatua.me #${i + 1}`}
+              alt={`Tatuagem em preto e cinza realizada por parceiro TATUAME #${i + 1}`}
               loading="lazy"
               width={768}
               height={768}

@@ -35,7 +35,7 @@ function LoginPage() {
       <Card className="w-full max-w-md p-8 space-y-6">
         <div>
           <h1 className="font-display text-3xl font-bold">Entrar</h1>
-          <p className="text-muted-foreground text-sm mt-1">Acesse sua conta Tatua.me</p>
+          <p className="text-muted-foreground text-sm mt-1">Acesse sua conta TATUAME</p>
         </div>
         <Button onClick={google} variant="outline" className="w-full">Entrar com Google</Button>
         <div className="flex items-center gap-3 text-xs text-muted-foreground"><div className="h-px bg-border flex-1" />ou<div className="h-px bg-border flex-1" /></div>

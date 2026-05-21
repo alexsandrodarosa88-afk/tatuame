@@ -17,7 +17,7 @@ export function Guarantee() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-success/30 bg-success/10 px-3 py-1 text-xs text-success font-semibold mb-5">
                 <ShieldCheck className="h-3.5 w-3.5" />
-                Garantia Tatua.me
+                Garantia TATUAME
               </div>
               <h2 className="font-display text-4xl md:text-5xl font-bold leading-tight">
                 Você nunca perde.{" "}
