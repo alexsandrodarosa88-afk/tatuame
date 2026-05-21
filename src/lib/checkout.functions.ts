@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
 
 function adminClient() {
   return createClient<Database>(
@@ -12,11 +11,42 @@ function adminClient() {
   );
 }
 
+function getAsaasConfig() {
+  const key = process.env.ASAAS_API_KEY;
+  if (!key) throw new Error("ASAAS_API_KEY não configurada");
+  // Sandbox keys start with $aact_hmlg_ or contain 'hmlg'/'sandbox'; production with $aact_prod_
+  const isSandbox = /hmlg|sandbox/i.test(key);
+  const baseUrl = isSandbox
+    ? "https://api-sandbox.asaas.com/v3"
+    : "https://api.asaas.com/v3";
+  return { key, baseUrl };
+}
+
+async function asaasFetch(path: string, init: RequestInit = {}) {
+  const { key, baseUrl } = getAsaasConfig();
+  const res = await fetch(`${baseUrl}${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      access_token: key,
+      "User-Agent": "Tatuame",
+      ...(init.headers ?? {}),
+    },
+  });
+  const body = await res.text();
+  let json: any = null;
+  try { json = body ? JSON.parse(body) : null; } catch { /* keep raw */ }
+  if (!res.ok) {
+    const msg = json?.errors?.[0]?.description || json?.message || body || `HTTP ${res.status}`;
+    console.error("Asaas API error:", res.status, msg);
+    throw new Error("Asaas: " + msg);
+  }
+  return json;
+}
+
 export const createPixCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { environment: StripeEnv; returnUrl: string }) => {
-    if (data.environment !== "sandbox" && data.environment !== "live")
-      throw new Error("Invalid environment");
+  .inputValidator((data: { returnUrl: string }) => {
     if (!/^https?:\/\//.test(data.returnUrl)) throw new Error("Invalid returnUrl");
     return data;
   })
@@ -47,6 +77,21 @@ export const createPixCheckout = createServerFn({ method: "POST" })
 
     const admin = adminClient();
 
+    // Load user profile for Asaas customer
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("nome_completo, cpf, email, telefone")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (!profile?.nome_completo || !profile?.cpf) {
+      throw new Error("Complete seu cadastro (nome e CPF) antes de finalizar a compra.");
+    }
+    const cleanCpf = String(profile.cpf).replace(/\D/g, "");
+    if (cleanCpf.length !== 11 && cleanCpf.length !== 14) {
+      throw new Error("CPF inválido no seu cadastro.");
+    }
+
     // Create order
     const { data: order, error: orderErr } = await admin
       .from("orders")
@@ -76,40 +121,55 @@ export const createPixCheckout = createServerFn({ method: "POST" })
       throw new Error("Falha ao registrar itens do pedido.");
     }
 
-    // Create Stripe Hosted Checkout Session with PIX (redirect-based — most reliable for PIX in BR)
-    const stripe = createStripeClient(data.environment);
-    let session;
-    try {
-      session = await stripe.checkout.sessions.create({
-        mode: "payment",
-        success_url: `${data.returnUrl}?order_id=${order.id}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${data.returnUrl}?order_id=${order.id}&canceled=1`,
-        client_reference_id: order.id,
-        metadata: { order_id: order.id, user_id: userId },
-        payment_intent_data: { metadata: { order_id: order.id, user_id: userId } },
-        line_items: rows.map((r) => ({
-          price_data: {
-            currency: "brl",
-            product_data: { name: `Cota TATUAME — campanha ${r.campaign_id.slice(0, 8)}` },
-            unit_amount: Math.round(Number(r.campaigns.price_per_quota) * 100),
-          },
-          quantity: r.quantity,
-        })),
+    // ===== ASAAS =====
+    // 1. Create or fetch customer
+    let customerId: string;
+    const existing = await asaasFetch(`/customers?cpfCnpj=${cleanCpf}&limit=1`);
+    if (existing?.data?.[0]?.id) {
+      customerId = existing.data[0].id;
+    } else {
+      const created = await asaasFetch(`/customers`, {
+        method: "POST",
+        body: JSON.stringify({
+          name: profile.nome_completo,
+          cpfCnpj: cleanCpf,
+          email: profile.email ?? undefined,
+          mobilePhone: profile.telefone ? String(profile.telefone).replace(/\D/g, "") : undefined,
+          externalReference: userId,
+        }),
       });
-    } catch (e: any) {
-      console.error("createPixCheckout stripe error:", e?.message, e?.raw);
-      throw new Error("Falha ao criar sessão de pagamento: " + (e?.message ?? "erro desconhecido"));
+      customerId = created.id;
     }
 
-    if (!session.url) throw new Error("Stripe não retornou URL de checkout");
+    // 2. Create payment (UNDEFINED = cliente escolhe PIX/cartão/boleto na página do Asaas)
+    const dueDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const payment = await asaasFetch(`/payments`, {
+      method: "POST",
+      body: JSON.stringify({
+        customer: customerId,
+        billingType: "UNDEFINED",
+        value: Number(total.toFixed(2)),
+        dueDate,
+        description: `Pedido TATUAME #${order.id.slice(0, 8)}`,
+        externalReference: order.id,
+        callback: {
+          successUrl: `${data.returnUrl}?order_id=${order.id}`,
+          autoRedirect: true,
+        },
+      }),
+    });
+
+    if (!payment?.invoiceUrl) {
+      throw new Error("Asaas não retornou URL de pagamento.");
+    }
 
     await admin
       .from("orders")
-      .update({ stripe_payment_intent_id: session.id })
+      .update({ asaas_payment_id: payment.id })
       .eq("id", order.id);
 
     // Clear cart
     await admin.from("cart_items").delete().eq("user_id", userId);
 
-    return { orderId: order.id, checkoutUrl: session.url };
+    return { orderId: order.id, checkoutUrl: payment.invoiceUrl };
   });
