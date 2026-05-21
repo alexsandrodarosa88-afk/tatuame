@@ -104,7 +104,7 @@ export const Route = createFileRoute("/api/public/asaas-webhook")({
         if (event === "PAYMENT_DELETED" || event === "PAYMENT_REFUNDED" || event === "PAYMENT_REFUND_IN_PROGRESS") {
           await admin
             .from("orders")
-            .update({ status: "cancelled" })
+            .update({ status: "canceled" })
             .eq("id", order.id)
             .eq("status", "pending");
           return new Response("ok");

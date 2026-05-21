@@ -23,6 +23,7 @@ import { Route as AuthenticatedCampanhasRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedTatuadorIndexRouteImport } from './routes/_authenticated/tatuador.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
 import { Route as AuthenticatedTatuadorRateioRouteImport } from './routes/_authenticated/tatuador.rateio'
 import { Route as AuthenticatedTatuadorPerfilRouteImport } from './routes/_authenticated/tatuador.perfil'
 import { Route as AuthenticatedTatuadorMensalidadeRouteImport } from './routes/_authenticated/tatuador.mensalidade'
@@ -107,6 +108,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const ApiPublicAsaasWebhookRoute = ApiPublicAsaasWebhookRouteImport.update({
+  id: '/api/public/asaas-webhook',
+  path: '/api/public/asaas-webhook',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedTatuadorRateioRoute =
   AuthenticatedTatuadorRateioRouteImport.update({
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/tatuador/mensalidade': typeof AuthenticatedTatuadorMensalidadeRoute
   '/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
+  '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/tatuador/': typeof AuthenticatedTatuadorIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -245,6 +252,7 @@ export interface FileRoutesByTo {
   '/tatuador/mensalidade': typeof AuthenticatedTatuadorMensalidadeRoute
   '/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
+  '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/tatuador': typeof AuthenticatedTatuadorIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -276,6 +284,7 @@ export interface FileRoutesById {
   '/_authenticated/tatuador/mensalidade': typeof AuthenticatedTatuadorMensalidadeRoute
   '/_authenticated/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/_authenticated/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
+  '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/tatuador/': typeof AuthenticatedTatuadorIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -307,6 +316,7 @@ export interface FileRouteTypes {
     | '/tatuador/mensalidade'
     | '/tatuador/perfil'
     | '/tatuador/rateio'
+    | '/api/public/asaas-webhook'
     | '/admin/'
     | '/tatuador/'
     | '/api/public/payments/webhook'
@@ -334,6 +344,7 @@ export interface FileRouteTypes {
     | '/tatuador/mensalidade'
     | '/tatuador/perfil'
     | '/tatuador/rateio'
+    | '/api/public/asaas-webhook'
     | '/admin'
     | '/tatuador'
     | '/api/public/payments/webhook'
@@ -364,6 +375,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tatuador/mensalidade'
     | '/_authenticated/tatuador/perfil'
     | '/_authenticated/tatuador/rateio'
+    | '/api/public/asaas-webhook'
     | '/_authenticated/admin/'
     | '/_authenticated/tatuador/'
     | '/api/public/payments/webhook'
@@ -377,6 +389,7 @@ export interface RootRouteChildren {
   TatuadoresRoute: typeof TatuadoresRoute
   CheckoutOrderIdRoute: typeof CheckoutOrderIdRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
+  ApiPublicAsaasWebhookRoute: typeof ApiPublicAsaasWebhookRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -479,6 +492,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/asaas-webhook': {
+      id: '/api/public/asaas-webhook'
+      path: '/api/public/asaas-webhook'
+      fullPath: '/api/public/asaas-webhook'
+      preLoaderRoute: typeof ApiPublicAsaasWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/tatuador/rateio': {
       id: '/_authenticated/tatuador/rateio'
@@ -659,6 +679,7 @@ const rootRouteChildren: RootRouteChildren = {
   TatuadoresRoute: TatuadoresRoute,
   CheckoutOrderIdRoute: CheckoutOrderIdRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
+  ApiPublicAsaasWebhookRoute: ApiPublicAsaasWebhookRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
