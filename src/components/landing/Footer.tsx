@@ -11,6 +11,7 @@ export function Footer() {
           <a href="#campanhas" className="hover:text-foreground transition-colors">Campanhas</a>
           <a href="#como-funciona" className="hover:text-foreground transition-colors">Como funciona</a>
           <a href="#garantia" className="hover:text-foreground transition-colors">Garantia</a>
+          <a href="/login?next=/tatuador" className="hover:text-foreground transition-colors">Área do Tatuador</a>
         </nav>
         <div>© {new Date().getFullYear()} TATUAME — Todos os direitos reservados.</div>
       </div>

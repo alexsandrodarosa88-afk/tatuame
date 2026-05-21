@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -9,7 +9,10 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { z } from "zod";
 
-export const Route = createFileRoute("/cadastro")({ component: SignupPage });
+export const Route = createFileRoute("/cadastro")({
+  component: SignupPage,
+  validateSearch: (s: Record<string, unknown>) => ({ next: typeof s.next === "string" ? s.next : undefined }),
+});
 
 const schema = z.object({
   nome_completo: z.string().min(3, "Nome muito curto").max(120),
@@ -22,6 +25,8 @@ const schema = z.object({
 
 function SignupPage() {
   const navigate = useNavigate();
+  const { next } = useSearch({ from: "/cadastro" });
+  const dest = next || "/campanhas";
   const [form, setForm] = useState({ nome_completo: "", email: "", password: "", cpf: "", telefone: "", cidade: "" });
   const [loading, setLoading] = useState(false);
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value });
@@ -37,7 +42,7 @@ function SignupPage() {
       email: form.email,
       password: form.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/campanhas`,
+        emailRedirectTo: `${window.location.origin}${dest}`,
         data: {
           nome_completo: form.nome_completo,
           cpf: form.cpf,
@@ -49,11 +54,11 @@ function SignupPage() {
     setLoading(false);
     if (error) return toast.error(error.message);
     toast.success("Conta criada! Confirme seu email para entrar.");
-    navigate({ to: "/login" });
+    navigate({ to: "/login", search: next ? { next } as any : undefined });
   };
 
   const google = async () => {
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/campanhas" });
+    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + dest });
     if (r.error) toast.error("Falha no Google");
   };
 
@@ -61,8 +66,12 @@ function SignupPage() {
     <div className="min-h-screen grid place-items-center bg-background px-4 py-12">
       <Card className="w-full max-w-md p-8 space-y-5">
         <div>
-          <h1 className="font-display text-3xl font-bold">Criar conta</h1>
-          <p className="text-muted-foreground text-sm mt-1">Garanta sua próxima tatuagem</p>
+          <h1 className="font-display text-3xl font-bold">{next === "/tatuador" ? "Cadastro de Tatuador" : "Criar conta"}</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            {next === "/tatuador"
+              ? "Crie sua conta. Em seguida você completa o cadastro de tatuador para aprovação."
+              : "Garanta sua próxima tatuagem"}
+          </p>
         </div>
         <Button onClick={google} variant="outline" className="w-full">Continuar com Google</Button>
         <div className="flex items-center gap-3 text-xs text-muted-foreground"><div className="h-px bg-border flex-1" />ou<div className="h-px bg-border flex-1" /></div>
@@ -78,7 +87,8 @@ function SignupPage() {
           <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-[var(--primary-glow)] mt-2">{loading ? "Criando..." : "Criar conta"}</Button>
         </form>
         <div className="text-sm text-muted-foreground text-center">
-          Já tem conta? <Link to="/login" className="text-primary font-medium">Entrar</Link>
+          Já tem conta?{" "}
+          <Link to="/login" search={next ? { next } as any : undefined} className="text-primary font-medium">Entrar</Link>
         </div>
       </Card>
     </div>
