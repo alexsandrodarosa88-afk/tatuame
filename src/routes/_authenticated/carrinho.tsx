@@ -1,9 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
-import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { getStripe, getStripeEnvironment } from "@/lib/stripe";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { getCart, removeCartItem, upsertCartItem } from "@/lib/cart.functions";
 import { createPixCheckout } from "@/lib/checkout.functions";
 import { Card } from "@/components/ui/card";
@@ -22,8 +20,6 @@ function CartPage() {
   const checkoutFn = useServerFn(createPixCheckout);
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-
   const { data: cart, isLoading } = useQuery({ queryKey: ["cart"], queryFn: () => cartFn() });
 
   const remove = useMutation({
@@ -42,25 +38,17 @@ function CartPage() {
           returnUrl: `${window.location.origin}/checkout/return`,
         },
       }),
-    onSuccess: (r) => { setClientSecret(r.clientSecret); },
+    onSuccess: (r: any) => {
+      if (r?.checkoutUrl) {
+        window.location.href = r.checkoutUrl;
+      } else {
+        toast.error("Não foi possível abrir o checkout.");
+      }
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const total = (cart ?? []).reduce((acc: number, i: any) => acc + Number(i.campaigns?.price_per_quota ?? 0) * i.quantity, 0);
-
-  if (clientSecret) {
-    return (
-      <div className="container mx-auto px-4 py-10 max-w-3xl">
-        <h1 className="font-display text-3xl font-bold mb-6">Pagamento PIX</h1>
-        <Card className="p-2 overflow-hidden">
-          <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret }}>
-            <EmbeddedCheckout />
-          </EmbeddedCheckoutProvider>
-        </Card>
-        <p className="text-xs text-muted-foreground text-center mt-4">Pagamento processado com segurança pela Stripe.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto px-4 py-10 max-w-3xl">
