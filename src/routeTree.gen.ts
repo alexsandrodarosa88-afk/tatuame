@@ -30,6 +30,7 @@ import { Route as AuthenticatedAdminTatuadoresRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminMensalidadesRouteImport } from './routes/_authenticated/admin.mensalidades'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminCampanhasRouteImport } from './routes/_authenticated/admin.campanhas'
+import { Route as AuthenticatedAdminAplicacoesRouteImport } from './routes/_authenticated/admin.aplicacoes'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const TatuadoresRoute = TatuadoresRouteImport.update({
@@ -144,6 +145,12 @@ const AuthenticatedAdminCampanhasRoute =
     path: '/campanhas',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAplicacoesRoute =
+  AuthenticatedAdminAplicacoesRouteImport.update({
+    id: '/aplicacoes',
+    path: '/aplicacoes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -163,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/tatuador': typeof AuthenticatedTatuadorRouteWithChildren
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/admin/aplicacoes': typeof AuthenticatedAdminAplicacoesRoute
   '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
@@ -184,6 +192,7 @@ export interface FileRoutesByTo {
   '/conta': typeof AuthenticatedContaRoute
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/admin/aplicacoes': typeof AuthenticatedAdminAplicacoesRoute
   '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
@@ -209,6 +218,7 @@ export interface FileRoutesById {
   '/_authenticated/tatuador': typeof AuthenticatedTatuadorRouteWithChildren
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/_authenticated/admin/aplicacoes': typeof AuthenticatedAdminAplicacoesRoute
   '/_authenticated/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/tatuador'
     | '/checkout/$orderId'
     | '/checkout/return'
+    | '/admin/aplicacoes'
     | '/admin/campanhas'
     | '/admin/clientes'
     | '/admin/mensalidades'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/checkout/$orderId'
     | '/checkout/return'
+    | '/admin/aplicacoes'
     | '/admin/campanhas'
     | '/admin/clientes'
     | '/admin/mensalidades'
@@ -279,6 +291,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tatuador'
     | '/checkout/$orderId'
     | '/checkout/return'
+    | '/_authenticated/admin/aplicacoes'
     | '/_authenticated/admin/campanhas'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/mensalidades'
@@ -451,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCampanhasRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/aplicacoes': {
+      id: '/_authenticated/admin/aplicacoes'
+      path: '/aplicacoes'
+      fullPath: '/admin/aplicacoes'
+      preLoaderRoute: typeof AuthenticatedAdminAplicacoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -462,6 +482,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAplicacoesRoute: typeof AuthenticatedAdminAplicacoesRoute
   AuthenticatedAdminCampanhasRoute: typeof AuthenticatedAdminCampanhasRoute
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
   AuthenticatedAdminMensalidadesRoute: typeof AuthenticatedAdminMensalidadesRoute
@@ -471,6 +492,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAplicacoesRoute: AuthenticatedAdminAplicacoesRoute,
   AuthenticatedAdminCampanhasRoute: AuthenticatedAdminCampanhasRoute,
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
   AuthenticatedAdminMensalidadesRoute: AuthenticatedAdminMensalidadesRoute,
