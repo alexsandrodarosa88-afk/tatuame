@@ -82,7 +82,6 @@ export const createPixCheckout = createServerFn({ method: "POST" })
     try {
       session = await stripe.checkout.sessions.create({
         mode: "payment",
-        payment_method_types: ["pix"],
         success_url: `${data.returnUrl}?order_id=${order.id}&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${data.returnUrl}?order_id=${order.id}&canceled=1`,
         client_reference_id: order.id,
