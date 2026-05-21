@@ -25,8 +25,11 @@ import { Route as AuthenticatedTatuadorIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedTatuadorRateioRouteImport } from './routes/_authenticated/tatuador.rateio'
 import { Route as AuthenticatedTatuadorPerfilRouteImport } from './routes/_authenticated/tatuador.perfil'
+import { Route as AuthenticatedTatuadorMensalidadeRouteImport } from './routes/_authenticated/tatuador.mensalidade'
+import { Route as AuthenticatedTatuadorDadosRouteImport } from './routes/_authenticated/tatuador.dados'
 import { Route as AuthenticatedAdminVendasRouteImport } from './routes/_authenticated/admin.vendas'
 import { Route as AuthenticatedAdminTatuadoresRouteImport } from './routes/_authenticated/admin.tatuadores'
+import { Route as AuthenticatedAdminSaquesRouteImport } from './routes/_authenticated/admin.saques'
 import { Route as AuthenticatedAdminRateiosRouteImport } from './routes/_authenticated/admin.rateios'
 import { Route as AuthenticatedAdminMensalidadesRouteImport } from './routes/_authenticated/admin.mensalidades'
 import { Route as AuthenticatedAdminEstilosRouteImport } from './routes/_authenticated/admin.estilos'
@@ -117,6 +120,18 @@ const AuthenticatedTatuadorPerfilRoute =
     path: '/perfil',
     getParentRoute: () => AuthenticatedTatuadorRoute,
   } as any)
+const AuthenticatedTatuadorMensalidadeRoute =
+  AuthenticatedTatuadorMensalidadeRouteImport.update({
+    id: '/mensalidade',
+    path: '/mensalidade',
+    getParentRoute: () => AuthenticatedTatuadorRoute,
+  } as any)
+const AuthenticatedTatuadorDadosRoute =
+  AuthenticatedTatuadorDadosRouteImport.update({
+    id: '/dados',
+    path: '/dados',
+    getParentRoute: () => AuthenticatedTatuadorRoute,
+  } as any)
 const AuthenticatedAdminVendasRoute =
   AuthenticatedAdminVendasRouteImport.update({
     id: '/vendas',
@@ -127,6 +142,12 @@ const AuthenticatedAdminTatuadoresRoute =
   AuthenticatedAdminTatuadoresRouteImport.update({
     id: '/tatuadores',
     path: '/tatuadores',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSaquesRoute =
+  AuthenticatedAdminSaquesRouteImport.update({
+    id: '/saques',
+    path: '/saques',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminRateiosRoute =
@@ -190,8 +211,11 @@ export interface FileRoutesByFullPath {
   '/admin/estilos': typeof AuthenticatedAdminEstilosRoute
   '/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/admin/rateios': typeof AuthenticatedAdminRateiosRoute
+  '/admin/saques': typeof AuthenticatedAdminSaquesRoute
   '/admin/tatuadores': typeof AuthenticatedAdminTatuadoresRoute
   '/admin/vendas': typeof AuthenticatedAdminVendasRoute
+  '/tatuador/dados': typeof AuthenticatedTatuadorDadosRoute
+  '/tatuador/mensalidade': typeof AuthenticatedTatuadorMensalidadeRoute
   '/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -214,8 +238,11 @@ export interface FileRoutesByTo {
   '/admin/estilos': typeof AuthenticatedAdminEstilosRoute
   '/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/admin/rateios': typeof AuthenticatedAdminRateiosRoute
+  '/admin/saques': typeof AuthenticatedAdminSaquesRoute
   '/admin/tatuadores': typeof AuthenticatedAdminTatuadoresRoute
   '/admin/vendas': typeof AuthenticatedAdminVendasRoute
+  '/tatuador/dados': typeof AuthenticatedTatuadorDadosRoute
+  '/tatuador/mensalidade': typeof AuthenticatedTatuadorMensalidadeRoute
   '/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -242,8 +269,11 @@ export interface FileRoutesById {
   '/_authenticated/admin/estilos': typeof AuthenticatedAdminEstilosRoute
   '/_authenticated/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/_authenticated/admin/rateios': typeof AuthenticatedAdminRateiosRoute
+  '/_authenticated/admin/saques': typeof AuthenticatedAdminSaquesRoute
   '/_authenticated/admin/tatuadores': typeof AuthenticatedAdminTatuadoresRoute
   '/_authenticated/admin/vendas': typeof AuthenticatedAdminVendasRoute
+  '/_authenticated/tatuador/dados': typeof AuthenticatedTatuadorDadosRoute
+  '/_authenticated/tatuador/mensalidade': typeof AuthenticatedTatuadorMensalidadeRoute
   '/_authenticated/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/_authenticated/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -270,8 +300,11 @@ export interface FileRouteTypes {
     | '/admin/estilos'
     | '/admin/mensalidades'
     | '/admin/rateios'
+    | '/admin/saques'
     | '/admin/tatuadores'
     | '/admin/vendas'
+    | '/tatuador/dados'
+    | '/tatuador/mensalidade'
     | '/tatuador/perfil'
     | '/tatuador/rateio'
     | '/admin/'
@@ -294,8 +327,11 @@ export interface FileRouteTypes {
     | '/admin/estilos'
     | '/admin/mensalidades'
     | '/admin/rateios'
+    | '/admin/saques'
     | '/admin/tatuadores'
     | '/admin/vendas'
+    | '/tatuador/dados'
+    | '/tatuador/mensalidade'
     | '/tatuador/perfil'
     | '/tatuador/rateio'
     | '/admin'
@@ -321,8 +357,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/estilos'
     | '/_authenticated/admin/mensalidades'
     | '/_authenticated/admin/rateios'
+    | '/_authenticated/admin/saques'
     | '/_authenticated/admin/tatuadores'
     | '/_authenticated/admin/vendas'
+    | '/_authenticated/tatuador/dados'
+    | '/_authenticated/tatuador/mensalidade'
     | '/_authenticated/tatuador/perfil'
     | '/_authenticated/tatuador/rateio'
     | '/_authenticated/admin/'
@@ -455,6 +494,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTatuadorPerfilRouteImport
       parentRoute: typeof AuthenticatedTatuadorRoute
     }
+    '/_authenticated/tatuador/mensalidade': {
+      id: '/_authenticated/tatuador/mensalidade'
+      path: '/mensalidade'
+      fullPath: '/tatuador/mensalidade'
+      preLoaderRoute: typeof AuthenticatedTatuadorMensalidadeRouteImport
+      parentRoute: typeof AuthenticatedTatuadorRoute
+    }
+    '/_authenticated/tatuador/dados': {
+      id: '/_authenticated/tatuador/dados'
+      path: '/dados'
+      fullPath: '/tatuador/dados'
+      preLoaderRoute: typeof AuthenticatedTatuadorDadosRouteImport
+      parentRoute: typeof AuthenticatedTatuadorRoute
+    }
     '/_authenticated/admin/vendas': {
       id: '/_authenticated/admin/vendas'
       path: '/vendas'
@@ -467,6 +520,13 @@ declare module '@tanstack/react-router' {
       path: '/tatuadores'
       fullPath: '/admin/tatuadores'
       preLoaderRoute: typeof AuthenticatedAdminTatuadoresRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/saques': {
+      id: '/_authenticated/admin/saques'
+      path: '/saques'
+      fullPath: '/admin/saques'
+      preLoaderRoute: typeof AuthenticatedAdminSaquesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/rateios': {
@@ -528,6 +588,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminEstilosRoute: typeof AuthenticatedAdminEstilosRoute
   AuthenticatedAdminMensalidadesRoute: typeof AuthenticatedAdminMensalidadesRoute
   AuthenticatedAdminRateiosRoute: typeof AuthenticatedAdminRateiosRoute
+  AuthenticatedAdminSaquesRoute: typeof AuthenticatedAdminSaquesRoute
   AuthenticatedAdminTatuadoresRoute: typeof AuthenticatedAdminTatuadoresRoute
   AuthenticatedAdminVendasRoute: typeof AuthenticatedAdminVendasRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -540,6 +601,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminEstilosRoute: AuthenticatedAdminEstilosRoute,
   AuthenticatedAdminMensalidadesRoute: AuthenticatedAdminMensalidadesRoute,
   AuthenticatedAdminRateiosRoute: AuthenticatedAdminRateiosRoute,
+  AuthenticatedAdminSaquesRoute: AuthenticatedAdminSaquesRoute,
   AuthenticatedAdminTatuadoresRoute: AuthenticatedAdminTatuadoresRoute,
   AuthenticatedAdminVendasRoute: AuthenticatedAdminVendasRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
@@ -549,12 +611,16 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedTatuadorRouteChildren {
+  AuthenticatedTatuadorDadosRoute: typeof AuthenticatedTatuadorDadosRoute
+  AuthenticatedTatuadorMensalidadeRoute: typeof AuthenticatedTatuadorMensalidadeRoute
   AuthenticatedTatuadorPerfilRoute: typeof AuthenticatedTatuadorPerfilRoute
   AuthenticatedTatuadorRateioRoute: typeof AuthenticatedTatuadorRateioRoute
   AuthenticatedTatuadorIndexRoute: typeof AuthenticatedTatuadorIndexRoute
 }
 
 const AuthenticatedTatuadorRouteChildren: AuthenticatedTatuadorRouteChildren = {
+  AuthenticatedTatuadorDadosRoute: AuthenticatedTatuadorDadosRoute,
+  AuthenticatedTatuadorMensalidadeRoute: AuthenticatedTatuadorMensalidadeRoute,
   AuthenticatedTatuadorPerfilRoute: AuthenticatedTatuadorPerfilRoute,
   AuthenticatedTatuadorRateioRoute: AuthenticatedTatuadorRateioRoute,
   AuthenticatedTatuadorIndexRoute: AuthenticatedTatuadorIndexRoute,
