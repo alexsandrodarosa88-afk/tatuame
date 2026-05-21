@@ -415,6 +415,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          asaas_payment_id: string | null
           created_at: string
           expires_at: string | null
           id: string
@@ -428,6 +429,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          asaas_payment_id?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
@@ -441,6 +443,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          asaas_payment_id?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
