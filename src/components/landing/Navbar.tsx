@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User as UserIcon, Palette, ShieldCheck } from "lucide-react";
+import { ShoppingCart, User as UserIcon, Palette, ShieldCheck, Brush } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import logoTatuame from "@/assets/tatuame-logo.png";
 import { useAuth } from "@/hooks/use-auth";
@@ -26,6 +26,7 @@ export function Navbar() {
             {isAdmin && (
               <Button asChild size="sm" variant="outline"><Link to="/admin"><ShieldCheck className="h-4 w-4 mr-1" /> Admin</Link></Button>
             )}
+            <Button asChild size="sm" variant="ghost" className="hidden md:inline-flex"><Link to="/tatuador"><Brush className="h-4 w-4 mr-1" /> Tatuador</Link></Button>
             <Button asChild size="sm" variant="ghost" className="md:hidden"><Link to="/tatuadores"><Palette className="h-4 w-4" /></Link></Button>
             <Button asChild size="sm" variant="ghost"><Link to="/carrinho"><ShoppingCart className="h-4 w-4" /></Link></Button>
             <Button asChild size="sm" variant="outline"><Link to="/conta"><UserIcon className="h-4 w-4 mr-1" /> Conta</Link></Button>
