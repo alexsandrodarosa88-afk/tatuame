@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
   LayoutDashboard, Users, ShoppingBag, Megaphone, Palette, CreditCard, ShieldCheck,
+  UserPlus, Wallet, Sparkles,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: AdminLayout });
@@ -16,6 +17,9 @@ const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/vendas", label: "Vendas", icon: ShoppingBag },
   { to: "/admin/campanhas", label: "Campanhas", icon: Megaphone },
   { to: "/admin/tatuadores", label: "Tatuadores", icon: Palette },
+  { to: "/admin/aplicacoes", label: "Cadastros", icon: UserPlus },
+  { to: "/admin/rateios", label: "Rateios", icon: Wallet },
+  { to: "/admin/estilos", label: "Estilos", icon: Sparkles },
   { to: "/admin/mensalidades", label: "Mensalidades", icon: CreditCard },
 ];
 

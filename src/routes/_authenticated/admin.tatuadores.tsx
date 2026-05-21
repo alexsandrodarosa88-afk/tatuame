@@ -9,7 +9,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2, Power, Upload, Loader2 } from "lucide-react";
-import { TATTOO_STYLES } from "@/lib/tattoo-styles";
 
 export const Route = createFileRoute("/_authenticated/admin/tatuadores")({ component: AdminTatuadores });
 
@@ -26,6 +25,7 @@ const empty = {
 
 function AdminTatuadores() {
   const [rows, setRows] = useState<Artist[]>([]);
+  const [styles, setStyles] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Artist | null>(null);
   const [form, setForm] = useState<any>(empty);
@@ -36,7 +36,11 @@ function AdminTatuadores() {
     const { data } = await supabase.from("tattoo_artists").select("*").order("name");
     if (data) setRows(data as Artist[]);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    supabase.from("tattoo_styles").select("name").eq("is_active", true).order("sort_order")
+      .then(({ data }) => setStyles((data ?? []).map((s: any) => s.name)));
+  }, []);
 
   const openNew = () => { setEditing(null); setForm(empty); setOpen(true); };
   const openEdit = (a: Artist) => {
@@ -148,7 +152,7 @@ function AdminTatuadores() {
               <div>
                 <Label>Estilos (selecione os que domina)</Label>
                 <div className="mt-2 grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto rounded-md border border-border p-2">
-                  {TATTOO_STYLES.map((s) => {
+                  {styles.map((s) => {
                     const checked = form.styles.includes(s);
                     return (
                       <label key={s} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted/50 rounded px-1 py-0.5">
