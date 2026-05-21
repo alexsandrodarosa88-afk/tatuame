@@ -28,6 +28,7 @@ import { Route as AuthenticatedTatuadorPerfilRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminVendasRouteImport } from './routes/_authenticated/admin.vendas'
 import { Route as AuthenticatedAdminTatuadoresRouteImport } from './routes/_authenticated/admin.tatuadores'
 import { Route as AuthenticatedAdminMensalidadesRouteImport } from './routes/_authenticated/admin.mensalidades'
+import { Route as AuthenticatedAdminEstilosRouteImport } from './routes/_authenticated/admin.estilos'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminCampanhasRouteImport } from './routes/_authenticated/admin.campanhas'
 import { Route as AuthenticatedAdminAplicacoesRouteImport } from './routes/_authenticated/admin.aplicacoes'
@@ -133,6 +134,12 @@ const AuthenticatedAdminMensalidadesRoute =
     path: '/mensalidades',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminEstilosRoute =
+  AuthenticatedAdminEstilosRouteImport.update({
+    id: '/estilos',
+    path: '/estilos',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminClientesRoute =
   AuthenticatedAdminClientesRouteImport.update({
     id: '/clientes',
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/admin/aplicacoes': typeof AuthenticatedAdminAplicacoesRoute
   '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/estilos': typeof AuthenticatedAdminEstilosRoute
   '/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/admin/tatuadores': typeof AuthenticatedAdminTatuadoresRoute
   '/admin/vendas': typeof AuthenticatedAdminVendasRoute
@@ -195,6 +203,7 @@ export interface FileRoutesByTo {
   '/admin/aplicacoes': typeof AuthenticatedAdminAplicacoesRoute
   '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/estilos': typeof AuthenticatedAdminEstilosRoute
   '/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/admin/tatuadores': typeof AuthenticatedAdminTatuadoresRoute
   '/admin/vendas': typeof AuthenticatedAdminVendasRoute
@@ -221,6 +230,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/aplicacoes': typeof AuthenticatedAdminAplicacoesRoute
   '/_authenticated/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/_authenticated/admin/estilos': typeof AuthenticatedAdminEstilosRoute
   '/_authenticated/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/_authenticated/admin/tatuadores': typeof AuthenticatedAdminTatuadoresRoute
   '/_authenticated/admin/vendas': typeof AuthenticatedAdminVendasRoute
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/admin/aplicacoes'
     | '/admin/campanhas'
     | '/admin/clientes'
+    | '/admin/estilos'
     | '/admin/mensalidades'
     | '/admin/tatuadores'
     | '/admin/vendas'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '/admin/aplicacoes'
     | '/admin/campanhas'
     | '/admin/clientes'
+    | '/admin/estilos'
     | '/admin/mensalidades'
     | '/admin/tatuadores'
     | '/admin/vendas'
@@ -294,6 +306,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/aplicacoes'
     | '/_authenticated/admin/campanhas'
     | '/_authenticated/admin/clientes'
+    | '/_authenticated/admin/estilos'
     | '/_authenticated/admin/mensalidades'
     | '/_authenticated/admin/tatuadores'
     | '/_authenticated/admin/vendas'
@@ -450,6 +463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMensalidadesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/estilos': {
+      id: '/_authenticated/admin/estilos'
+      path: '/estilos'
+      fullPath: '/admin/estilos'
+      preLoaderRoute: typeof AuthenticatedAdminEstilosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/clientes': {
       id: '/_authenticated/admin/clientes'
       path: '/clientes'
@@ -485,6 +505,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAplicacoesRoute: typeof AuthenticatedAdminAplicacoesRoute
   AuthenticatedAdminCampanhasRoute: typeof AuthenticatedAdminCampanhasRoute
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
+  AuthenticatedAdminEstilosRoute: typeof AuthenticatedAdminEstilosRoute
   AuthenticatedAdminMensalidadesRoute: typeof AuthenticatedAdminMensalidadesRoute
   AuthenticatedAdminTatuadoresRoute: typeof AuthenticatedAdminTatuadoresRoute
   AuthenticatedAdminVendasRoute: typeof AuthenticatedAdminVendasRoute
@@ -495,6 +516,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAplicacoesRoute: AuthenticatedAdminAplicacoesRoute,
   AuthenticatedAdminCampanhasRoute: AuthenticatedAdminCampanhasRoute,
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
+  AuthenticatedAdminEstilosRoute: AuthenticatedAdminEstilosRoute,
   AuthenticatedAdminMensalidadesRoute: AuthenticatedAdminMensalidadesRoute,
   AuthenticatedAdminTatuadoresRoute: AuthenticatedAdminTatuadoresRoute,
   AuthenticatedAdminVendasRoute: AuthenticatedAdminVendasRoute,
@@ -554,3 +576,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
