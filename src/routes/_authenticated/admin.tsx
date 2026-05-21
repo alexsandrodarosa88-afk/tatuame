@@ -6,8 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
   LayoutDashboard, Users, ShoppingBag, Megaphone, Palette, CreditCard, ShieldCheck,
-  UserPlus, Wallet, Sparkles,
+  UserPlus, Wallet, Sparkles, Banknote,
 } from "lucide-react";
+import { NotificationsBell } from "@/components/admin/NotificationsBell";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: AdminLayout });
 
@@ -19,6 +20,7 @@ const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/tatuadores", label: "Tatuadores", icon: Palette },
   { to: "/admin/aplicacoes", label: "Cadastros", icon: UserPlus },
   { to: "/admin/rateios", label: "Rateios", icon: Wallet },
+  { to: "/admin/saques", label: "Saques", icon: Banknote },
   { to: "/admin/estilos", label: "Estilos", icon: Sparkles },
   { to: "/admin/mensalidades", label: "Mensalidades", icon: CreditCard },
 ];
@@ -59,7 +61,10 @@ function AdminLayout() {
           <Link to="/admin" className="flex items-center gap-2 font-semibold">
             <ShieldCheck className="h-5 w-5 text-primary" /> Admin · TATUAME
           </Link>
-          <Button asChild size="sm" variant="ghost"><Link to="/">Voltar ao site</Link></Button>
+          <div className="flex items-center gap-1">
+            <NotificationsBell />
+            <Button asChild size="sm" variant="ghost"><Link to="/">Voltar ao site</Link></Button>
+          </div>
         </div>
       </header>
       <div className="container mx-auto px-4 py-6 grid gap-6 md:grid-cols-[220px,1fr]">
