@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          message: string | null
+          related_id: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          message?: string | null
+          related_id?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          message?: string | null
+          related_id?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       artist_applications: {
         Row: {
           address: string
@@ -62,6 +95,63 @@ export type Database = {
           status?: Database["public"]["Enums"]["artist_application_status"]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      artist_bank_details: {
+        Row: {
+          address: string
+          artist_id: string
+          bank_account: string
+          bank_agency: string
+          bank_name: string
+          birth_date: string
+          cpf: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_locked: boolean
+          phone: string
+          pix_key: string
+          rg: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          artist_id: string
+          bank_account: string
+          bank_agency: string
+          bank_name: string
+          birth_date: string
+          cpf: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          is_locked?: boolean
+          phone: string
+          pix_key: string
+          rg: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          artist_id?: string
+          bank_account?: string
+          bank_agency?: string
+          bank_name?: string
+          birth_date?: string
+          cpf?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_locked?: boolean
+          phone?: string
+          pix_key?: string
+          rg?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -124,6 +214,7 @@ export type Database = {
           amount: number
           artist_id: string
           created_at: string
+          due_date: string | null
           id: string
           notes: string | null
           paid_at: string | null
@@ -135,6 +226,7 @@ export type Database = {
           amount: number
           artist_id: string
           created_at?: string
+          due_date?: string | null
           id?: string
           notes?: string | null
           paid_at?: string | null
@@ -146,6 +238,7 @@ export type Database = {
           amount?: number
           artist_id?: string
           created_at?: string
+          due_date?: string | null
           id?: string
           notes?: string | null
           paid_at?: string | null
@@ -533,6 +626,45 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_requests: {
+        Row: {
+          amount: number
+          artist_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          processed_at: string | null
+          processed_by: string | null
+          requested_at: string
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          artist_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_at?: string
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          artist_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_at?: string
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -570,6 +702,7 @@ export type Database = {
       campaign_status: "active" | "closed" | "drawn"
       order_status: "pending" | "paid" | "expired" | "canceled"
       payout_status: "pending" | "paid" | "cancelled"
+      withdrawal_status: "pending" | "approved" | "paid" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -702,6 +835,7 @@ export const Constants = {
       campaign_status: ["active", "closed", "drawn"],
       order_status: ["pending", "paid", "expired", "canceled"],
       payout_status: ["pending", "paid", "cancelled"],
+      withdrawal_status: ["pending", "approved", "paid", "rejected"],
     },
   },
 } as const
