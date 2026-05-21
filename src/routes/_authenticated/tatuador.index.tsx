@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/tatuador/")({ component: T
 function TatuadorIndex() {
   const { user } = useAuth();
   const { application, artist, loading, reload } = useArtist();
-  const [form, setForm] = useState({ full_name: "", email: "", address: "", cpf: "" });
+  const [form, setForm] = useState({ full_name: "", email: "", address: "", cpf: "", phone: "", instagram: "" });
   const [submitting, setSubmitting] = useState(false);
 
   if (loading) {
@@ -24,7 +24,7 @@ function TatuadorIndex() {
 
   const submit = async () => {
     if (!user) return;
-    if (!form.full_name.trim() || !form.email.trim() || !form.address.trim() || !form.cpf.trim()) {
+    if (!form.full_name.trim() || !form.email.trim() || !form.address.trim() || !form.cpf.trim() || !form.phone.trim() || !form.instagram.trim()) {
       toast.error("Preencha todos os campos."); return;
     }
     setSubmitting(true);
@@ -34,6 +34,8 @@ function TatuadorIndex() {
       email: form.email.trim(),
       address: form.address.trim(),
       cpf: form.cpf.replace(/\D/g, ""),
+      phone: form.phone.trim(),
+      instagram: form.instagram.trim().replace(/^@/, ""),
     } as any);
     setSubmitting(false);
     if (error) { toast.error("Erro ao enviar cadastro: " + error.message); return; }
@@ -55,6 +57,8 @@ function TatuadorIndex() {
             <div><Label>E-mail *</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             <div><Label>Endereço completo *</Label><Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Rua, número, bairro, cidade/UF, CEP" /></div>
             <div><Label>CPF *</Label><Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} placeholder="000.000.000-00" /></div>
+            <div><Label>Telefone *</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="(11) 99999-9999" /></div>
+            <div><Label>Instagram *</Label><Input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@seuinstagram" /></div>
             <Button className="w-full" onClick={submit} disabled={submitting}>
               {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Enviar cadastro para aprovação

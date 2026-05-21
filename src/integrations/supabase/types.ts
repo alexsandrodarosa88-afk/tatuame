@@ -22,7 +22,9 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          instagram: string | null
           notes: string | null
+          phone: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: Database["public"]["Enums"]["artist_application_status"]
@@ -36,7 +38,9 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          instagram?: string | null
           notes?: string | null
+          phone?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["artist_application_status"]
@@ -50,7 +54,9 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          instagram?: string | null
           notes?: string | null
+          phone?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["artist_application_status"]
