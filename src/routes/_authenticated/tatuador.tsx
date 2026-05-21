@@ -3,11 +3,11 @@ import { LayoutDashboard, UserCircle, Wallet, Palette } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tatuador")({ component: TatuadorLayout });
 
-const nav = [
+const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/tatuador", label: "Visão geral", icon: LayoutDashboard, exact: true },
   { to: "/tatuador/perfil", label: "Meu perfil", icon: UserCircle },
   { to: "/tatuador/rateio", label: "Meus rateios", icon: Wallet },
-] as const;
+];
 
 function TatuadorLayout() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
