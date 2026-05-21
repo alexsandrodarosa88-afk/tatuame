@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2, Power } from "lucide-react";
+import { Pencil, Plus, Trash2, Power, Upload, Loader2 } from "lucide-react";
+import { TATTOO_STYLES } from "@/lib/tattoo-styles";
 
 export const Route = createFileRoute("/_authenticated/admin/tatuadores")({ component: AdminTatuadores });
 
@@ -18,13 +19,18 @@ type Artist = {
   instagram: string | null; whatsapp: string | null; is_active: boolean;
 };
 
-const empty = { name: "", photo_url: "", bio: "", styles: "", city: "", state: "", address: "", instagram: "", whatsapp: "", is_active: true };
+const empty = {
+  name: "", photo_url: "", bio: "", styles: [] as string[],
+  city: "", state: "", address: "", instagram: "", whatsapp: "", is_active: true,
+};
 
 function AdminTatuadores() {
   const [rows, setRows] = useState<Artist[]>([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Artist | null>(null);
   const [form, setForm] = useState<any>(empty);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     const { data } = await supabase.from("tattoo_artists").select("*").order("name");
@@ -37,11 +43,39 @@ function AdminTatuadores() {
     setEditing(a);
     setForm({
       name: a.name, photo_url: a.photo_url ?? "", bio: a.bio ?? "",
-      styles: (a.styles ?? []).join(", "), city: a.city ?? "", state: a.state ?? "",
+      styles: a.styles ?? [], city: a.city ?? "", state: a.state ?? "",
       address: a.address ?? "", instagram: a.instagram ?? "", whatsapp: a.whatsapp ?? "",
       is_active: a.is_active,
     });
     setOpen(true);
+  };
+
+  const toggleStyle = (s: string) => {
+    setForm((f: any) => ({
+      ...f,
+      styles: f.styles.includes(s) ? f.styles.filter((x: string) => x !== s) : [...f.styles, s],
+    }));
+  };
+
+  const handlePhotoUpload = async (file: File) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Imagem máx. 5MB."); return; }
+    if (!file.type.startsWith("image/")) { toast.error("Envie uma imagem."); return; }
+    setUploading(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) { toast.error("Sessão expirada."); return; }
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${uid}/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("tattoo-artists").upload(path, file, { upsert: false });
+      if (upErr) { toast.error("Erro ao enviar foto."); return; }
+      const { data: pub } = supabase.storage.from("tattoo-artists").getPublicUrl(path);
+      setForm((f: any) => ({ ...f, photo_url: pub.publicUrl }));
+      toast.success("Foto enviada.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const save = async () => {
@@ -50,7 +84,7 @@ function AdminTatuadores() {
       name: form.name.trim(),
       photo_url: form.photo_url?.trim() || null,
       bio: form.bio?.trim() || null,
-      styles: form.styles.split(",").map((s: string) => s.trim()).filter(Boolean),
+      styles: Array.isArray(form.styles) ? form.styles : [],
       city: form.city?.trim() || null,
       state: form.state?.trim() || null,
       address: form.address?.trim() || null,
@@ -88,8 +122,43 @@ function AdminTatuadores() {
             <DialogHeader><DialogTitle>{editing ? "Editar tatuador" : "Novo tatuador"}</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div><Label>Nome *</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-              <div><Label>URL da foto</Label><Input placeholder="https://..." value={form.photo_url} onChange={(e) => setForm({ ...form, photo_url: e.target.value })} /></div>
-              <div><Label>Estilos (separados por vírgula)</Label><Input placeholder="Realismo, Blackwork, Old School" value={form.styles} onChange={(e) => setForm({ ...form, styles: e.target.value })} /></div>
+              <div>
+                <Label>Foto do tatuador</Label>
+                <div className="flex items-center gap-3 mt-1">
+                  <div className="h-16 w-16 rounded-md bg-muted overflow-hidden shrink-0">
+                    {form.photo_url ? (
+                      <img src={form.photo_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full grid place-items-center text-xl text-muted-foreground">?</div>
+                    )}
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])}
+                  />
+                  <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                    {uploading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+                    {form.photo_url ? "Trocar foto" : "Enviar foto"}
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <Label>Estilos (selecione os que domina)</Label>
+                <div className="mt-2 grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto rounded-md border border-border p-2">
+                  {TATTOO_STYLES.map((s) => {
+                    const checked = form.styles.includes(s);
+                    return (
+                      <label key={s} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted/50 rounded px-1 py-0.5">
+                        <input type="checkbox" checked={checked} onChange={() => toggleStyle(s)} />
+                        <span className="truncate">{s}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Cidade</Label><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
                 <div><Label>Estado (UF)</Label><Input maxLength={2} value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value.toUpperCase() })} /></div>
