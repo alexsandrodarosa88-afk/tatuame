@@ -23,6 +23,7 @@ import { Route as AuthenticatedCampanhasRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedTatuadorIndexRouteImport } from './routes/_authenticated/tatuador.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedTatuadorPerfilRouteImport } from './routes/_authenticated/tatuador.perfil'
 import { Route as AuthenticatedAdminVendasRouteImport } from './routes/_authenticated/admin.vendas'
 import { Route as AuthenticatedAdminTatuadoresRouteImport } from './routes/_authenticated/admin.tatuadores'
 import { Route as AuthenticatedAdminMensalidadesRouteImport } from './routes/_authenticated/admin.mensalidades'
@@ -100,6 +101,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedTatuadorPerfilRoute =
+  AuthenticatedTatuadorPerfilRouteImport.update({
+    id: '/perfil',
+    path: '/perfil',
+    getParentRoute: () => AuthenticatedTatuadorRoute,
+  } as any)
 const AuthenticatedAdminVendasRoute =
   AuthenticatedAdminVendasRouteImport.update({
     id: '/vendas',
@@ -154,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/admin/tatuadores': typeof AuthenticatedAdminTatuadoresRoute
   '/admin/vendas': typeof AuthenticatedAdminVendasRoute
+  '/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/tatuador/': typeof AuthenticatedTatuadorIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -173,6 +181,7 @@ export interface FileRoutesByTo {
   '/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/admin/tatuadores': typeof AuthenticatedAdminTatuadoresRoute
   '/admin/vendas': typeof AuthenticatedAdminVendasRoute
+  '/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/tatuador': typeof AuthenticatedTatuadorIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -196,6 +205,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/_authenticated/admin/tatuadores': typeof AuthenticatedAdminTatuadoresRoute
   '/_authenticated/admin/vendas': typeof AuthenticatedAdminVendasRoute
+  '/_authenticated/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/tatuador/': typeof AuthenticatedTatuadorIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/admin/mensalidades'
     | '/admin/tatuadores'
     | '/admin/vendas'
+    | '/tatuador/perfil'
     | '/admin/'
     | '/tatuador/'
     | '/api/public/payments/webhook'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/admin/mensalidades'
     | '/admin/tatuadores'
     | '/admin/vendas'
+    | '/tatuador/perfil'
     | '/admin'
     | '/tatuador'
     | '/api/public/payments/webhook'
@@ -260,6 +272,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/mensalidades'
     | '/_authenticated/admin/tatuadores'
     | '/_authenticated/admin/vendas'
+    | '/_authenticated/tatuador/perfil'
     | '/_authenticated/admin/'
     | '/_authenticated/tatuador/'
     | '/api/public/payments/webhook'
@@ -376,6 +389,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/tatuador/perfil': {
+      id: '/_authenticated/tatuador/perfil'
+      path: '/perfil'
+      fullPath: '/tatuador/perfil'
+      preLoaderRoute: typeof AuthenticatedTatuadorPerfilRouteImport
+      parentRoute: typeof AuthenticatedTatuadorRoute
+    }
     '/_authenticated/admin/vendas': {
       id: '/_authenticated/admin/vendas'
       path: '/vendas'
@@ -443,10 +463,12 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedTatuadorRouteChildren {
+  AuthenticatedTatuadorPerfilRoute: typeof AuthenticatedTatuadorPerfilRoute
   AuthenticatedTatuadorIndexRoute: typeof AuthenticatedTatuadorIndexRoute
 }
 
 const AuthenticatedTatuadorRouteChildren: AuthenticatedTatuadorRouteChildren = {
+  AuthenticatedTatuadorPerfilRoute: AuthenticatedTatuadorPerfilRoute,
   AuthenticatedTatuadorIndexRoute: AuthenticatedTatuadorIndexRoute,
 }
 
