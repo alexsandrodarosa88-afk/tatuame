@@ -40,6 +40,130 @@ export const Route = createFileRoute("/api/public/asaas-webhook")({
 
         const admin = adminClient();
 
+        // ===== ASSINATURA DO TATUADOR =====
+        // Eventos cuja payment.subscription está presente OU externalReference começa com "artist_sub:"
+        const isArtistSub =
+          !!payment.subscription ||
+          (typeof payment.externalReference === "string" && payment.externalReference.startsWith("artist_sub:"));
+
+        if (isArtistSub) {
+          // Localiza tatuador pela subscription_id ou pelo externalReference
+          let artist: { id: string } | null = null;
+          if (payment.subscription) {
+            const { data } = await admin
+              .from("tattoo_artists")
+              .select("id")
+              .eq("asaas_subscription_id", payment.subscription)
+              .maybeSingle();
+            artist = data;
+          }
+          if (!artist && typeof payment.externalReference === "string") {
+            const artistId = payment.externalReference.replace("artist_sub:", "");
+            const { data } = await admin
+              .from("tattoo_artists")
+              .select("id")
+              .eq("id", artistId)
+              .maybeSingle();
+            artist = data;
+          }
+          if (!artist) {
+            console.warn("[asaas-webhook] Tatuador não encontrado para subscription:", payment.subscription);
+            return new Response("ok");
+          }
+
+          const refMonth = (() => {
+            const d = payment.dueDate ? new Date(payment.dueDate) : new Date();
+            return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10);
+          })();
+
+          // Upsert da linha em artist_subscriptions pelo asaas_payment_id
+          const { data: existing } = await admin
+            .from("artist_subscriptions")
+            .select("id, status")
+            .eq("asaas_payment_id", payment.id)
+            .maybeSingle();
+
+          if (event === "PAYMENT_CONFIRMED" || event === "PAYMENT_RECEIVED") {
+            const paidAt = new Date().toISOString();
+            if (existing) {
+              await admin
+                .from("artist_subscriptions")
+                .update({ status: "paid", paid_at: paidAt, invoice_url: payment.invoiceUrl ?? undefined })
+                .eq("id", existing.id);
+            } else {
+              await admin.from("artist_subscriptions").insert({
+                artist_id: artist.id,
+                reference_month: refMonth,
+                amount: Number(payment.value ?? 0),
+                status: "paid",
+                paid_at: paidAt,
+                due_date: payment.dueDate ?? null,
+                asaas_payment_id: payment.id,
+                invoice_url: payment.invoiceUrl ?? null,
+                billing_type: payment.billingType ?? null,
+              });
+            }
+
+            // Próximo vencimento = mesmo dia do próximo mês
+            const nextDue = (() => {
+              const base = payment.dueDate ? new Date(payment.dueDate) : new Date();
+              const n = new Date(base);
+              n.setMonth(n.getMonth() + 1);
+              return n.toISOString().slice(0, 10);
+            })();
+
+            await admin
+              .from("tattoo_artists")
+              .update({ subscription_status: "active", subscription_next_due: nextDue })
+              .eq("id", artist.id);
+            return new Response("ok");
+          }
+
+          if (event === "PAYMENT_OVERDUE") {
+            if (!existing) {
+              await admin.from("artist_subscriptions").insert({
+                artist_id: artist.id,
+                reference_month: refMonth,
+                amount: Number(payment.value ?? 0),
+                status: "pending",
+                due_date: payment.dueDate ?? null,
+                asaas_payment_id: payment.id,
+                invoice_url: payment.invoiceUrl ?? null,
+                billing_type: payment.billingType ?? null,
+              });
+            }
+            await admin
+              .from("tattoo_artists")
+              .update({ subscription_status: "overdue" })
+              .eq("id", artist.id);
+            return new Response("ok");
+          }
+
+          // PAYMENT_CREATED ou outros → garante linha pendente com invoice_url
+          if (event === "PAYMENT_CREATED" || event === "PAYMENT_UPDATED") {
+            if (existing) {
+              await admin
+                .from("artist_subscriptions")
+                .update({ invoice_url: payment.invoiceUrl ?? undefined, due_date: payment.dueDate ?? null })
+                .eq("id", existing.id);
+            } else {
+              await admin.from("artist_subscriptions").insert({
+                artist_id: artist.id,
+                reference_month: refMonth,
+                amount: Number(payment.value ?? 0),
+                status: "pending",
+                due_date: payment.dueDate ?? null,
+                asaas_payment_id: payment.id,
+                invoice_url: payment.invoiceUrl ?? null,
+                billing_type: payment.billingType ?? null,
+              });
+            }
+            return new Response("ok");
+          }
+
+          return new Response("ok");
+        }
+
         // Localiza o pedido por asaas_payment_id ou pelo externalReference
         const orderId: string | undefined = payment.externalReference || undefined;
         let order;
