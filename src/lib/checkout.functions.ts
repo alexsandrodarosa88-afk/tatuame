@@ -141,35 +141,52 @@ export const createPixCheckout = createServerFn({ method: "POST" })
       customerId = created.id;
     }
 
-    // 2. Create payment (UNDEFINED = cliente escolhe PIX/cartão/boleto na página do Asaas)
-    const dueDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-    const payment = await asaasFetch(`/payments`, {
+    // 2. Create checkout session — PIX + Credit Card (no boleto, no debit)
+    const items = rows.map((r) => ({
+      name: `Cotas TATUAME`,
+      description: `${r.quantity}x cota de ${Number(r.campaigns.price_per_quota).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`,
+      quantity: r.quantity,
+      value: Number(r.campaigns.price_per_quota),
+    }));
+
+    const checkout = await asaasFetch(`/checkouts`, {
       method: "POST",
       body: JSON.stringify({
-        customer: customerId,
-        billingType: "UNDEFINED",
-        value: Number(total.toFixed(2)),
-        dueDate,
-        description: `Pedido TATUAME #${order.id.slice(0, 8)}`,
+        billingTypes: ["PIX", "CREDIT_CARD"],
+        chargeTypes: ["DETACHED"],
+        minutesToExpire: 30,
+        items,
+        customerData: {
+          name: profile.nome_completo,
+          cpfCnpj: cleanCpf,
+          email: profile.email ?? undefined,
+          phone: profile.telefone ? String(profile.telefone).replace(/\D/g, "") : undefined,
+        },
         externalReference: order.id,
         callback: {
           successUrl: `${data.returnUrl}?order_id=${order.id}`,
-          autoRedirect: true,
+          cancelUrl: `${data.returnUrl}?order_id=${order.id}&canceled=1`,
+          expiredUrl: `${data.returnUrl}?order_id=${order.id}&expired=1`,
         },
       }),
     });
 
-    if (!payment?.invoiceUrl) {
+    const checkoutUrl: string | undefined =
+      checkout?.link || checkout?.url || checkout?.checkoutUrl || checkout?.invoiceUrl;
+    if (!checkoutUrl) {
+      console.error("Asaas checkout sem URL:", checkout);
       throw new Error("Asaas não retornou URL de pagamento.");
     }
 
-    await admin
-      .from("orders")
-      .update({ asaas_payment_id: payment.id })
-      .eq("id", order.id);
+    if (checkout?.id) {
+      await admin
+        .from("orders")
+        .update({ asaas_payment_id: checkout.id })
+        .eq("id", order.id);
+    }
 
     // Clear cart
     await admin.from("cart_items").delete().eq("user_id", userId);
 
-    return { orderId: order.id, checkoutUrl: payment.invoiceUrl };
+    return { orderId: order.id, checkoutUrl };
   });
