@@ -1,6 +1,11 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, UserCircle, Wallet, Palette, CreditCard, FileText } from "lucide-react";
 import { useArtist } from "@/hooks/use-artist";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getMyArtistSubscription } from "@/lib/artist-subscription.functions";
+import AssinaturaPage from "./tatuador.assinatura";
+import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/tatuador")({ component: TatuadorLayout });
 
@@ -16,6 +21,12 @@ function TatuadorLayout() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const { application } = useArtist();
   const approved = application?.status === "approved";
+  const statusFn = useServerFn(getMyArtistSubscription);
+  const { data: sub, isLoading: subLoading } = useQuery({
+    queryKey: ["artist-sub"],
+    queryFn: () => statusFn(),
+    enabled: approved,
+  });
 
   if (!approved) {
     // Antes da aprovação não mostramos a navegação interna — apenas o formulário/estado.
@@ -24,6 +35,23 @@ function TatuadorLayout() {
         <Outlet />
       </div>
     );
+  }
+
+  // Bloqueio: só libera quando a assinatura estiver ativa.
+  // Exceção: rota /tatuador/dados (precisa preencher dados antes de pagar).
+  const isOnDados = pathname.startsWith("/tatuador/dados");
+  const isOnAssinatura = pathname.startsWith("/tatuador/assinatura");
+  const subActive = sub?.artistFound && sub.status === "active";
+
+  if (approved && !subLoading && sub && !subActive && !isOnDados && !isOnAssinatura) {
+    return (
+      <div className="container mx-auto px-4 py-10">
+        <AssinaturaPage />
+      </div>
+    );
+  }
+  if (approved && subLoading) {
+    return <div className="grid place-items-center py-20 text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin" /></div>;
   }
 
   return (
