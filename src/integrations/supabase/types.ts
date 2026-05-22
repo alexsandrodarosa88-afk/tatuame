@@ -213,9 +213,12 @@ export type Database = {
         Row: {
           amount: number
           artist_id: string
+          asaas_payment_id: string | null
+          billing_type: string | null
           created_at: string
           due_date: string | null
           id: string
+          invoice_url: string | null
           notes: string | null
           paid_at: string | null
           reference_month: string
@@ -225,9 +228,12 @@ export type Database = {
         Insert: {
           amount: number
           artist_id: string
+          asaas_payment_id?: string | null
+          billing_type?: string | null
           created_at?: string
           due_date?: string | null
           id?: string
+          invoice_url?: string | null
           notes?: string | null
           paid_at?: string | null
           reference_month: string
@@ -237,9 +243,12 @@ export type Database = {
         Update: {
           amount?: number
           artist_id?: string
+          asaas_payment_id?: string | null
+          billing_type?: string | null
           created_at?: string
           due_date?: string | null
           id?: string
+          invoice_url?: string | null
           notes?: string | null
           paid_at?: string | null
           reference_month?: string
@@ -536,6 +545,8 @@ export type Database = {
       tattoo_artists: {
         Row: {
           address: string | null
+          asaas_customer_id: string | null
+          asaas_subscription_id: string | null
           bio: string | null
           city: string | null
           created_at: string
@@ -546,12 +557,17 @@ export type Database = {
           photo_url: string | null
           state: string | null
           styles: string[]
+          subscription_billing_type: string | null
+          subscription_next_due: string | null
+          subscription_status: string
           updated_at: string
           user_id: string | null
           whatsapp: string | null
         }
         Insert: {
           address?: string | null
+          asaas_customer_id?: string | null
+          asaas_subscription_id?: string | null
           bio?: string | null
           city?: string | null
           created_at?: string
@@ -562,12 +578,17 @@ export type Database = {
           photo_url?: string | null
           state?: string | null
           styles?: string[]
+          subscription_billing_type?: string | null
+          subscription_next_due?: string | null
+          subscription_status?: string
           updated_at?: string
           user_id?: string | null
           whatsapp?: string | null
         }
         Update: {
           address?: string | null
+          asaas_customer_id?: string | null
+          asaas_subscription_id?: string | null
           bio?: string | null
           city?: string | null
           created_at?: string
@@ -578,6 +599,9 @@ export type Database = {
           photo_url?: string | null
           state?: string | null
           styles?: string[]
+          subscription_billing_type?: string | null
+          subscription_next_due?: string | null
+          subscription_status?: string
           updated_at?: string
           user_id?: string | null
           whatsapp?: string | null
