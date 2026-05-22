@@ -86,9 +86,9 @@ function CartPage() {
             <span className="font-display text-2xl font-bold">{formatBRL(total)}</span>
           </div>
           <Button onClick={() => checkout.mutate()} disabled={checkout.isPending} className="w-full bg-primary hover:bg-[var(--primary-glow)] h-12 text-base font-semibold">
-            {checkout.isPending ? "Gerando pagamento..." : "Pagar (PIX, cartão ou boleto)"}
+            {checkout.isPending ? "Gerando pagamento..." : "PAGAR"}
           </Button>
-          <p className="text-xs text-muted-foreground text-center">Você será redirecionado para a página segura de pagamento e poderá escolher PIX, cartão ou boleto.</p>
+          <p className="text-xs text-muted-foreground text-center">Você será redirecionado para a página segura do Asaas e poderá pagar com PIX ou cartão (cartão disponível para compras acima de R$ 150,00).</p>
         </Card>
       )}
     </div>
