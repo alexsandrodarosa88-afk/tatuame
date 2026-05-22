@@ -9,11 +9,10 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/tatuador/assinatura")({ component: AssinaturaPage });
-export default AssinaturaPage;
 
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-function AssinaturaPage() {
+export function AssinaturaPage() {
   const statusFn = useServerFn(getMyArtistSubscription);
   const createFn = useServerFn(createArtistSubscription);
   const { data, isLoading, refetch } = useQuery({ queryKey: ["artist-sub"], queryFn: () => statusFn() });
