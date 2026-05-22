@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useArtist } from "@/hooks/use-artist";
+import { useServerFn } from "@tanstack/react-start";
+import { getArtistInvoiceUrl } from "@/lib/artist-subscription.functions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, CreditCard, CheckCircle2, AlertCircle } from "lucide-react";
@@ -9,13 +11,23 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/tatuador/mensalidade")({ component: Mensalidade });
 
-type Sub = { id: string; amount: number; status: string; reference_month: string; due_date: string | null; paid_at: string | null };
+type Sub = {
+  id: string;
+  amount: number;
+  status: string;
+  reference_month: string;
+  due_date: string | null;
+  paid_at: string | null;
+  invoice_url: string | null;
+};
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 function Mensalidade() {
   const { artist, application, loading } = useArtist();
   const [rows, setRows] = useState<Sub[]>([]);
   const [load, setLoad] = useState(true);
+  const invoiceFn = useServerFn(getArtistInvoiceUrl);
+  const [openingId, setOpeningId] = useState<string | null>(null);
 
   const reload = () => {
     if (!artist) { setLoad(false); return; }
@@ -33,8 +45,21 @@ function Mensalidade() {
 
   const pending = rows.find((r) => r.status === "pending");
 
-  const payNow = async () => {
-    toast.info("Estamos preparando o pagamento online. Por enquanto, o admin marca como pago manualmente após a confirmação.");
+  const payNow = async (id: string, existingUrl: string | null) => {
+    if (existingUrl) {
+      window.open(existingUrl, "_blank");
+      return;
+    }
+    setOpeningId(id);
+    try {
+      const r = await invoiceFn({ data: { invoiceId: id } });
+      if (r?.invoiceUrl) window.open(r.invoiceUrl, "_blank");
+      else toast.error("Não foi possível abrir a fatura.");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao abrir a fatura.");
+    } finally {
+      setOpeningId(null);
+    }
   };
 
   return (
@@ -50,7 +75,13 @@ function Mensalidade() {
               Referência: <strong>{new Date(pending.reference_month).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}</strong>
               {pending.due_date && <> · Vencimento: <strong>{new Date(pending.due_date).toLocaleDateString("pt-BR")}</strong></>}
             </p>
-            <Button onClick={payNow} className="w-full sm:w-auto">Pagar mensalidade</Button>
+            <Button
+              onClick={() => payNow(pending.id, pending.invoice_url)}
+              disabled={openingId === pending.id}
+              className="w-full sm:w-auto bg-primary hover:bg-[var(--primary-glow)]"
+            >
+              {openingId === pending.id ? "Abrindo…" : "PAGAR mensalidade"}
+            </Button>
           </CardContent>
         </Card>
       ) : (
@@ -60,6 +91,9 @@ function Mensalidade() {
             <div>
               <p className="font-semibold">Nenhuma mensalidade em aberto</p>
               <p className="text-sm text-muted-foreground">Você está em dia. A próxima mensalidade aparecerá aqui.</p>
+              <Button asChild variant="link" className="p-0 h-auto mt-1 text-sm">
+                <Link to="/tatuador/assinatura">Gerenciar forma de pagamento</Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
