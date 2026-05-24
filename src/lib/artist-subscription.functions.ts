@@ -35,7 +35,7 @@ export const getMyArtistSubscription = createServerFn({ method: "GET" })
     const admin = adminClient();
 
     // Auto-block atrasados > 5 dias (silencioso)
-    await admin.rpc("block_overdue_artists").catch(() => {});
+    try { await admin.rpc("block_overdue_artists"); } catch { /* */ }
 
     const { data: artist } = await supabase
       .from("tattoo_artists")
@@ -95,8 +95,7 @@ export const createArtistSubscription = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const admin = adminClient();
 
-    // Garante que o status reflita atrasos antes de tentar gerar
-    await admin.rpc("block_overdue_artists").catch(() => {});
+    try { await admin.rpc("block_overdue_artists"); } catch { /* */ }
 
     const { data: artist, error: artistErr } = await supabase
       .from("tattoo_artists")
