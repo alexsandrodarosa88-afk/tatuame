@@ -20,6 +20,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +34,17 @@ function LoginPage() {
   const google = async () => {
     const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + dest });
     if (r.error) toast.error("Falha no login com Google");
+  };
+
+  const forgotPassword = async () => {
+    if (!email) return toast.error("Digite seu email para receber o link de redefinição.");
+    setResetLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetLoading(false);
+    if (error) return toast.error(error.message);
+    toast.success("Enviamos o link para redefinir sua senha.");
   };
 
   return (
@@ -52,6 +64,9 @@ function LoginPage() {
         <form onSubmit={submit} className="space-y-4">
           <div className="space-y-2"><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
           <div className="space-y-2"><Label>Senha</Label><Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
+          <button type="button" onClick={forgotPassword} disabled={resetLoading} className="text-sm text-primary hover:underline">
+            {resetLoading ? "Enviando..." : "Esqueci minha senha"}
+          </button>
           <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-[var(--primary-glow)]">{loading ? "Entrando..." : "Entrar"}</Button>
         </form>
         <div className="text-sm text-muted-foreground text-center">
