@@ -37,7 +37,17 @@ export async function mpFetch(path: string, init: RequestInit = {}) {
       json?.cause?.[0]?.description ||
       body ||
       `HTTP ${res.status}`;
-    console.error("Mercado Pago API error:", res.status, msg);
+    console.error("[MP] API error", {
+      status: res.status,
+      path,
+      message: msg,
+      cause: json?.cause,
+      error: json?.error,
+      full: body?.slice(0, 2000),
+      requestBody:
+        typeof init.body === "string" ? init.body.slice(0, 2000) : undefined,
+      tokenPrefix: (process.env.MERCADOPAGO_ACCESS_TOKEN ?? "").slice(0, 8),
+    });
     throw new Error("Mercado Pago: " + msg);
   }
   return json;
