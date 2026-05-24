@@ -6,7 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getArtistInvoiceUrl } from "@/lib/artist-subscription.functions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, CreditCard, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, CreditCard, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/tatuador/mensalidade")({ component: Mensalidade });
@@ -65,6 +65,14 @@ function Mensalidade() {
   return (
     <div className="space-y-4 max-w-3xl">
       <div className="flex items-center gap-2"><CreditCard className="h-5 w-5 text-primary" /><h1 className="text-2xl font-bold">Mensalidade</h1></div>
+
+      <div className="flex items-start gap-2 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
+        <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+        <div>
+          <p className="font-semibold">Promoção de lançamento</p>
+          <p className="text-muted-foreground">6 primeiros meses por <strong>R$ 39,90</strong>, depois <strong>R$ 59,90/mês</strong>.</p>
+        </div>
+      </div>
 
       {pending ? (
         <Card className="border-primary/30">
