@@ -13,6 +13,11 @@ export function SocialProof() {
     { name: get("social.t3_name", "Juliana Mendes"), role: get("social.t3_role", "Belo Horizonte, MG"), text: get("social.t3_text", "Plataforma séria, tatuadores incríveis e a campanha foi super transparente. Recomendo demais.") },
   ];
   const images = [get("social.image1", t1), get("social.image2", t2), get("social.image3", t3)];
+  const positions = [
+    get("social.image1_pos", "center center"),
+    get("social.image2_pos", "center center"),
+    get("social.image3_pos", "center center"),
+  ];
   return (
     <section id="depoimentos" className="py-24 border-t border-border bg-card/30">
       <div className="container mx-auto px-4">
@@ -48,6 +53,7 @@ export function SocialProof() {
               width={768}
               height={768}
               className="rounded-xl border border-border object-cover aspect-square w-full"
+              style={{ objectPosition: positions[i] }}
             />
           ))}
         </div>
