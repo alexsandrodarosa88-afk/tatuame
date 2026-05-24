@@ -10,7 +10,7 @@ export const listActiveCampaigns = createServerFn({ method: "GET" }).handler(asy
   );
   const { data, error } = await supabase
     .from("campaigns")
-    .select("id, tattoo_value, price_per_quota, total_quotas, sold_quotas, ends_at, status, title")
+    .select("id, code, tattoo_value, price_per_quota, total_quotas, sold_quotas, ends_at, status, title")
     .eq("status", "active")
     .order("tattoo_value", { ascending: true });
   if (error) {
