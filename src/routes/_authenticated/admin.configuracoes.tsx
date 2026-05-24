@@ -59,6 +59,10 @@ const GROUPS: Group[] = [
       { key: "how.step3_desc", label: "Passo 3 — descrição", type: "textarea" },
       { key: "how.step4_title", label: "Passo 4 — título", type: "text" },
       { key: "how.step4_desc", label: "Passo 4 — descrição", type: "textarea" },
+      { key: "how.step5_title", label: "Passo 5 — título", type: "text" },
+      { key: "how.step5_desc", label: "Passo 5 — descrição", type: "textarea" },
+      { key: "how.step6_title", label: "Passo 6 — título", type: "text" },
+      { key: "how.step6_desc", label: "Passo 6 — descrição", type: "textarea" },
     ],
   },
   {
