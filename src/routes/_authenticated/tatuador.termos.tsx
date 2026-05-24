@@ -113,7 +113,7 @@ function TermosPage() {
 
       <Card className="border-primary/30 bg-primary/5">
         <CardContent className="p-4 text-sm text-muted-foreground">
-          Preencha os dados do tatuador e do cliente, descreva a tatuagem e o valor. O termo gerado deixa claro que a TATUAME <strong>não se responsabiliza pela entrega/execução</strong> do serviço — apenas pelo repasse do valor do prêmio ganho. Ao final, o cliente assina confirmando o recebimento e autorizando o repasse do prêmio para o tatuador.
+          Preencha os dados do tatuador e do cliente, descreva a tatuagem e o valor. Em seguida clique em <strong>"Imprimir / PDF"</strong> para <strong>baixar o termo em PDF ou imprimir em papel</strong>, e colher as assinaturas físicas do <strong>tatuador</strong> e do <strong>cliente</strong> (e a assinatura de recebimento ao final, depois da tatuagem entregue). O termo deixa claro que a TATUAME <strong>não se responsabiliza pela execução</strong> do serviço — apenas pelo repasse do prêmio.
         </CardContent>
       </Card>
 
