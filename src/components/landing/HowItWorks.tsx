@@ -1,19 +1,20 @@
 import { Wallet, Hash, Users, Gift } from "lucide-react";
-
-const steps = [
-  { icon: Wallet, title: "Compre crédito", desc: "Escolha o valor e adicione crédito à sua conta. Válido por 12 meses." },
-  { icon: Hash, title: "Receba seu número", desc: "Cada compra gera um número promocional único e exclusivo." },
-  { icon: Users, title: "Participe da campanha", desc: "Acompanhe o progresso em tempo real até o fechamento." },
-  { icon: Gift, title: "Garanta seu upgrade", desc: "O sorteado leva a tatuagem completa. Todos saem com crédito." },
-];
+import { useSiteSettings } from "@/hooks/use-site-settings";
 
 export function HowItWorks() {
+  const { get } = useSiteSettings();
+  const steps = [
+    { icon: Wallet, title: get("how.step1_title", "Compre crédito"), desc: get("how.step1_desc", "Escolha o valor e adicione crédito à sua conta. Válido por 12 meses.") },
+    { icon: Hash, title: get("how.step2_title", "Receba seu número"), desc: get("how.step2_desc", "Cada compra gera um número promocional único e exclusivo.") },
+    { icon: Users, title: get("how.step3_title", "Participe da campanha"), desc: get("how.step3_desc", "Acompanhe o progresso em tempo real até o fechamento.") },
+    { icon: Gift, title: get("how.step4_title", "Garanta seu upgrade"), desc: get("how.step4_desc", "O sorteado leva a tatuagem completa. Todos saem com crédito.") },
+  ];
   return (
     <section id="como-funciona" className="py-24 border-t border-border bg-card/30">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-3">Como funciona</div>
-          <h2 className="font-display text-4xl md:text-5xl font-bold">Simples, justo e transparente.</h2>
+          <div className="text-xs uppercase tracking-[0.2em] text-primary font-semibold mb-3">{get("how.eyebrow", "Como funciona")}</div>
+          <h2 className="font-display text-4xl md:text-5xl font-bold">{get("how.title", "Simples, justo e transparente.")}</h2>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
           {steps.map((s, i) => (
