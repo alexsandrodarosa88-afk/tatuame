@@ -13,7 +13,7 @@ import { Pencil, Plus, Trash2 } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/admin/campanhas")({ component: AdminCampanhas });
 
 type Campaign = {
-  id: string; title: string | null; description: string | null; status: string;
+  id: string; code: string; title: string | null; description: string | null; status: string;
   tattoo_value: number; price_per_quota: number; total_quotas: number; sold_quotas: number; ends_at: string;
 };
 
@@ -146,8 +146,11 @@ function AdminCampanhas() {
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h3 className="font-semibold truncate">{c.title}</h3>
-                    <p className="text-xs text-muted-foreground">Encerra: {c.ends_at ? new Date(c.ends_at).toLocaleString("pt-BR") : "—"} · Status: {c.status}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-mono font-semibold text-primary border border-primary/20">{c.code}</span>
+                      <h3 className="font-semibold truncate">{c.title}</h3>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Encerra: {c.ends_at ? new Date(c.ends_at).toLocaleString("pt-BR") : "—"} · Status: {c.status}</p>
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <Button size="icon" variant="ghost" onClick={() => openEdit(c)}><Pencil className="h-4 w-4" /></Button>
