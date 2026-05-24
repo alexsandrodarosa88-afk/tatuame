@@ -119,14 +119,21 @@ export const Route = createFileRoute("/api/public/mercadopago-webhook")({
               n.setMonth(n.getMonth() + 1);
               return n.toISOString().slice(0, 10);
             })();
-            const patch: Record<string, any> = {
-              subscription_status: "active",
-              subscription_next_due: nextDue,
-            };
             if (!artist.subscription_started_at) {
-              patch.subscription_started_at = paidAt;
+              await admin
+                .from("tattoo_artists")
+                .update({
+                  subscription_status: "active",
+                  subscription_next_due: nextDue,
+                  subscription_started_at: paidAt,
+                })
+                .eq("id", artist.id);
+            } else {
+              await admin
+                .from("tattoo_artists")
+                .update({ subscription_status: "active", subscription_next_due: nextDue })
+                .eq("id", artist.id);
             }
-            await admin.from("tattoo_artists").update(patch).eq("id", artist.id);
           } else if (status === "rejected" || status === "cancelled") {
             await admin
               .from("tattoo_artists")
