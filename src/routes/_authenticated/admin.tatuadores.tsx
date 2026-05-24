@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2, Power, Upload, Loader2, ShieldCheck, Gift } from "lucide-react";
+import { Pencil, Plus, Trash2, Power, Upload, Loader2, ShieldCheck, Gift, FileText } from "lucide-react";
+import { UserAcceptancesDialog } from "@/components/admin/UserAcceptancesDialog";
 
 export const Route = createFileRoute("/_authenticated/admin/tatuadores")({ component: AdminTatuadores });
 
@@ -17,6 +18,7 @@ type Artist = {
   styles: string[]; city: string | null; state: string | null; address: string | null;
   instagram: string | null; whatsapp: string | null; is_active: boolean;
   subscription_status?: string | null; is_lifetime_free?: boolean | null;
+  user_id?: string | null;
 };
 
 const empty = {
@@ -32,6 +34,7 @@ function AdminTatuadores() {
   const [form, setForm] = useState<any>(empty);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [acceptUser, setAcceptUser] = useState<{ userId: string; name: string } | null>(null);
 
   const load = async () => {
     const { data } = await supabase.from("tattoo_artists").select("*").order("name");
@@ -228,6 +231,11 @@ function AdminTatuadores() {
                       <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                     </Button>
                   )}
+                  {a.user_id && (
+                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Ver termos aceitos" onClick={() => setAcceptUser({ userId: a.user_id!, name: a.name })}>
+                      <FileText className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remove(a.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
                 </div>
               </div>
@@ -236,6 +244,12 @@ function AdminTatuadores() {
         ))}
         {rows.length === 0 && <p className="text-muted-foreground text-center py-10 col-span-full">Nenhum tatuador cadastrado.</p>}
       </div>
+      <UserAcceptancesDialog
+        open={!!acceptUser}
+        onOpenChange={(v) => !v && setAcceptUser(null)}
+        userId={acceptUser?.userId ?? null}
+        userName={acceptUser?.name}
+      />
     </div>
   );
 }
