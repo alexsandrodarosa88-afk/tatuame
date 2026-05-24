@@ -2,10 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCart, removeCartItem, upsertCartItem } from "@/lib/cart.functions";
-import { createPixCheckout } from "@/lib/checkout.functions";
+import { createCheckout } from "@/lib/checkout.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2, Minus, Plus } from "lucide-react";
+import { Trash2, Minus, Plus, QrCode, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,7 +28,7 @@ function CartPage() {
   const cartFn = useServerFn(getCart);
   const removeFn = useServerFn(removeCartItem);
   const upsertFn = useServerFn(upsertCartItem);
-  const checkoutFn = useServerFn(createPixCheckout);
+  const checkoutFn = useServerFn(createCheckout);
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { data: cart, isLoading } = useQuery({ queryKey: ["cart"], queryFn: () => cartFn() });
@@ -51,6 +51,7 @@ function CartPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState<ProfileForm>({ nome_completo: "", cpf: "", telefone: "", cidade: "" });
   const [saving, setSaving] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"PIX" | "CHECKOUT_PRO">("PIX");
 
   useEffect(() => {
     if (profile) {
@@ -78,6 +79,7 @@ function CartPage() {
       checkoutFn({
         data: {
           returnUrl: `${window.location.origin}/checkout/return`,
+          paymentMethod,
         },
       }),
     onSuccess: (r: any) => {
