@@ -2,10 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCart, removeCartItem, upsertCartItem } from "@/lib/cart.functions";
-import { createPixCheckout } from "@/lib/checkout.functions";
+import { createCheckout } from "@/lib/checkout.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2, Minus, Plus } from "lucide-react";
+import { Trash2, Minus, Plus, QrCode, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,7 +28,7 @@ function CartPage() {
   const cartFn = useServerFn(getCart);
   const removeFn = useServerFn(removeCartItem);
   const upsertFn = useServerFn(upsertCartItem);
-  const checkoutFn = useServerFn(createPixCheckout);
+  const checkoutFn = useServerFn(createCheckout);
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { data: cart, isLoading } = useQuery({ queryKey: ["cart"], queryFn: () => cartFn() });
@@ -51,6 +51,7 @@ function CartPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState<ProfileForm>({ nome_completo: "", cpf: "", telefone: "", cidade: "" });
   const [saving, setSaving] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"PIX" | "CHECKOUT_PRO">("PIX");
 
   useEffect(() => {
     if (profile) {
@@ -78,6 +79,7 @@ function CartPage() {
       checkoutFn({
         data: {
           returnUrl: `${window.location.origin}/checkout/return`,
+          paymentMethod,
         },
       }),
     onSuccess: (r: any) => {
@@ -200,10 +202,32 @@ function CartPage() {
             <span className="text-muted-foreground">Total</span>
             <span className="font-display text-2xl font-bold">{formatBRL(total)}</span>
           </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Button
+              type="button"
+              variant={paymentMethod === "PIX" ? "default" : "outline"}
+              onClick={() => setPaymentMethod("PIX")}
+              className="h-auto py-4 flex-col gap-1"
+            >
+              <QrCode className="h-5 w-5" />
+              <span className="font-semibold">PIX</span>
+              <span className="text-xs opacity-80">QR Code e copia e cola</span>
+            </Button>
+            <Button
+              type="button"
+              variant={paymentMethod === "CHECKOUT_PRO" ? "default" : "outline"}
+              onClick={() => setPaymentMethod("CHECKOUT_PRO")}
+              className="h-auto py-4 flex-col gap-1"
+            >
+              <CreditCard className="h-5 w-5" />
+              <span className="font-semibold">Cartão</span>
+              <span className="text-xs opacity-80">Checkout Pro</span>
+            </Button>
+          </div>
           <Button onClick={handlePayClick} disabled={checkout.isPending} className="w-full bg-primary hover:bg-[var(--primary-glow)] h-12 text-base font-semibold">
-            {checkout.isPending ? "Gerando pagamento..." : "PAGAR"}
+            {checkout.isPending ? "Gerando pagamento..." : paymentMethod === "PIX" ? "GERAR PIX" : "PAGAR COM CARTÃO"}
           </Button>
-          <p className="text-xs text-muted-foreground text-center">Você será redirecionado para a página segura do Mercado Pago e poderá pagar com PIX, cartão de crédito ou débito.</p>
+          <p className="text-xs text-muted-foreground text-center">PIX abre o QR Code no pedido. Cartão abre a página segura do Mercado Pago.</p>
         </Card>
       )}
 

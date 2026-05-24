@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { createMpPreference, isMpSandbox } from "./mercadopago.server";
+import { createMpPixPayment, createMpPreference, isMpSandbox } from "./mercadopago.server";
 
 function adminClient() {
   return createClient<Database>(
@@ -12,10 +12,13 @@ function adminClient() {
   );
 }
 
-export const createPixCheckout = createServerFn({ method: "POST" })
+export const createCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { returnUrl: string }) => {
+  .inputValidator((data: { returnUrl: string; paymentMethod?: "PIX" | "CHECKOUT_PRO" }) => {
     if (!/^https?:\/\//.test(data.returnUrl)) throw new Error("Invalid returnUrl");
+    if (data.paymentMethod && data.paymentMethod !== "PIX" && data.paymentMethod !== "CHECKOUT_PRO") {
+      throw new Error("Forma de pagamento inválida");
+    }
     return data;
   })
   .handler(async ({ context, data }) => {
@@ -101,18 +104,62 @@ export const createPixCheckout = createServerFn({ method: "POST" })
     }));
 
     const [firstName, ...rest] = profile.nome_completo.trim().split(/\s+/);
+    const payerEmail = profile.email ?? (context.claims as any)?.email;
+    if (!payerEmail) {
+      throw new Error("E-mail não encontrado no cadastro.");
+    }
     const phoneDigits = profile.telefone ? String(profile.telefone).replace(/\D/g, "") : "";
     const phone =
       phoneDigits.length >= 10
         ? { area_code: phoneDigits.slice(0, 2), number: phoneDigits.slice(2) }
         : undefined;
 
+    if ((data.paymentMethod ?? "PIX") === "PIX") {
+      const payment = await createMpPixPayment({
+        transactionAmount: total,
+        description: `Cotas TATUAME — pedido ${order.id}`,
+        payer: {
+          name: firstName,
+          surname: rest.join(" ") || undefined,
+          email: payerEmail,
+          identification: cleanCpf.length === 11
+            ? { type: "CPF", number: cleanCpf }
+            : { type: "CNPJ", number: cleanCpf },
+          phone,
+        },
+        externalReference: order.id,
+        notificationUrl,
+        expiresInMinutes: 30,
+      });
+
+      const transactionData = payment?.point_of_interaction?.transaction_data;
+      const pixCopyPaste = transactionData?.qr_code;
+      const pixQrCode = transactionData?.qr_code_base64;
+      if (!payment?.id || !pixCopyPaste) {
+        console.error("MP PIX sem QR Code:", payment);
+        throw new Error("Mercado Pago não retornou o PIX. Tente pagar com cartão.");
+      }
+
+      await admin
+        .from("orders")
+        .update({
+          asaas_payment_id: String(payment.id),
+          pix_copy_paste: pixCopyPaste,
+          pix_qr_code: pixQrCode ?? null,
+        })
+        .eq("id", order.id);
+
+      await admin.from("cart_items").delete().eq("user_id", userId);
+
+      return { orderId: order.id, checkoutUrl: `${origin}/checkout/${order.id}` };
+    }
+
     const preference = await createMpPreference({
       items,
       payer: {
         name: firstName,
         surname: rest.join(" ") || undefined,
-        email: profile.email ?? undefined,
+        email: payerEmail,
         identification: cleanCpf.length === 11
           ? { type: "CPF", number: cleanCpf }
           : { type: "CNPJ", number: cleanCpf },

@@ -6,7 +6,8 @@ import { getMyOrder } from "@/lib/cart.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Clock } from "lucide-react";
+import { CheckCircle2, Clock, Copy } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout/$orderId")({ component: CheckoutStatusPage });
 
@@ -28,6 +29,12 @@ function CheckoutStatusPage() {
     if (order?.status === "paid") refetch();
   }, [order?.status, refetch]);
 
+  const copyPix = async () => {
+    if (!order?.pix_copy_paste) return;
+    await navigator.clipboard.writeText(order.pix_copy_paste);
+    toast.success("Código PIX copiado.");
+  };
+
   if (loading) return <div className="min-h-screen grid place-items-center text-muted-foreground">Carregando...</div>;
 
   return (
@@ -45,7 +52,26 @@ function CheckoutStatusPage() {
             <Clock className="h-16 w-16 text-primary mx-auto animate-pulse" />
             <h1 className="font-display text-2xl font-bold">Aguardando pagamento</h1>
             <p className="text-muted-foreground">Total: <span className="font-semibold">{order ? formatBRL(Number(order.total_amount)) : "—"}</span></p>
-            <p className="text-xs text-muted-foreground">Assim que o PIX cair, esta página atualiza automaticamente.</p>
+            {order?.pix_copy_paste ? (
+              <div className="space-y-3">
+                {order.pix_qr_code && (
+                  <img
+                    src={`data:image/png;base64,${order.pix_qr_code}`}
+                    alt="QR Code PIX para pagamento"
+                    className="mx-auto h-56 w-56 rounded bg-card p-3"
+                  />
+                )}
+                <Button onClick={copyPix} className="w-full bg-primary hover:bg-[var(--primary-glow)]">
+                  <Copy className="h-4 w-4" /> Copiar código PIX
+                </Button>
+                <p className="break-all rounded border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+                  {order.pix_copy_paste}
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">Conclua o pagamento na página segura do Mercado Pago.</p>
+            )}
+            <p className="text-xs text-muted-foreground">Assim que o pagamento cair, esta página atualiza automaticamente.</p>
             <Button asChild variant="outline" className="w-full"><Link to="/conta">Ir para minha conta</Link></Button>
           </>
         )}

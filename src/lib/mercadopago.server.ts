@@ -100,6 +100,46 @@ export async function fetchMpPayment(paymentId: string) {
   return mpFetch(`/v1/payments/${paymentId}`, { method: "GET" });
 }
 
+export async function createMpPixPayment(input: {
+  transactionAmount: number;
+  description: string;
+  payer: {
+    name?: string;
+    surname?: string;
+    email: string;
+    identification?: { type: "CPF" | "CNPJ"; number: string };
+    phone?: { area_code?: string; number?: string };
+  };
+  externalReference: string;
+  notificationUrl: string;
+  expiresInMinutes?: number;
+}) {
+  const expiration = input.expiresInMinutes
+    ? new Date(Date.now() + input.expiresInMinutes * 60 * 1000).toISOString()
+    : undefined;
+
+  const body = {
+    transaction_amount: Number(input.transactionAmount.toFixed(2)),
+    description: input.description,
+    payment_method_id: "pix",
+    payer: {
+      email: input.payer.email,
+      first_name: input.payer.name,
+      last_name: input.payer.surname,
+      identification: input.payer.identification,
+      phone: input.payer.phone,
+    },
+    external_reference: input.externalReference,
+    notification_url: input.notificationUrl,
+    date_of_expiration: expiration,
+  };
+
+  return mpFetch(`/v1/payments`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
 export type MpPreferenceItem = {
   title: string;
   description?: string;
