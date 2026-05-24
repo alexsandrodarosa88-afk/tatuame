@@ -91,7 +91,7 @@ export const getMyParticipations = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("participations")
-      .select("id, lucky_number, created_at, campaigns(id, tattoo_value, title, ends_at, status)")
+      .select("id, lucky_number, created_at, campaigns(id, code, tattoo_value, title, ends_at, status)")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
     if (error) {
