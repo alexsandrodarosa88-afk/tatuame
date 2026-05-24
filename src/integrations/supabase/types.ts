@@ -267,6 +267,7 @@ export type Database = {
       }
       campaigns: {
         Row: {
+          code: string
           created_at: string
           description: string | null
           ends_at: string
@@ -280,6 +281,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          code?: string
           created_at?: string
           description?: string | null
           ends_at: string
@@ -293,6 +295,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          code?: string
           created_at?: string
           description?: string | null
           ends_at?: string
@@ -718,6 +721,7 @@ export type Database = {
         Args: { _gateway_payment_id?: string; _order_id: string }
         Returns: boolean
       }
+      generate_campaign_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
