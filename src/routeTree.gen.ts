@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CheckoutOrderIdRouteImport } from './routes/checkout.$orderId'
 import { Route as AuthenticatedTatuadorRouteImport } from './routes/_authenticated/tatuador'
+import { Route as AuthenticatedPoliticasRouteImport } from './routes/_authenticated/politicas'
 import { Route as AuthenticatedContaRouteImport } from './routes/_authenticated/conta'
 import { Route as AuthenticatedCarrinhoRouteImport } from './routes/_authenticated/carrinho'
 import { Route as AuthenticatedCampanhasRouteImport } from './routes/_authenticated/campanhas'
@@ -85,6 +86,11 @@ const CheckoutOrderIdRoute = CheckoutOrderIdRouteImport.update({
 const AuthenticatedTatuadorRoute = AuthenticatedTatuadorRouteImport.update({
   id: '/tatuador',
   path: '/tatuador',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPoliticasRoute = AuthenticatedPoliticasRouteImport.update({
+  id: '/politicas',
+  path: '/politicas',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedContaRoute = AuthenticatedContaRouteImport.update({
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/campanhas': typeof AuthenticatedCampanhasRoute
   '/carrinho': typeof AuthenticatedCarrinhoRoute
   '/conta': typeof AuthenticatedContaRoute
+  '/politicas': typeof AuthenticatedPoliticasRoute
   '/tatuador': typeof AuthenticatedTatuadorRouteWithChildren
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/campanhas': typeof AuthenticatedCampanhasRoute
   '/carrinho': typeof AuthenticatedCarrinhoRoute
   '/conta': typeof AuthenticatedContaRoute
+  '/politicas': typeof AuthenticatedPoliticasRoute
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/admin/aplicacoes': typeof AuthenticatedAdminAplicacoesRoute
@@ -304,6 +312,7 @@ export interface FileRoutesById {
   '/_authenticated/campanhas': typeof AuthenticatedCampanhasRoute
   '/_authenticated/carrinho': typeof AuthenticatedCarrinhoRoute
   '/_authenticated/conta': typeof AuthenticatedContaRoute
+  '/_authenticated/politicas': typeof AuthenticatedPoliticasRoute
   '/_authenticated/tatuador': typeof AuthenticatedTatuadorRouteWithChildren
   '/checkout/$orderId': typeof CheckoutOrderIdRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -340,6 +349,7 @@ export interface FileRouteTypes {
     | '/campanhas'
     | '/carrinho'
     | '/conta'
+    | '/politicas'
     | '/tatuador'
     | '/checkout/$orderId'
     | '/checkout/return'
@@ -373,6 +383,7 @@ export interface FileRouteTypes {
     | '/campanhas'
     | '/carrinho'
     | '/conta'
+    | '/politicas'
     | '/checkout/$orderId'
     | '/checkout/return'
     | '/admin/aplicacoes'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/_authenticated/campanhas'
     | '/_authenticated/carrinho'
     | '/_authenticated/conta'
+    | '/_authenticated/politicas'
     | '/_authenticated/tatuador'
     | '/checkout/$orderId'
     | '/checkout/return'
@@ -509,6 +521,13 @@ declare module '@tanstack/react-router' {
       path: '/tatuador'
       fullPath: '/tatuador'
       preLoaderRoute: typeof AuthenticatedTatuadorRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/politicas': {
+      id: '/_authenticated/politicas'
+      path: '/politicas'
+      fullPath: '/politicas'
+      preLoaderRoute: typeof AuthenticatedPoliticasRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/conta': {
@@ -741,6 +760,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCampanhasRoute: typeof AuthenticatedCampanhasRoute
   AuthenticatedCarrinhoRoute: typeof AuthenticatedCarrinhoRoute
   AuthenticatedContaRoute: typeof AuthenticatedContaRoute
+  AuthenticatedPoliticasRoute: typeof AuthenticatedPoliticasRoute
   AuthenticatedTatuadorRoute: typeof AuthenticatedTatuadorRouteWithChildren
 }
 
@@ -749,6 +769,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCampanhasRoute: AuthenticatedCampanhasRoute,
   AuthenticatedCarrinhoRoute: AuthenticatedCarrinhoRoute,
   AuthenticatedContaRoute: AuthenticatedContaRoute,
+  AuthenticatedPoliticasRoute: AuthenticatedPoliticasRoute,
   AuthenticatedTatuadorRoute: AuthenticatedTatuadorRouteWithChildren,
 }
 
@@ -772,13 +793,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Navbar } from "@/components/landing/Navbar";
+import { PolicyAcceptGate } from "@/components/PolicyAcceptGate";
 
 export const Route = createFileRoute("/_authenticated")({ component: AuthLayout });
 
@@ -21,6 +22,7 @@ function AuthLayout() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="pt-20"><Outlet /></main>
+      <PolicyAcceptGate />
     </div>
   );
 }

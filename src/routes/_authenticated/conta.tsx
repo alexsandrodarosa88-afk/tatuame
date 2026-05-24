@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getMyParticipations, getMyCredits, getMyProfile } from "@/lib/cart.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Ticket, Wallet, User as UserIcon } from "lucide-react";
+import { Ticket, Wallet, User as UserIcon, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/conta")({ component: AccountPage });
 
@@ -28,7 +28,12 @@ function AccountPage() {
 
   return (
     <div className="container mx-auto px-4 py-10 max-w-4xl">
-      <h1 className="font-display text-3xl font-bold mb-6">Minha conta</h1>
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+        <h1 className="font-display text-3xl font-bold">Minha conta</h1>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/politicas"><FileText className="h-4 w-4 mr-1" /> Políticas</Link>
+        </Button>
+      </div>
 
       {profile && (
         <Card className="p-6 mb-6">
