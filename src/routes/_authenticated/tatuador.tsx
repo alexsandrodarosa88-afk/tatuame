@@ -4,7 +4,7 @@ import { useArtist } from "@/hooks/use-artist";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyArtistSubscription } from "@/lib/artist-subscription.functions";
-import { AssinaturaPage } from "./tatuador.assinatura";
+import { AssinaturaPage } from "@/components/tatuador/AssinaturaPage";
 import { Loader2 } from "lucide-react";
 import { ArtistPolicyAcceptGate } from "@/components/ArtistPolicyAcceptGate";
 
