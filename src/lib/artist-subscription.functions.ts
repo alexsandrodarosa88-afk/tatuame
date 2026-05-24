@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { createMpPreference, isMpSandbox } from "./mercadopago.server";
 
 export const ARTIST_MONTHLY_FEE = 39.9;
 
@@ -11,38 +12,6 @@ function adminClient() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false } },
   );
-}
-
-function getAsaasConfig() {
-  const key = process.env.ASAAS_API_KEY;
-  if (!key) throw new Error("ASAAS_API_KEY não configurada");
-  const isSandbox = /hmlg|sandbox/i.test(key);
-  const baseUrl = isSandbox
-    ? "https://api-sandbox.asaas.com/v3"
-    : "https://api.asaas.com/v3";
-  return { key, baseUrl };
-}
-
-async function asaasFetch(path: string, init: RequestInit = {}) {
-  const { key, baseUrl } = getAsaasConfig();
-  const res = await fetch(`${baseUrl}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      access_token: key,
-      "User-Agent": "Tatuame",
-      ...(init.headers ?? {}),
-    },
-  });
-  const body = await res.text();
-  let json: any = null;
-  try { json = body ? JSON.parse(body) : null; } catch { /* keep raw */ }
-  if (!res.ok) {
-    const msg = json?.errors?.[0]?.description || json?.message || body || `HTTP ${res.status}`;
-    console.error("Asaas API error (artist sub):", res.status, msg);
-    throw new Error("Asaas: " + msg);
-  }
-  return json;
 }
 
 function firstOfMonth(d: Date) {
@@ -91,7 +60,7 @@ export const getMyArtistSubscription = createServerFn({ method: "GET" })
 
 export const createArtistSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { billingType: "PIX" | "CREDIT_CARD" }) => {
+  .inputValidator((data: { billingType: "PIX" | "CREDIT_CARD"; returnUrl?: string }) => {
     if (data.billingType !== "PIX" && data.billingType !== "CREDIT_CARD") {
       throw new Error("Forma de pagamento inválida");
     }
@@ -101,7 +70,6 @@ export const createArtistSubscription = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const admin = adminClient();
 
-    // Load artist + profile
     const { data: artist, error: artistErr } = await supabase
       .from("tattoo_artists")
       .select("id, name, asaas_customer_id, asaas_subscription_id")
@@ -131,96 +99,109 @@ export const createArtistSubscription = createServerFn({ method: "POST" })
     const cleanCpf = String(cpfRaw).replace(/\D/g, "");
     const email = bank?.email ?? profile?.email ?? application?.email ?? undefined;
     const phoneRaw = bank?.phone ?? profile?.telefone ?? application?.phone ?? "";
-    const phone = phoneRaw ? String(phoneRaw).replace(/\D/g, "") : undefined;
+    const phoneDigits = phoneRaw ? String(phoneRaw).replace(/\D/g, "") : "";
 
     if (!fullName || fullName.length < 3) throw new Error("Preencha seus dados (nome) antes de assinar.");
     if (cleanCpf.length !== 11) throw new Error("CPF inválido nos seus dados.");
 
-    // 1. Create or fetch Asaas customer
-    let customerId = artist.asaas_customer_id ?? null;
-    if (!customerId) {
-      const existing = await asaasFetch(`/customers?cpfCnpj=${cleanCpf}&limit=1`);
-      if (existing?.data?.[0]?.id) {
-        customerId = existing.data[0].id;
-      } else {
-        const created = await asaasFetch(`/customers`, {
-          method: "POST",
-          body: JSON.stringify({
-            name: fullName,
-            cpfCnpj: cleanCpf,
-            email,
-            mobilePhone: phone,
-            externalReference: `artist:${artist.id}`,
-          }),
-        });
-        customerId = created.id;
-      }
-      await admin.from("tattoo_artists").update({ asaas_customer_id: customerId }).eq("id", artist.id);
+    // ===== MERCADO PAGO — invoice for current month =====
+    const returnUrl = data.returnUrl ?? "https://tatuame.com/tatuador/assinatura";
+    const origin = new URL(returnUrl).origin;
+    const notificationUrl = `${origin}/api/public/mercadopago-webhook`;
+    const nowMonth = firstOfMonth(new Date());
+    const dueDate = new Date().toISOString().slice(0, 10);
+
+    // Reuse existing pending invoice for this month if present
+    const { data: existingPending } = await admin
+      .from("artist_subscriptions")
+      .select("id, asaas_payment_id, invoice_url")
+      .eq("artist_id", artist.id)
+      .eq("reference_month", nowMonth)
+      .eq("status", "pending")
+      .maybeSingle();
+
+    if (existingPending?.invoice_url) {
+      await admin
+        .from("tattoo_artists")
+        .update({ subscription_billing_type: data.billingType })
+        .eq("id", artist.id);
+      return { invoiceUrl: existingPending.invoice_url, subscriptionId: existingPending.asaas_payment_id };
     }
 
-    // 2. Cancel previous subscription if any (different billing type)
-    if (artist.asaas_subscription_id) {
-      try {
-        await asaasFetch(`/subscriptions/${artist.asaas_subscription_id}`, { method: "DELETE" });
-      } catch (e) {
-        console.warn("Falha ao cancelar assinatura anterior:", e);
-      }
-    }
+    const [firstName, ...rest] = fullName.trim().split(/\s+/);
+    const phone =
+      phoneDigits.length >= 10
+        ? { area_code: phoneDigits.slice(0, 2), number: phoneDigits.slice(2) }
+        : undefined;
 
-    // 3. Create subscription — first due today (so first invoice is generated now)
-    const nextDueDate = new Date().toISOString().slice(0, 10);
-    const sub = await asaasFetch(`/subscriptions`, {
-      method: "POST",
-      body: JSON.stringify({
-        customer: customerId,
-        billingType: data.billingType,
-        cycle: "MONTHLY",
-        value: ARTIST_MONTHLY_FEE,
-        nextDueDate,
-        description: `Mensalidade TATUAME — Tatuador`,
-        externalReference: `artist_sub:${artist.id}`,
-      }),
+    const preference = await createMpPreference({
+      items: [
+        {
+          title: "Mensalidade TATUAME — Tatuador",
+          description: `Referência ${nowMonth}`,
+          quantity: 1,
+          unit_price: ARTIST_MONTHLY_FEE,
+        },
+      ],
+      payer: {
+        name: firstName,
+        surname: rest.join(" ") || undefined,
+        email,
+        identification: { type: "CPF", number: cleanCpf },
+        phone,
+      } as any,
+      externalReference: `artist_sub:${artist.id}`,
+      notificationUrl,
+      backUrls: {
+        success: `${returnUrl}?paid=1`,
+        failure: `${returnUrl}?canceled=1`,
+        pending: `${returnUrl}?pending=1`,
+      },
+      expiresInMinutes: 60 * 24 * 7, // 7 dias
     });
 
-    // 4. Find first generated payment to grab invoiceUrl
-    let invoiceUrl: string | undefined;
-    let firstPaymentId: string | undefined;
-    try {
-      const payments = await asaasFetch(`/subscriptions/${sub.id}/payments`);
-      const p = payments?.data?.[0];
-      if (p) {
-        invoiceUrl = p.invoiceUrl;
-        firstPaymentId = p.id;
-      }
-    } catch (e) {
-      console.warn("Não foi possível buscar fatura inicial:", e);
+    const invoiceUrl: string | undefined = isMpSandbox()
+      ? preference?.sandbox_init_point || preference?.init_point
+      : preference?.init_point;
+    if (!invoiceUrl) {
+      console.error("MP preference sub sem init_point:", preference);
+      throw new Error("Mercado Pago não retornou URL de pagamento.");
     }
 
-    // 5. Save to DB
     await admin
       .from("tattoo_artists")
       .update({
-        asaas_subscription_id: sub.id,
+        asaas_subscription_id: preference.id ?? null,
         subscription_billing_type: data.billingType,
         subscription_status: "pending",
-        subscription_next_due: nextDueDate,
+        subscription_next_due: dueDate,
       })
       .eq("id", artist.id);
 
-    if (firstPaymentId) {
+    if (existingPending) {
+      await admin
+        .from("artist_subscriptions")
+        .update({
+          asaas_payment_id: preference.id,
+          invoice_url: invoiceUrl,
+          billing_type: data.billingType,
+          due_date: dueDate,
+        })
+        .eq("id", existingPending.id);
+    } else {
       await admin.from("artist_subscriptions").insert({
         artist_id: artist.id,
-        reference_month: firstOfMonth(new Date()),
+        reference_month: nowMonth,
         amount: ARTIST_MONTHLY_FEE,
         status: "pending",
-        due_date: nextDueDate,
-        asaas_payment_id: firstPaymentId,
-        invoice_url: invoiceUrl ?? null,
+        due_date: dueDate,
+        asaas_payment_id: preference.id,
+        invoice_url: invoiceUrl,
         billing_type: data.billingType,
       });
     }
 
-    return { invoiceUrl: invoiceUrl ?? null, subscriptionId: sub.id };
+    return { invoiceUrl, subscriptionId: preference.id };
   });
 
 export const getArtistInvoiceUrl = createServerFn({ method: "POST" })
@@ -240,18 +221,11 @@ export const getArtistInvoiceUrl = createServerFn({ method: "POST" })
 
     const { data: row } = await supabase
       .from("artist_subscriptions")
-      .select("invoice_url, asaas_payment_id")
+      .select("invoice_url")
       .eq("id", data.invoiceId)
       .eq("artist_id", artist.id)
       .maybeSingle();
     if (!row) throw new Error("Fatura não encontrada.");
     if (row.invoice_url) return { invoiceUrl: row.invoice_url };
-    if (!row.asaas_payment_id) throw new Error("Fatura sem identificador no Asaas.");
-
-    const pay = await asaasFetch(`/payments/${row.asaas_payment_id}`);
-    if (!pay?.invoiceUrl) throw new Error("Asaas não retornou link da fatura.");
-
-    const admin = adminClient();
-    await admin.from("artist_subscriptions").update({ invoice_url: pay.invoiceUrl }).eq("id", data.invoiceId);
-    return { invoiceUrl: pay.invoiceUrl };
+    throw new Error("Fatura sem link. Gere uma nova.");
   });

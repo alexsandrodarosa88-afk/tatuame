@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { createMpPreference, isMpSandbox } from "./mercadopago.server";
 
 function adminClient() {
   return createClient<Database>(
@@ -9,39 +10,6 @@ function adminClient() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false } },
   );
-}
-
-function getAsaasConfig() {
-  const key = process.env.ASAAS_API_KEY;
-  if (!key) throw new Error("ASAAS_API_KEY não configurada");
-  // Sandbox keys start with $aact_hmlg_ or contain 'hmlg'/'sandbox'; production with $aact_prod_
-  const isSandbox = /hmlg|sandbox/i.test(key);
-  const baseUrl = isSandbox
-    ? "https://api-sandbox.asaas.com/v3"
-    : "https://api.asaas.com/v3";
-  return { key, baseUrl };
-}
-
-async function asaasFetch(path: string, init: RequestInit = {}) {
-  const { key, baseUrl } = getAsaasConfig();
-  const res = await fetch(`${baseUrl}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      access_token: key,
-      "User-Agent": "Tatuame",
-      ...(init.headers ?? {}),
-    },
-  });
-  const body = await res.text();
-  let json: any = null;
-  try { json = body ? JSON.parse(body) : null; } catch { /* keep raw */ }
-  if (!res.ok) {
-    const msg = json?.errors?.[0]?.description || json?.message || body || `HTTP ${res.status}`;
-    console.error("Asaas API error:", res.status, msg);
-    throw new Error("Asaas: " + msg);
-  }
-  return json;
 }
 
 export const createPixCheckout = createServerFn({ method: "POST" })
@@ -77,7 +45,7 @@ export const createPixCheckout = createServerFn({ method: "POST" })
 
     const admin = adminClient();
 
-    // Load user profile for Asaas customer
+    // Load user profile for Mercado Pago payer
     const { data: profile } = await admin
       .from("profiles")
       .select("nome_completo, cpf, email, telefone")
@@ -121,67 +89,57 @@ export const createPixCheckout = createServerFn({ method: "POST" })
       throw new Error("Falha ao registrar itens do pedido.");
     }
 
-    // ===== ASAAS =====
-    // 1. Create or fetch customer
-    let customerId: string;
-    const existing = await asaasFetch(`/customers?cpfCnpj=${cleanCpf}&limit=1`);
-    if (existing?.data?.[0]?.id) {
-      customerId = existing.data[0].id;
-    } else {
-      const created = await asaasFetch(`/customers`, {
-        method: "POST",
-        body: JSON.stringify({
-          name: profile.nome_completo,
-          cpfCnpj: cleanCpf,
-          email: profile.email ?? undefined,
-          mobilePhone: profile.telefone ? String(profile.telefone).replace(/\D/g, "") : undefined,
-          externalReference: userId,
-        }),
-      });
-      customerId = created.id;
-    }
+    // ===== MERCADO PAGO =====
+    const origin = new URL(data.returnUrl).origin;
+    const notificationUrl = `${origin}/api/public/mercadopago-webhook`;
 
-    // 2. Create checkout session — PIX + Credit Card (no boleto, no debit)
     const items = rows.map((r) => ({
-      name: `Cotas TATUAME`,
-      description: `${r.quantity}x cota de ${Number(r.campaigns.price_per_quota).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`,
+      title: `Cota TATUAME`,
+      description: `Tatuagem premiada — ${r.quantity}x cota`,
       quantity: r.quantity,
-      value: Number(r.campaigns.price_per_quota),
+      unit_price: Number(r.campaigns.price_per_quota),
     }));
 
-    const checkout = await asaasFetch(`/checkouts`, {
-      method: "POST",
-      body: JSON.stringify({
-        billingTypes: ["PIX", "CREDIT_CARD"],
-        chargeTypes: ["DETACHED"],
-        minutesToExpire: 30,
-        items,
-        customerData: {
-          name: profile.nome_completo,
-          cpfCnpj: cleanCpf,
-          email: profile.email ?? undefined,
-          phone: profile.telefone ? String(profile.telefone).replace(/\D/g, "") : undefined,
-        },
-        externalReference: order.id,
-        callback: {
-          successUrl: `${data.returnUrl}?order_id=${order.id}`,
-          cancelUrl: `${data.returnUrl}?order_id=${order.id}&canceled=1`,
-          expiredUrl: `${data.returnUrl}?order_id=${order.id}&expired=1`,
-        },
-      }),
+    const [firstName, ...rest] = profile.nome_completo.trim().split(/\s+/);
+    const phoneDigits = profile.telefone ? String(profile.telefone).replace(/\D/g, "") : "";
+    const phone =
+      phoneDigits.length >= 10
+        ? { area_code: phoneDigits.slice(0, 2), number: phoneDigits.slice(2) }
+        : undefined;
+
+    const preference = await createMpPreference({
+      items,
+      payer: {
+        name: firstName,
+        surname: rest.join(" ") || undefined,
+        email: profile.email ?? undefined,
+        identification: cleanCpf.length === 11
+          ? { type: "CPF", number: cleanCpf }
+          : { type: "CNPJ", number: cleanCpf },
+        phone,
+      } as any,
+      externalReference: order.id,
+      notificationUrl,
+      backUrls: {
+        success: `${data.returnUrl}?order_id=${order.id}`,
+        failure: `${data.returnUrl}?order_id=${order.id}&canceled=1`,
+        pending: `${data.returnUrl}?order_id=${order.id}&pending=1`,
+      },
+      expiresInMinutes: 30,
     });
 
-    const checkoutUrl: string | undefined =
-      checkout?.link || checkout?.url || checkout?.checkoutUrl || checkout?.invoiceUrl;
+    const checkoutUrl: string | undefined = isMpSandbox()
+      ? preference?.sandbox_init_point || preference?.init_point
+      : preference?.init_point;
     if (!checkoutUrl) {
-      console.error("Asaas checkout sem URL:", checkout);
-      throw new Error("Asaas não retornou URL de pagamento.");
+      console.error("MP preference sem init_point:", preference);
+      throw new Error("Mercado Pago não retornou URL de pagamento.");
     }
 
-    if (checkout?.id) {
+    if (preference?.id) {
       await admin
         .from("orders")
-        .update({ asaas_payment_id: checkout.id })
+        .update({ asaas_payment_id: preference.id })
         .eq("id", order.id);
     }
 

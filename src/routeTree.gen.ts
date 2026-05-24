@@ -23,6 +23,7 @@ import { Route as AuthenticatedCampanhasRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedTatuadorIndexRouteImport } from './routes/_authenticated/tatuador.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
 import { Route as AuthenticatedTatuadorRateioRouteImport } from './routes/_authenticated/tatuador.rateio'
 import { Route as AuthenticatedTatuadorPerfilRouteImport } from './routes/_authenticated/tatuador.perfil'
@@ -110,6 +111,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const ApiPublicMercadopagoWebhookRoute =
+  ApiPublicMercadopagoWebhookRouteImport.update({
+    id: '/api/public/mercadopago-webhook',
+    path: '/api/public/mercadopago-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAsaasWebhookRoute = ApiPublicAsaasWebhookRouteImport.update({
   id: '/api/public/asaas-webhook',
   path: '/api/public/asaas-webhook',
@@ -233,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/tatuador/': typeof AuthenticatedTatuadorIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -262,6 +270,7 @@ export interface FileRoutesByTo {
   '/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/tatuador': typeof AuthenticatedTatuadorIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -295,6 +304,7 @@ export interface FileRoutesById {
   '/_authenticated/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/_authenticated/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/tatuador/': typeof AuthenticatedTatuadorIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -328,6 +338,7 @@ export interface FileRouteTypes {
     | '/tatuador/perfil'
     | '/tatuador/rateio'
     | '/api/public/asaas-webhook'
+    | '/api/public/mercadopago-webhook'
     | '/admin/'
     | '/tatuador/'
     | '/api/public/payments/webhook'
@@ -357,6 +368,7 @@ export interface FileRouteTypes {
     | '/tatuador/perfil'
     | '/tatuador/rateio'
     | '/api/public/asaas-webhook'
+    | '/api/public/mercadopago-webhook'
     | '/admin'
     | '/tatuador'
     | '/api/public/payments/webhook'
@@ -389,6 +401,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tatuador/perfil'
     | '/_authenticated/tatuador/rateio'
     | '/api/public/asaas-webhook'
+    | '/api/public/mercadopago-webhook'
     | '/_authenticated/admin/'
     | '/_authenticated/tatuador/'
     | '/api/public/payments/webhook'
@@ -403,6 +416,7 @@ export interface RootRouteChildren {
   CheckoutOrderIdRoute: typeof CheckoutOrderIdRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   ApiPublicAsaasWebhookRoute: typeof ApiPublicAsaasWebhookRoute
+  ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -505,6 +519,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/mercadopago-webhook': {
+      id: '/api/public/mercadopago-webhook'
+      path: '/api/public/mercadopago-webhook'
+      fullPath: '/api/public/mercadopago-webhook'
+      preLoaderRoute: typeof ApiPublicMercadopagoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/asaas-webhook': {
       id: '/api/public/asaas-webhook'
@@ -702,18 +723,9 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutOrderIdRoute: CheckoutOrderIdRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   ApiPublicAsaasWebhookRoute: ApiPublicAsaasWebhookRoute,
+  ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
