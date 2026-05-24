@@ -7,6 +7,7 @@ import { useSiteSettings } from "@/hooks/use-site-settings";
 export function Hero() {
   const { get } = useSiteSettings();
   const img = get("hero.image", heroImage);
+  const imgPos = get("hero.image_pos", "center center");
   return (
     <section id="top" className="relative overflow-hidden pt-32 pb-24 md:pt-40 md:pb-32">
       <div
@@ -52,7 +53,8 @@ export function Hero() {
             alt="Close-up cinematográfico de braço tatuado em preto e cinza"
             width={1536}
             height={1024}
-            className="relative rounded-2xl border border-border shadow-[var(--shadow-card)] object-cover aspect-[4/3]"
+            className="relative rounded-2xl border border-border shadow-[var(--shadow-card)] object-cover aspect-[4/3] w-full"
+            style={{ objectPosition: imgPos }}
           />
         </div>
       </div>
