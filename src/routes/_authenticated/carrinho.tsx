@@ -202,10 +202,32 @@ function CartPage() {
             <span className="text-muted-foreground">Total</span>
             <span className="font-display text-2xl font-bold">{formatBRL(total)}</span>
           </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Button
+              type="button"
+              variant={paymentMethod === "PIX" ? "default" : "outline"}
+              onClick={() => setPaymentMethod("PIX")}
+              className="h-auto py-4 flex-col gap-1"
+            >
+              <QrCode className="h-5 w-5" />
+              <span className="font-semibold">PIX</span>
+              <span className="text-xs opacity-80">QR Code e copia e cola</span>
+            </Button>
+            <Button
+              type="button"
+              variant={paymentMethod === "CHECKOUT_PRO" ? "default" : "outline"}
+              onClick={() => setPaymentMethod("CHECKOUT_PRO")}
+              className="h-auto py-4 flex-col gap-1"
+            >
+              <CreditCard className="h-5 w-5" />
+              <span className="font-semibold">Cartão</span>
+              <span className="text-xs opacity-80">Checkout Pro</span>
+            </Button>
+          </div>
           <Button onClick={handlePayClick} disabled={checkout.isPending} className="w-full bg-primary hover:bg-[var(--primary-glow)] h-12 text-base font-semibold">
-            {checkout.isPending ? "Gerando pagamento..." : "PAGAR"}
+            {checkout.isPending ? "Gerando pagamento..." : paymentMethod === "PIX" ? "GERAR PIX" : "PAGAR COM CARTÃO"}
           </Button>
-          <p className="text-xs text-muted-foreground text-center">Você será redirecionado para a página segura do Mercado Pago e poderá pagar com PIX, cartão de crédito ou débito.</p>
+          <p className="text-xs text-muted-foreground text-center">PIX abre o QR Code no pedido. Cartão abre a página segura do Mercado Pago.</p>
         </Card>
       )}
 
