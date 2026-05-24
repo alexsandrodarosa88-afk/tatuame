@@ -25,7 +25,12 @@ function CheckoutStatusPage() {
     queryFn: async () => {
       const current = await fn({ data: { id: orderId } });
       if (current.status !== "paid") {
-        await checkFn({ data: { id: orderId } });
+        try {
+          await checkFn({ data: { id: orderId } });
+        } catch (error) {
+          console.warn("Falha na verificação automática do pagamento:", error);
+          return current;
+        }
         return fn({ data: { id: orderId } });
       }
       return current;
