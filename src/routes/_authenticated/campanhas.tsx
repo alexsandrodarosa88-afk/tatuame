@@ -68,10 +68,16 @@ function CampaignBuyCard({ c, onAdd, loading }: { c: any; onAdd: (q: number) => 
         {pct >= 70 && <Badge className="bg-primary/15 text-primary border border-primary/30">Quase fechando</Badge>}
       </div>
       <div className="text-sm text-muted-foreground">
-        Cota: <span className="text-foreground font-semibold">{formatBRL(Number(c.price_per_quota))}</span> · Restam {remaining}
+        Cota: <span className="text-foreground font-semibold">{formatBRL(Number(c.price_per_quota))}</span>
       </div>
-      <div className="h-2 rounded-full bg-secondary overflow-hidden">
-        <div className="h-full" style={{ width: `${pct}%`, background: "var(--gradient-primary)" }} />
+      <div className="space-y-1">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">Cotas vendidas</span>
+          <span className="font-semibold text-primary">{pct}%</span>
+        </div>
+        <div className="h-2 rounded-full bg-secondary overflow-hidden">
+          <div className="h-full" style={{ width: `${pct}%`, background: "var(--gradient-primary)" }} />
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <Button size="icon" variant="outline" onClick={() => setQty(Math.max(1, qty - 1))}><Minus className="h-4 w-4" /></Button>
