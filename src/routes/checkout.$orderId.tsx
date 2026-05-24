@@ -22,9 +22,16 @@ function CheckoutStatusPage() {
 
   const { data: order, refetch } = useQuery({
     queryKey: ["order", orderId],
-    queryFn: () => fn({ data: { id: orderId } }),
+    queryFn: async () => {
+      const current = await fn({ data: { id: orderId } });
+      if (current.status !== "paid") {
+        await checkFn({ data: { id: orderId } });
+        return fn({ data: { id: orderId } });
+      }
+      return current;
+    },
     enabled: !!user,
-    refetchInterval: (query) => (query.state.data?.status === "paid" ? false : 4000),
+    refetchInterval: (query) => ((query.state.data as any)?.status === "paid" ? false : 4000),
   });
 
   const checkPayment = useMutation({
@@ -39,10 +46,6 @@ function CheckoutStatusPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
-
-  useEffect(() => {
-    if (order?.status !== "paid") checkPayment.mutate();
-  }, [order?.status]);
 
   useEffect(() => {
     if (order?.status === "paid") {
