@@ -100,6 +100,15 @@ export async function fetchMpPayment(paymentId: string) {
   return mpFetch(`/v1/payments/${paymentId}`, { method: "GET" });
 }
 
+export async function searchMpPaymentsByExternalReference(externalReference: string) {
+  const params = new URLSearchParams({
+    external_reference: externalReference,
+    sort: "date_created",
+    criteria: "desc",
+  });
+  return mpFetch(`/v1/payments/search?${params.toString()}`, { method: "GET" });
+}
+
 export async function createMpPixPayment(input: {
   transactionAmount: number;
   description: string;
