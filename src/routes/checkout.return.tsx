@@ -17,9 +17,9 @@ function CheckoutReturnPage() {
     <div className="min-h-screen grid place-items-center bg-background px-4 py-12">
       <Card className="w-full max-w-lg p-8 text-center space-y-5">
         <CheckCircle2 className="h-16 w-16 text-success mx-auto" />
-        <h1 className="font-display text-3xl font-bold">Recebemos seu PIX!</h1>
+        <h1 className="font-display text-3xl font-bold">Pagamento recebido!</h1>
         <p className="text-muted-foreground">
-          Assim que o pagamento for confirmado pelo banco, seus números da sorte e créditos serão liberados.
+          Assim que o Mercado Pago confirmar o pagamento, seus números da sorte serão liberados automaticamente.
         </p>
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" /> Acompanhe o status na sua conta.
