@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { createMpPreference, isMpSandbox } from "./mercadopago.server";
+import { createMpPixPayment, createMpPreference, isMpSandbox } from "./mercadopago.server";
 
 function adminClient() {
   return createClient<Database>(
@@ -12,10 +12,13 @@ function adminClient() {
   );
 }
 
-export const createPixCheckout = createServerFn({ method: "POST" })
+export const createCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { returnUrl: string }) => {
+  .inputValidator((data: { returnUrl: string; paymentMethod?: "PIX" | "CHECKOUT_PRO" }) => {
     if (!/^https?:\/\//.test(data.returnUrl)) throw new Error("Invalid returnUrl");
+    if (data.paymentMethod && data.paymentMethod !== "PIX" && data.paymentMethod !== "CHECKOUT_PRO") {
+      throw new Error("Forma de pagamento inválida");
+    }
     return data;
   })
   .handler(async ({ context, data }) => {
