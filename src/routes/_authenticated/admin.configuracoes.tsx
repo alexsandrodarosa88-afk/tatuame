@@ -14,7 +14,12 @@ import { useInvalidateSiteSettings } from "@/hooks/use-site-settings";
 export const Route = createFileRoute("/_authenticated/admin/configuracoes")({ component: AdminConfig });
 
 type FieldType = "text" | "textarea" | "image";
-type Field = { key: string; label: string; type: FieldType };
+type ImageSpec = {
+  aspectRatio: string; // CSS aspect-ratio, e.g. "4/3", "1/1"
+  recommended: string; // human size, e.g. "1536×1024"
+  fit?: "cover" | "contain"; // default cover
+};
+type Field = { key: string; label: string; type: FieldType; image?: ImageSpec };
 type Group = { id: string; label: string; fields: Field[] };
 
 const GROUPS: Group[] = [
@@ -26,7 +31,7 @@ const GROUPS: Group[] = [
       { key: "hero.subtitle", label: "Subtítulo", type: "textarea" },
       { key: "hero.cta_primary", label: "Botão primário", type: "text" },
       { key: "hero.cta_secondary", label: "Botão secundário", type: "text" },
-      { key: "hero.image", label: "Imagem do topo", type: "image" },
+      { key: "hero.image", label: "Imagem do topo", type: "image", image: { aspectRatio: "4/3", recommended: "1536 × 1024 px (4:3)", fit: "cover" } },
       { key: "hero.stat1_value", label: "Stat 1 — valor", type: "text" },
       { key: "hero.stat1_label", label: "Stat 1 — texto", type: "text" },
       { key: "hero.stat2_value", label: "Stat 2 — valor", type: "text" },
@@ -79,9 +84,9 @@ const GROUPS: Group[] = [
       { key: "social.t3_name", label: "Depoimento 3 — nome", type: "text" },
       { key: "social.t3_role", label: "Depoimento 3 — cidade", type: "text" },
       { key: "social.t3_text", label: "Depoimento 3 — texto", type: "textarea" },
-      { key: "social.image1", label: "Imagem 1", type: "image" },
-      { key: "social.image2", label: "Imagem 2", type: "image" },
-      { key: "social.image3", label: "Imagem 3", type: "image" },
+      { key: "social.image1", label: "Imagem 1", type: "image", image: { aspectRatio: "1/1", recommended: "768 × 768 px (quadrada)", fit: "cover" } },
+      { key: "social.image2", label: "Imagem 2", type: "image", image: { aspectRatio: "1/1", recommended: "768 × 768 px (quadrada)", fit: "cover" } },
+      { key: "social.image3", label: "Imagem 3", type: "image", image: { aspectRatio: "1/1", recommended: "768 × 768 px (quadrada)", fit: "cover" } },
     ],
   },
   {
@@ -94,7 +99,7 @@ const GROUPS: Group[] = [
   {
     id: "footer", label: "Rodapé", fields: [
       { key: "footer.copyright", label: "Linha de copyright", type: "text" },
-      { key: "footer.logo", label: "Logo do rodapé", type: "image" },
+      { key: "footer.logo", label: "Logo do rodapé", type: "image", image: { aspectRatio: "3/1", recommended: "PNG transparente, ~600 × 200 px", fit: "contain" } },
     ],
   },
 ];
