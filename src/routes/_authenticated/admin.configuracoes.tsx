@@ -104,7 +104,22 @@ const GROUPS: Group[] = [
   },
 ];
 
-const ALL_KEYS = GROUPS.flatMap((g) => g.fields.map((f) => f.key));
+const POS_SUFFIX = "_pos";
+const ALL_KEYS = GROUPS.flatMap((g) =>
+  g.fields.flatMap((f) => (f.type === "image" ? [f.key, f.key + POS_SUFFIX] : [f.key]))
+);
+
+const POSITIONS: { id: string; label: string; css: string }[] = [
+  { id: "tl", label: "↖", css: "left top" },
+  { id: "tc", label: "↑", css: "center top" },
+  { id: "tr", label: "↗", css: "right top" },
+  { id: "ml", label: "←", css: "left center" },
+  { id: "mc", label: "•", css: "center center" },
+  { id: "mr", label: "→", css: "right center" },
+  { id: "bl", label: "↙", css: "left bottom" },
+  { id: "bc", label: "↓", css: "center bottom" },
+  { id: "br", label: "↘", css: "right bottom" },
+];
 
 function AdminConfig() {
   const [values, setValues] = useState<Record<string, string>>({});
