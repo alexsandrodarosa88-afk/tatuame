@@ -59,6 +59,9 @@ function CampaignBuyCard({ c, onAdd, loading }: { c: any; onAdd: (q: number) => 
     <Card className="p-5 flex flex-col gap-4 bg-card/80 border-border">
       <div className="flex items-start justify-between">
         <div>
+          <div className="flex items-center gap-2 mb-1">
+            {c.code && <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-mono font-semibold text-primary border border-primary/20">{c.code}</span>}
+          </div>
           <div className="text-xs uppercase tracking-wider text-muted-foreground">Tatuagem até</div>
           <div className="font-display text-2xl font-bold">{formatBRL(Number(c.tattoo_value))}</div>
         </div>
