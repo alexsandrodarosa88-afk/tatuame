@@ -17,11 +17,20 @@ type Campaign = {
   tattoo_value: number; price_per_quota: number; total_quotas: number; sold_quotas: number; ends_at: string;
 };
 
+type CampaignSale = {
+  orderId: string;
+  quantity: number;
+  total: number;
+  paidAt: string | null;
+  customer: string;
+};
+
 const brl = (n: number) => Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const empty = { title: "", description: "", tattoo_value: 0, price_per_quota: 0, total_quotas: 999, ends_at: "", status: "active" };
 
 function AdminCampanhas() {
   const [rows, setRows] = useState<Campaign[]>([]);
+  const [salesByCampaign, setSalesByCampaign] = useState<Record<string, CampaignSale[]>>({});
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Campaign | null>(null);
   const [form, setForm] = useState<any>(empty);
@@ -29,6 +38,40 @@ function AdminCampanhas() {
   const load = async () => {
     const { data } = await supabase.from("campaigns").select("*").order("created_at", { ascending: false });
     if (data) setRows(data as Campaign[]);
+
+    const { data: paidOrders } = await supabase
+      .from("orders")
+      .select("id,user_id,total_amount,paid_at,status")
+      .eq("status", "paid")
+      .order("paid_at", { ascending: false })
+      .limit(500);
+    const orderIds = (paidOrders ?? []).map((o) => o.id);
+    if (orderIds.length === 0) {
+      setSalesByCampaign({});
+      return;
+    }
+
+    const [{ data: items }, { data: profiles }] = await Promise.all([
+      supabase.from("order_items").select("order_id,campaign_id,quantity,unit_price").in("order_id", orderIds),
+      supabase.from("profiles").select("id,nome_completo,email").in("id", (paidOrders ?? []).map((o) => o.user_id)),
+    ]);
+    const ordersMap = new Map((paidOrders ?? []).map((o) => [o.id, o]));
+    const profilesMap = new Map((profiles ?? []).map((p) => [p.id, p]));
+    const grouped: Record<string, CampaignSale[]> = {};
+    for (const item of items ?? []) {
+      const order = ordersMap.get(item.order_id);
+      if (!order) continue;
+      const profile = profilesMap.get(order.user_id);
+      const sale: CampaignSale = {
+        orderId: item.order_id,
+        quantity: item.quantity,
+        total: Number(item.unit_price) * item.quantity,
+        paidAt: order.paid_at,
+        customer: profile?.nome_completo || profile?.email || order.user_id.slice(0, 8),
+      };
+      grouped[item.campaign_id] = [...(grouped[item.campaign_id] ?? []), sale].slice(0, 5);
+    }
+    setSalesByCampaign(grouped);
   };
   useEffect(() => { load(); }, []);
 
