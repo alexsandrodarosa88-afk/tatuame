@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
-import { getMyOrder } from "@/lib/cart.functions";
+import { checkMyOrderPayment, getMyOrder } from "@/lib/cart.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Clock, Copy } from "lucide-react";
+import { CheckCircle2, Clock, Copy, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout/$orderId")({ component: CheckoutStatusPage });
@@ -17,17 +17,41 @@ function CheckoutStatusPage() {
   const { orderId } = Route.useParams();
   const { user, loading } = useAuth();
   const fn = useServerFn(getMyOrder);
+  const checkFn = useServerFn(checkMyOrderPayment);
+  const qc = useQueryClient();
 
   const { data: order, refetch } = useQuery({
     queryKey: ["order", orderId],
     queryFn: () => fn({ data: { id: orderId } }),
     enabled: !!user,
-    refetchInterval: 4000,
+    refetchInterval: (query) => (query.state.data?.status === "paid" ? false : 4000),
+  });
+
+  const checkPayment = useMutation({
+    mutationFn: () => checkFn({ data: { id: orderId } }),
+    onSuccess: async (result) => {
+      await qc.invalidateQueries({ queryKey: ["order", orderId] });
+      if (result.status === "paid") {
+        toast.success("Pagamento confirmado. Seus números foram gerados.");
+      } else {
+        toast.info("Pagamento ainda não confirmado pelo Mercado Pago.");
+      }
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   useEffect(() => {
-    if (order?.status === "paid") refetch();
-  }, [order?.status, refetch]);
+    if (order?.status !== "paid") checkPayment.mutate();
+  }, [order?.status]);
+
+  useEffect(() => {
+    if (order?.status === "paid") {
+      const t = window.setTimeout(() => {
+        window.location.href = "/conta";
+      }, 1800);
+      return () => window.clearTimeout(t);
+    }
+  }, [order?.status]);
 
   const copyPix = async () => {
     if (!order?.pix_copy_paste) return;
@@ -44,7 +68,7 @@ function CheckoutStatusPage() {
           <>
             <CheckCircle2 className="h-16 w-16 text-success mx-auto" />
             <h1 className="font-display text-3xl font-bold">Pagamento confirmado!</h1>
-            <p className="text-muted-foreground">Seus números da sorte e créditos foram liberados.</p>
+            <p className="text-muted-foreground">Seus números da sorte foram gerados. Redirecionando para sua conta...</p>
             <Button asChild className="bg-primary hover:bg-[var(--primary-glow)] w-full"><Link to="/conta">Ver minha conta</Link></Button>
           </>
         ) : (
@@ -63,6 +87,15 @@ function CheckoutStatusPage() {
                 )}
                 <Button onClick={copyPix} className="w-full bg-primary hover:bg-[var(--primary-glow)]">
                   <Copy className="h-4 w-4" /> Copiar código PIX
+                </Button>
+                <Button
+                  onClick={() => checkPayment.mutate()}
+                  disabled={checkPayment.isPending}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <RefreshCw className={checkPayment.isPending ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
+                  {checkPayment.isPending ? "Verificando..." : "Já efetuei o pagamento"}
                 </Button>
                 <p className="break-all rounded border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
                   {order.pix_copy_paste}
