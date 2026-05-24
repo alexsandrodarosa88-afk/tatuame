@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
   LayoutDashboard, Users, ShoppingBag, Megaphone, Palette, CreditCard, ShieldCheck,
-  UserPlus, Wallet, Sparkles, Banknote,
+  UserPlus, Wallet, Sparkles, Banknote, Settings,
 } from "lucide-react";
 import { NotificationsBell } from "@/components/admin/NotificationsBell";
 
@@ -23,6 +23,7 @@ const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/saques", label: "Saques", icon: Banknote },
   { to: "/admin/estilos", label: "Estilos", icon: Sparkles },
   { to: "/admin/mensalidades", label: "Mensalidades", icon: CreditCard },
+  { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];
 
 function AdminLayout() {
