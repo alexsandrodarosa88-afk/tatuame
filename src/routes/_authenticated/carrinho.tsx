@@ -182,7 +182,7 @@ function CartPage() {
           return (
             <Card key={item.id} className="p-5 flex items-center gap-4">
               <div className="flex-1">
-                <div className="font-display text-lg font-semibold">Tatuagem até {formatBRL(Number(c?.tattoo_value ?? 0))}</div>
+                <div className="font-display text-lg font-semibold">Tatuagem de {formatBRL(Number(c?.tattoo_value ?? 0))}</div>
                 <div className="text-sm text-muted-foreground">{formatBRL(Number(c?.price_per_quota ?? 0))} por cota</div>
               </div>
               <div className="flex items-center gap-1">

@@ -62,7 +62,7 @@ function CampaignBuyCard({ c, onAdd, loading }: { c: any; onAdd: (q: number) => 
           <div className="flex items-center gap-2 mb-1">
             {c.code && <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-mono font-semibold text-primary border border-primary/20">{c.code}</span>}
           </div>
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">Tatuagem até</div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">Tatuagem de</div>
           <div className="font-display text-2xl font-bold">{formatBRL(Number(c.tattoo_value))}</div>
         </div>
         {pct >= 70 && <Badge className="bg-primary/15 text-primary border border-primary/30">Quase fechando</Badge>}
