@@ -19,7 +19,13 @@ export function AssinaturaPage() {
   const [picking, setPicking] = useState<"PIX" | "CREDIT_CARD" | null>(null);
 
   const create = useMutation({
-    mutationFn: (billingType: "PIX" | "CREDIT_CARD") => createFn({ data: { billingType } }),
+    mutationFn: (billingType: "PIX" | "CREDIT_CARD") =>
+      createFn({
+        data: {
+          billingType,
+          returnUrl: `${window.location.origin}/tatuador/assinatura`,
+        },
+      }),
     onSuccess: (r: any) => {
       if (r?.invoiceUrl) {
         window.location.href = r.invoiceUrl;
@@ -114,7 +120,7 @@ export function AssinaturaPage() {
       </Card>
 
       <p className="text-xs text-muted-foreground text-center">
-        Pagamento processado pelo Asaas. Você pode trocar a forma de pagamento a qualquer momento.
+        Pagamento processado pelo Mercado Pago. Você pode trocar a forma de pagamento a qualquer momento.
       </p>
     </div>
   );
