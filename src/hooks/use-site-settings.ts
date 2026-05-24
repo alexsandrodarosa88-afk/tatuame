@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 export type SiteSettings = Record<string, string>;
 
@@ -12,13 +13,17 @@ async function fetchSiteSettings(): Promise<SiteSettings> {
 }
 
 export function useSiteSettings() {
+  // Avoid SSR/client hydration mismatch: only expose fetched values after mount.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { data } = useQuery({
     queryKey: ["site_settings"],
     queryFn: fetchSiteSettings,
     staleTime: 60_000,
   });
-  const get = (key: string, fallback = "") => (data?.[key] && data[key].length ? data[key] : fallback);
-  return { settings: data ?? {}, get };
+  const get = (key: string, fallback = "") =>
+    mounted && data?.[key] && data[key].length ? data[key] : fallback;
+  return { settings: mounted ? data ?? {} : {}, get };
 }
 
 export function useInvalidateSiteSettings() {
