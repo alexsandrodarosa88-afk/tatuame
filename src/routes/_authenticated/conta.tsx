@@ -68,8 +68,11 @@ function AccountPage() {
         {ativos.map((p: any) => (
           <Card key={p.id} className="p-4 flex items-center justify-between">
             <div>
-              <div className="font-semibold">{p.campaigns?.title ?? "Campanha"}</div>
-              <div className="text-xs text-muted-foreground">Sorteio até {formatDate(p.campaigns?.ends_at)}</div>
+              <div className="flex items-center gap-2 flex-wrap">
+                {p.campaigns?.code && <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-mono font-semibold text-primary border border-primary/20">{p.campaigns.code}</span>}
+                <span className="font-semibold">{p.campaigns?.title ?? "Campanha"}</span>
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">Sorteio até {formatDate(p.campaigns?.ends_at)}</div>
             </div>
             <div className="text-right">
               <div className="text-xs text-muted-foreground">Seu número</div>
@@ -86,8 +89,11 @@ function AccountPage() {
             {historico.map((p: any) => (
               <Card key={p.id} className="p-4 flex items-center justify-between opacity-80">
                 <div>
-                  <div className="font-semibold">{p.campaigns?.title ?? "Campanha"}</div>
-                  <div className="text-xs text-muted-foreground">Encerrado em {formatDate(p.campaigns?.ends_at)}</div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {p.campaigns?.code && <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-[10px] font-mono font-semibold text-muted-foreground border border-border">{p.campaigns.code}</span>}
+                    <span className="font-semibold">{p.campaigns?.title ?? "Campanha"}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">Encerrado em {formatDate(p.campaigns?.ends_at)}</div>
                 </div>
                 <div className="text-right">
                   <div className="text-xs text-muted-foreground">Número</div>
