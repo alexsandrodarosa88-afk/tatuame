@@ -53,6 +53,9 @@ export function Hero() {
             alt="Close-up cinematográfico de braço tatuado em preto e cinza"
             width={1536}
             height={1024}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="relative rounded-2xl border border-border shadow-[var(--shadow-card)] object-cover aspect-[4/3] w-full"
             style={{ objectPosition: imgPos }}
           />
