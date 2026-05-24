@@ -21,13 +21,14 @@ const schema = z.object({
   cpf: z.string().regex(/^\d{11}$/, "CPF deve ter 11 dígitos"),
   telefone: z.string().regex(/^\d{10,11}$/, "Telefone com DDD (10 ou 11 dígitos)"),
   cidade: z.string().min(2).max(80),
+  data_nascimento: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data de nascimento obrigatória"),
 });
 
 function SignupPage() {
   const navigate = useNavigate();
   const { next } = useSearch({ from: "/cadastro" });
   const dest = next || "/campanhas";
-  const [form, setForm] = useState({ nome_completo: "", email: "", password: "", cpf: "", telefone: "", cidade: "" });
+  const [form, setForm] = useState({ nome_completo: "", email: "", password: "", cpf: "", telefone: "", cidade: "", data_nascimento: "" });
   const [loading, setLoading] = useState(false);
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value });
   const onlyDigits = (k: "cpf" | "telefone") => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -48,6 +49,7 @@ function SignupPage() {
           cpf: form.cpf,
           telefone: form.telefone,
           cidade: form.cidade,
+          data_nascimento: form.data_nascimento,
         },
       },
     });
@@ -83,7 +85,10 @@ function SignupPage() {
             <div className="space-y-1.5"><Label>CPF</Label><Input value={form.cpf} onChange={onlyDigits("cpf")} maxLength={11} placeholder="00000000000" required /></div>
             <div className="space-y-1.5"><Label>Telefone</Label><Input value={form.telefone} onChange={onlyDigits("telefone")} maxLength={11} placeholder="11999999999" required /></div>
           </div>
-          <div className="space-y-1.5"><Label>Cidade</Label><Input value={form.cidade} onChange={set("cidade")} required /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5"><Label>Data de nascimento</Label><Input type="date" value={form.data_nascimento} onChange={set("data_nascimento")} required /></div>
+            <div className="space-y-1.5"><Label>Cidade</Label><Input value={form.cidade} onChange={set("cidade")} required /></div>
+          </div>
           <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-[var(--primary-glow)] mt-2">{loading ? "Criando..." : "Criar conta"}</Button>
         </form>
         <div className="text-sm text-muted-foreground text-center">
