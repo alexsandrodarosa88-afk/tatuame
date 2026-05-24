@@ -40,30 +40,20 @@ export function Campaigns() {
                   <div className="flex items-start justify-between">
                     <div>
                       {c.code && <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-mono font-semibold text-primary border border-primary/20 mb-2">{c.code}</span>}
-                      <div className="text-xs uppercase tracking-wider text-muted-foreground">Tatuagem até</div>
+                      <div className="text-xs uppercase tracking-wider text-muted-foreground">Tatuagem de</div>
                       <div className="font-display text-3xl font-bold mt-1">{formatBRL(Number(c.tattoo_value))}</div>
                     </div>
                     {isHot && <Badge className="bg-primary/15 text-primary border border-primary/30 hover:bg-primary/15">Quase fechando</Badge>}
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-lg bg-secondary/40 border border-border p-3">
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Ticket className="h-3.5 w-3.5" /> Por cota</div>
-                      <div className="font-display text-xl font-semibold mt-1">{formatBRL(Number(c.price_per_quota))}</div>
-                    </div>
-                    <div className="rounded-lg bg-secondary/40 border border-border p-3">
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Users className="h-3.5 w-3.5" /> Cotas</div>
-                      <div className="font-display text-xl font-semibold mt-1">{c.total_quotas}</div>
-                    </div>
+                  <div className="rounded-lg bg-secondary/40 border border-border p-3">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Ticket className="h-3.5 w-3.5" /> Por cota</div>
+                    <div className="font-display text-xl font-semibold mt-1">{formatBRL(Number(c.price_per_quota))}</div>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Progresso</span>
-                      <span className="font-semibold">{pct}%</span>
-                    </div>
                     <div className="h-2 rounded-full bg-secondary overflow-hidden">
                       <div className="h-full rounded-full transition-[width] duration-700" style={{ width: `${pct}%`, background: "var(--gradient-primary)" }} />
                     </div>
-                    <div className="text-xs text-muted-foreground">Restam <span className="text-foreground font-semibold">{remaining}</span> cotas</div>
+                    <div className="text-xs text-muted-foreground">Sorteio quando finalizar as cotas e ter a 100% de cotas</div>
                   </div>
                   <Button asChild className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold w-full mt-auto">
                     <Link to="/cadastro">Participar agora</Link>
