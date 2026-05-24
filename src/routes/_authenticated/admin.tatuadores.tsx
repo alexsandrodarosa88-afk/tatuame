@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2, Power, Upload, Loader2 } from "lucide-react";
+import { Pencil, Plus, Trash2, Power, Upload, Loader2, ShieldCheck, Gift } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/tatuadores")({ component: AdminTatuadores });
 
@@ -16,6 +16,7 @@ type Artist = {
   id: string; name: string; photo_url: string | null; bio: string | null;
   styles: string[]; city: string | null; state: string | null; address: string | null;
   instagram: string | null; whatsapp: string | null; is_active: boolean;
+  subscription_status?: string | null; is_lifetime_free?: boolean | null;
 };
 
 const empty = {
@@ -116,6 +117,24 @@ function AdminTatuadores() {
     load();
   };
 
+  const unblock = async (a: Artist) => {
+    if (!confirm(`Desbloquear ${a.name}? Faturas pendentes atrasadas serão canceladas e ele poderá gerar nova mensalidade.`)) return;
+    const { error } = await supabase.rpc("admin_unblock_artist", { _artist_id: a.id });
+    if (error) { toast.error("Erro ao desbloquear: " + error.message); return; }
+    toast.success("Tatuador desbloqueado.");
+    load();
+  };
+
+  const toggleLifetime = async (a: Artist) => {
+    const next = !a.is_lifetime_free;
+    const patch: any = { is_lifetime_free: next };
+    if (next) patch.subscription_status = "active";
+    const { error } = await supabase.from("tattoo_artists").update(patch).eq("id", a.id);
+    if (error) { toast.error("Erro: " + error.message); return; }
+    toast.success(next ? "Marcado como vitalício gratuito." : "Vitalício removido.");
+    load();
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -193,9 +212,22 @@ function AdminTatuadores() {
                 <h3 className="font-semibold truncate">{a.name}</h3>
                 <p className="text-xs text-muted-foreground truncate">{(a.styles ?? []).join(" • ") || "—"}</p>
                 <p className="text-xs text-muted-foreground truncate">{[a.city, a.state].filter(Boolean).join("/") || "—"}</p>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {a.is_lifetime_free && <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/15 text-green-600 dark:text-green-400 font-medium">Vitalício</span>}
+                  {a.subscription_status === "blocked" && <span className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/15 text-destructive font-medium">Bloqueado</span>}
+                  {a.subscription_status === "active" && !a.is_lifetime_free && <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/15 text-primary font-medium">Ativo</span>}
+                </div>
                 <div className="flex gap-1 mt-1">
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(a)}><Pencil className="h-3.5 w-3.5" /></Button>
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => toggleActive(a)}><Power className="h-3.5 w-3.5" /></Button>
+                  <Button size="icon" variant="ghost" className="h-7 w-7" title={a.is_lifetime_free ? "Remover vitalício" : "Marcar vitalício gratuito"} onClick={() => toggleLifetime(a)}>
+                    <Gift className={`h-3.5 w-3.5 ${a.is_lifetime_free ? "text-green-500" : ""}`} />
+                  </Button>
+                  {a.subscription_status === "blocked" && (
+                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Desbloquear" onClick={() => unblock(a)}>
+                      <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                    </Button>
+                  )}
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remove(a.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
                 </div>
               </div>
