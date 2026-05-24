@@ -41,7 +41,8 @@ function TatuadorLayout() {
   // Exceção: rota /tatuador/dados (precisa preencher dados antes de pagar).
   const isOnDados = pathname.startsWith("/tatuador/dados");
   const isOnAssinatura = pathname.startsWith("/tatuador/assinatura");
-  const subActive = sub?.artistFound && sub.status === "active";
+  const subActive =
+    sub?.artistFound && (sub.status === "active" || (sub as any).isLifetimeFree);
 
   if (approved && !subLoading && sub && !subActive && !isOnDados && !isOnAssinatura) {
     return (

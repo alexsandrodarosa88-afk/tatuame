@@ -5,6 +5,16 @@ import type { Database } from "@/integrations/supabase/types";
 import { createMpPreference, isMpSandbox } from "./mercadopago.server";
 
 export const ARTIST_MONTHLY_FEE = 39.9;
+export const ARTIST_PROMO_FEE = 39.9;
+export const ARTIST_REGULAR_FEE = 59.9;
+
+function computeFee(startedAt: string | null, isLifetimeFree: boolean): number {
+  if (isLifetimeFree) return 0;
+  if (!startedAt) return ARTIST_PROMO_FEE;
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  return new Date(startedAt) > sixMonthsAgo ? ARTIST_PROMO_FEE : ARTIST_REGULAR_FEE;
+}
 
 function adminClient() {
   return createClient<Database>(
@@ -22,9 +32,14 @@ export const getMyArtistSubscription = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
+    const admin = adminClient();
+
+    // Auto-block atrasados > 5 dias (silencioso)
+    try { await admin.rpc("block_overdue_artists"); } catch { /* */ }
+
     const { data: artist } = await supabase
       .from("tattoo_artists")
-      .select("id, subscription_status, subscription_next_due, subscription_billing_type, asaas_subscription_id")
+      .select("id, subscription_status, subscription_next_due, subscription_billing_type, asaas_subscription_id, is_lifetime_free, subscription_started_at")
       .eq("user_id", userId)
       .maybeSingle();
     if (!artist) return { artistFound: false as const };
@@ -38,13 +53,23 @@ export const getMyArtistSubscription = createServerFn({ method: "GET" })
       .limit(1)
       .maybeSingle();
 
+    const fee = computeFee(artist.subscription_started_at as any, !!(artist as any).is_lifetime_free);
+    const daysOverdue = pending?.due_date
+      ? Math.floor((Date.now() - new Date(pending.due_date).getTime()) / 86400000)
+      : 0;
+
     return {
       artistFound: true as const,
-      status: artist.subscription_status as "pending" | "active" | "overdue" | "canceled",
+      status: artist.subscription_status as "pending" | "active" | "overdue" | "canceled" | "blocked",
       nextDue: artist.subscription_next_due,
       billingType: artist.subscription_billing_type,
       hasSubscription: !!artist.asaas_subscription_id,
-      monthlyFee: ARTIST_MONTHLY_FEE,
+      monthlyFee: fee,
+      promoFee: ARTIST_PROMO_FEE,
+      regularFee: ARTIST_REGULAR_FEE,
+      isLifetimeFree: !!(artist as any).is_lifetime_free,
+      subscriptionStartedAt: artist.subscription_started_at as any,
+      daysOverdue,
       pendingInvoice: pending
         ? {
             id: pending.id,
@@ -70,13 +95,21 @@ export const createArtistSubscription = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const admin = adminClient();
 
+    try { await admin.rpc("block_overdue_artists"); } catch { /* */ }
+
     const { data: artist, error: artistErr } = await supabase
       .from("tattoo_artists")
-      .select("id, name, asaas_customer_id, asaas_subscription_id")
+      .select("id, name, asaas_customer_id, asaas_subscription_id, subscription_status, is_lifetime_free, subscription_started_at")
       .eq("user_id", userId)
       .maybeSingle();
     if (artistErr) throw new Error("Falha ao carregar tatuador.");
     if (!artist) throw new Error("Cadastro de tatuador não aprovado.");
+    if ((artist as any).is_lifetime_free) {
+      throw new Error("Sua conta é vitalícia gratuita — não há mensalidade.");
+    }
+    if (artist.subscription_status === "blocked") {
+      throw new Error("Cadastro bloqueado. Entre em contato com o suporte — após 5 dias de atraso só o admin pode reativar.");
+    }
 
     const { data: bank } = await admin
       .from("artist_bank_details")
@@ -108,6 +141,7 @@ export const createArtistSubscription = createServerFn({ method: "POST" })
     const returnUrl = data.returnUrl ?? "https://tatuame.com/tatuador/assinatura";
     const origin = new URL(returnUrl).origin;
     const notificationUrl = `${origin}/api/public/mercadopago-webhook`;
+    const fee = computeFee((artist as any).subscription_started_at ?? null, false);
     const nowMonth = firstOfMonth(new Date());
     const dueDate = new Date().toISOString().slice(0, 10);
 
@@ -140,7 +174,7 @@ export const createArtistSubscription = createServerFn({ method: "POST" })
           title: "Mensalidade TATUAME — Tatuador",
           description: `Referência ${nowMonth}`,
           quantity: 1,
-          unit_price: ARTIST_MONTHLY_FEE,
+          unit_price: fee,
         },
       ],
       payer: {
@@ -192,7 +226,7 @@ export const createArtistSubscription = createServerFn({ method: "POST" })
       await admin.from("artist_subscriptions").insert({
         artist_id: artist.id,
         reference_month: nowMonth,
-        amount: ARTIST_MONTHLY_FEE,
+        amount: fee,
         status: "pending",
         due_date: dueDate,
         asaas_payment_id: preference.id,

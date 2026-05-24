@@ -72,7 +72,7 @@ export const Route = createFileRoute("/api/public/mercadopago-webhook")({
           const artistId = externalRef.replace("artist_sub:", "");
           const { data: artist } = await admin
             .from("tattoo_artists")
-            .select("id")
+            .select("id, subscription_started_at")
             .eq("id", artistId)
             .maybeSingle();
           if (!artist) return new Response("ok");
@@ -119,10 +119,21 @@ export const Route = createFileRoute("/api/public/mercadopago-webhook")({
               n.setMonth(n.getMonth() + 1);
               return n.toISOString().slice(0, 10);
             })();
-            await admin
-              .from("tattoo_artists")
-              .update({ subscription_status: "active", subscription_next_due: nextDue })
-              .eq("id", artist.id);
+            if (!artist.subscription_started_at) {
+              await admin
+                .from("tattoo_artists")
+                .update({
+                  subscription_status: "active",
+                  subscription_next_due: nextDue,
+                  subscription_started_at: paidAt,
+                })
+                .eq("id", artist.id);
+            } else {
+              await admin
+                .from("tattoo_artists")
+                .update({ subscription_status: "active", subscription_next_due: nextDue })
+                .eq("id", artist.id);
+            }
           } else if (status === "rejected" || status === "cancelled") {
             await admin
               .from("tattoo_artists")
