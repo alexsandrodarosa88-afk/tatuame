@@ -135,7 +135,6 @@ export async function createMpPreference(input: {
     auto_return: "approved",
     statement_descriptor: input.statementDescriptor ?? "TATUAME",
     payment_methods: {
-      excluded_payment_types: [{ id: "ticket" }, { id: "atm" }],
       installments: 12,
     },
     expires: !!expiration,
