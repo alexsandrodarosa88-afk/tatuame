@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Clock, Flame } from "lucide-react";
-import { campaigns } from "@/data/campaigns";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { listActiveCampaigns } from "@/lib/campaigns.functions";
 
 function useCountdown(target: string) {
   const [now, setNow] = useState<number | null>(null);
@@ -19,9 +21,13 @@ function useCountdown(target: string) {
 }
 
 export function Urgency() {
-  const next = [...campaigns].sort((a, b) => +new Date(a.endsAt) - +new Date(b.endsAt))[0];
-  const remaining = next.totalQuotas - next.soldQuotas;
-  const { d, h, m, s } = useCountdown(next.endsAt);
+  const fn = useServerFn(listActiveCampaigns);
+  const { data } = useQuery({ queryKey: ["public_campaigns"], queryFn: () => fn(), refetchInterval: 60_000 });
+  const active = (data ?? []).filter((c: any) => new Date(c.ends_at).getTime() > Date.now() && c.sold_quotas < c.total_quotas);
+  const next = [...active].sort((a: any, b: any) => +new Date(a.ends_at) - +new Date(b.ends_at))[0];
+  const { d, h, m, s } = useCountdown(next?.ends_at ?? new Date().toISOString());
+  if (!next) return null;
+  const remaining = next.total_quotas - next.sold_quotas;
 
   return (
     <section className="py-20 border-t border-border">

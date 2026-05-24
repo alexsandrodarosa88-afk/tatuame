@@ -1,13 +1,14 @@
 import { Check, ShieldCheck } from "lucide-react";
-
-const points = [
-  "Toda compra vira crédito na sua conta",
-  "Crédito válido por 12 meses, sem letras miúdas",
-  "Use para pagar até 70% de qualquer tatuagem",
-  "Disponível com todos os tatuadores parceiros",
-];
+import { useSiteSettings } from "@/hooks/use-site-settings";
 
 export function Guarantee() {
+  const { get } = useSiteSettings();
+  const points = [
+    get("guarantee.point1", "Toda compra vira crédito na sua conta"),
+    get("guarantee.point2", "Crédito válido por 12 meses, sem letras miúdas"),
+    get("guarantee.point3", "Use para pagar até 70% de qualquer tatuagem"),
+    get("guarantee.point4", "Disponível com todos os tatuadores parceiros"),
+  ];
   return (
     <section id="garantia" className="py-24 border-t border-border">
       <div className="container mx-auto px-4">
@@ -20,9 +21,9 @@ export function Guarantee() {
                 Garantia TATUAME
               </div>
               <h2 className="font-display text-4xl md:text-5xl font-bold leading-tight">
-                Você nunca perde.{" "}
+                {get("guarantee.title", "Você nunca perde.")}{" "}
                 <span className="bg-[image:var(--gradient-primary)] bg-clip-text text-transparent">
-                  Seu dinheiro vira tatuagem.
+                  {get("guarantee.title_highlight", "Seu dinheiro vira tatuagem.")}
                 </span>
               </h2>
             </div>
