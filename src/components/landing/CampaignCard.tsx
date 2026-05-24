@@ -29,6 +29,10 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
       </div>
 
       <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">Cotas vendidas</span>
+          <span className="font-semibold text-primary">{pct}%</span>
+        </div>
         <div className="h-2 rounded-full bg-secondary overflow-hidden">
           <div
             className="h-full rounded-full transition-[width] duration-700"
@@ -36,7 +40,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
           />
         </div>
         <div className="text-xs text-muted-foreground">
-          Sorteio quando finalizar as cotas e ter a 100% de cotas
+          Sorteio quando finalizar as cotas
         </div>
       </div>
 
