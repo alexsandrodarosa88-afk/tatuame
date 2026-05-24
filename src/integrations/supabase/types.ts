@@ -548,6 +548,27 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: string | null
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string | null
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string | null
+        }
+        Relationships: []
+      }
       tattoo_artists: {
         Row: {
           address: string | null
@@ -721,6 +742,7 @@ export type Database = {
         Args: { _gateway_payment_id?: string; _order_id: string }
         Returns: boolean
       }
+      expire_completed_campaigns: { Args: never; Returns: number }
       generate_campaign_code: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -737,7 +759,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "client" | "tattoo_artist"
       artist_application_status: "pending" | "approved" | "rejected"
-      campaign_status: "active" | "closed" | "drawn"
+      campaign_status: "active" | "closed" | "drawn" | "completed"
       order_status: "pending" | "paid" | "expired" | "canceled"
       payout_status: "pending" | "paid" | "cancelled"
       withdrawal_status: "pending" | "approved" | "paid" | "rejected"
@@ -870,7 +892,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "client", "tattoo_artist"],
       artist_application_status: ["pending", "approved", "rejected"],
-      campaign_status: ["active", "closed", "drawn"],
+      campaign_status: ["active", "closed", "drawn", "completed"],
       order_status: ["pending", "paid", "expired", "canceled"],
       payout_status: ["pending", "paid", "cancelled"],
       withdrawal_status: ["pending", "approved", "paid", "rejected"],
