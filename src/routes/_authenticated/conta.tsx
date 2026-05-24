@@ -72,7 +72,7 @@ function AccountPage() {
                 {p.campaigns?.code && <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-mono font-semibold text-primary border border-primary/20">{p.campaigns.code}</span>}
                 <span className="font-semibold">{p.campaigns?.title ?? "Campanha"}</span>
               </div>
-              <div className="text-xs text-muted-foreground mt-1">Sorteio até {formatDate(p.campaigns?.ends_at)}</div>
+              <div className="text-xs text-muted-foreground mt-1">Sorteio quando finalizar as cotas</div>
             </div>
             <div className="text-right">
               <div className="text-xs text-muted-foreground">Seu número</div>
