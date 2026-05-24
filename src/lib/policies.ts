@@ -1,4 +1,5 @@
-export const POLICY_VERSION = "1.0.0";
+export const POLICY_VERSION = "1.1.0";
+export const ARTIST_POLICY_VERSION = "1.0.0";
 
 export const POLICY_SECTIONS: { title: string; body: string }[] = [
   {
