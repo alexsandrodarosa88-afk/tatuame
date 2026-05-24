@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.notify_admin_payout_request() FROM anon, authenticated, PUBLIC;
