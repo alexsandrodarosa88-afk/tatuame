@@ -203,7 +203,7 @@ function CartPage() {
           <Button onClick={handlePayClick} disabled={checkout.isPending} className="w-full bg-primary hover:bg-[var(--primary-glow)] h-12 text-base font-semibold">
             {checkout.isPending ? "Gerando pagamento..." : "PAGAR"}
           </Button>
-          <p className="text-xs text-muted-foreground text-center">Você será redirecionado para a página segura do Asaas e poderá pagar com PIX ou cartão (cartão disponível para compras acima de R$ 150,00).</p>
+          <p className="text-xs text-muted-foreground text-center">Você será redirecionado para a página segura do Mercado Pago e poderá pagar com PIX, cartão de crédito ou débito.</p>
         </Card>
       )}
 
@@ -212,7 +212,7 @@ function CartPage() {
           <DialogHeader>
             <DialogTitle>Complete seu cadastro</DialogTitle>
             <DialogDescription>
-              Precisamos desses dados para emitir sua cobrança no Asaas. Eles ficam salvos para as próximas compras.
+              Precisamos desses dados para emitir sua cobrança no Mercado Pago. Eles ficam salvos para as próximas compras.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
