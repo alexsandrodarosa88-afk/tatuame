@@ -580,12 +580,14 @@ export type Database = {
           id: string
           instagram: string | null
           is_active: boolean
+          is_lifetime_free: boolean
           name: string
           photo_url: string | null
           state: string | null
           styles: string[]
           subscription_billing_type: string | null
           subscription_next_due: string | null
+          subscription_started_at: string | null
           subscription_status: string
           updated_at: string
           user_id: string | null
@@ -601,12 +603,14 @@ export type Database = {
           id?: string
           instagram?: string | null
           is_active?: boolean
+          is_lifetime_free?: boolean
           name: string
           photo_url?: string | null
           state?: string | null
           styles?: string[]
           subscription_billing_type?: string | null
           subscription_next_due?: string | null
+          subscription_started_at?: string | null
           subscription_status?: string
           updated_at?: string
           user_id?: string | null
@@ -622,12 +626,14 @@ export type Database = {
           id?: string
           instagram?: string | null
           is_active?: boolean
+          is_lifetime_free?: boolean
           name?: string
           photo_url?: string | null
           state?: string | null
           styles?: string[]
           subscription_billing_type?: string | null
           subscription_next_due?: string | null
+          subscription_started_at?: string | null
           subscription_status?: string
           updated_at?: string
           user_id?: string | null
@@ -724,6 +730,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_unblock_artist: { Args: { _artist_id: string }; Returns: boolean }
       allocate_lucky_numbers: {
         Args: {
           _campaign_id: string
@@ -737,7 +744,12 @@ export type Database = {
         Args: { _application_id: string }
         Returns: string
       }
+      block_overdue_artists: { Args: never; Returns: number }
       bootstrap_first_admin: { Args: never; Returns: boolean }
+      compute_artist_monthly_fee: {
+        Args: { _artist_id: string }
+        Returns: number
+      }
       confirm_paid_order: {
         Args: { _gateway_payment_id?: string; _order_id: string }
         Returns: boolean
