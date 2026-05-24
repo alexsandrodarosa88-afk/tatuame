@@ -160,6 +160,19 @@ function AdminCampanhas() {
                   <div><p className="text-xs text-muted-foreground">Vendidas</p><p className="font-medium">{c.sold_quotas} / {c.total_quotas}</p></div>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden"><div className="h-full bg-primary" style={{ width: `${pct}%` }} /></div>
+                {salesByCampaign[c.id]?.length > 0 && (
+                  <div className="rounded-md border border-border bg-muted/30 p-3">
+                    <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Últimas vendas pagas desta campanha</p>
+                    <div className="space-y-1.5">
+                      {salesByCampaign[c.id].map((sale) => (
+                        <div key={`${sale.orderId}-${sale.quantity}`} className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                          <span className="font-medium">{sale.customer}</span>
+                          <span className="text-muted-foreground">{sale.quantity} cota(s) · {brl(sale.total)} · {sale.paidAt ? new Date(sale.paidAt).toLocaleString("pt-BR") : "pago"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           );
