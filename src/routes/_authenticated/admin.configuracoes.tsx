@@ -184,7 +184,7 @@ function AdminConfig() {
 }
 
 function FieldRow({ field, value, onChange }: { field: Field; value: string; onChange: (v: string) => void }) {
-  if (field.type === "image") return <ImageField field={field} value={value} onChange={onChange} />;
+  if (field.type === "image") return null; // handled separately to access position value
   if (field.type === "textarea") return (
     <div><Label>{field.label}</Label><Textarea rows={3} value={value} onChange={(e) => onChange(e.target.value)} /></div>
   );
@@ -193,9 +193,24 @@ function FieldRow({ field, value, onChange }: { field: Field; value: string; onC
   );
 }
 
-function ImageField({ field, value, onChange }: { field: Field; value: string; onChange: (v: string) => void }) {
+function ImageField({
+  field,
+  value,
+  position,
+  onChange,
+  onChangePosition,
+}: {
+  field: Field;
+  value: string;
+  position: string;
+  onChange: (v: string) => void;
+  onChangePosition: (v: string) => void;
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const spec = field.image ?? { aspectRatio: "1/1", recommended: "", fit: "cover" as const };
+  const fit = spec.fit ?? "cover";
+  const currentPos = position || "center center";
 
   const onFile = async (file: File) => {
     setUploading(true);
@@ -218,21 +233,68 @@ function ImageField({ field, value, onChange }: { field: Field; value: string; o
   return (
     <div className="space-y-2">
       <Label>{field.label}</Label>
-      <div className="flex items-start gap-3 flex-wrap">
-        {value ? (
-          <img src={value} alt={field.label} className="h-24 w-24 rounded-md border border-border object-cover bg-muted" />
-        ) : (
-          <div className="h-24 w-24 rounded-md border border-dashed border-border grid place-items-center text-xs text-muted-foreground">Sem imagem</div>
-        )}
-        <div className="flex-1 min-w-[240px] space-y-2">
+      <p className="text-xs text-muted-foreground">
+        Tamanho ideal: <span className="font-medium">{spec.recommended}</span>
+        {fit === "cover" && " — imagens fora dessa proporção serão cortadas. Use o seletor abaixo para escolher qual parte aparece."}
+      </p>
+      <div className="grid gap-4 md:grid-cols-[260px_1fr]">
+        {/* Live preview at the real site aspect ratio */}
+        <div>
+          <div className="text-xs font-medium mb-1">Prévia (como aparece no site)</div>
+          <div
+            className="w-full rounded-md border border-border bg-muted/50 overflow-hidden"
+            style={{ aspectRatio: spec.aspectRatio }}
+          >
+            {value ? (
+              <img
+                src={value}
+                alt={field.label}
+                className="w-full h-full"
+                style={{ objectFit: fit, objectPosition: currentPos }}
+              />
+            ) : (
+              <div className="w-full h-full grid place-items-center text-xs text-muted-foreground">Sem imagem</div>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-3">
           <Input placeholder="URL da imagem" value={value} onChange={(e) => onChange(e.target.value)} />
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button type="button" size="sm" variant="outline" onClick={() => inputRef.current?.click()} disabled={uploading}>
               <Upload className="h-4 w-4 mr-1" /> {uploading ? "Enviando..." : "Enviar arquivo"}
             </Button>
             {value && <Button type="button" size="sm" variant="ghost" onClick={() => onChange("")}>Remover</Button>}
           </div>
           <input ref={inputRef} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }} />
+
+          {fit === "cover" && value && (
+            <div>
+              <div className="text-xs font-medium mb-1">Posição do recorte</div>
+              <div className="inline-grid grid-cols-3 gap-1 p-1 rounded-md border border-border bg-muted/30">
+                {POSITIONS.map((p) => {
+                  const active = currentPos === p.css;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => onChangePosition(p.css)}
+                      className={
+                        "h-9 w-9 rounded text-base leading-none grid place-items-center transition-colors " +
+                        (active
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-background hover:bg-muted text-muted-foreground")
+                      }
+                      aria-label={`Posição ${p.css}`}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1">Clique em um ponto para escolher qual parte da imagem fica visível.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
