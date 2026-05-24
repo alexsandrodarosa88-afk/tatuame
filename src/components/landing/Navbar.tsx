@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User as UserIcon, ShieldCheck, Brush, Instagram } from "lucide-react";
+import { ShoppingCart, User as UserIcon, ShieldCheck, Brush } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import logoTatuame from "@/assets/tatuame-logo.png";
 import { useAuth } from "@/hooks/use-auth";
