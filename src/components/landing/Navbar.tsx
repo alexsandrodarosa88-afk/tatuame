@@ -4,11 +4,14 @@ import { Link } from "@tanstack/react-router";
 import logoTatuame from "@/assets/tatuame-logo.png";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-admin";
+import { useArtist } from "@/hooks/use-artist";
 import { supabase } from "@/integrations/supabase/client";
 
 export function Navbar() {
   const { user } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { artist, application } = useArtist();
+  const isArtist = !!artist || !!application;
   const tatuadorHref = user ? "/tatuador" : "/login?next=/tatuador";
   return (
     <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border">
@@ -17,11 +20,24 @@ export function Navbar() {
           <img src={logoTatuame} alt="TATUAME" className="h-8 w-auto" width={1536} height={1024} />
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-          <Link to="/" hash="campanhas" className="hover:text-foreground transition-colors">Campanhas</Link>
-          <Link to="/tatuadores" className="hover:text-foreground transition-colors">Tatuadores</Link>
-          <Link to="/" hash="como-funciona" className="hover:text-foreground transition-colors">Como funciona</Link>
-          <Link to="/" hash="garantia" className="hover:text-foreground transition-colors">Garantia</Link>
-          <Link to={tatuadorHref as any} className="hover:text-foreground transition-colors inline-flex items-center gap-1"><Brush className="h-3.5 w-3.5" /> Área do Tatuador</Link>
+          {user ? (
+            <>
+              <Link to="/campanhas" className="hover:text-foreground transition-colors">Campanhas</Link>
+              <Link to="/tatuadores" className="hover:text-foreground transition-colors">Tatuadores</Link>
+              <Link to="/" hash="como-funciona" className="hover:text-foreground transition-colors">Como funciona</Link>
+              {(isArtist || isAdmin) && (
+                <Link to="/tatuador" className="hover:text-foreground transition-colors inline-flex items-center gap-1"><Brush className="h-3.5 w-3.5" /> Área do Tatuador</Link>
+              )}
+            </>
+          ) : (
+            <>
+              <Link to="/" hash="campanhas" className="hover:text-foreground transition-colors">Campanhas</Link>
+              <Link to="/tatuadores" className="hover:text-foreground transition-colors">Tatuadores</Link>
+              <Link to="/" hash="como-funciona" className="hover:text-foreground transition-colors">Como funciona</Link>
+              <Link to="/" hash="garantia" className="hover:text-foreground transition-colors">Garantia</Link>
+              <Link to={tatuadorHref as any} className="hover:text-foreground transition-colors inline-flex items-center gap-1"><Brush className="h-3.5 w-3.5" /> Área do Tatuador</Link>
+            </>
+          )}
         </nav>
         {user ? (
           <div className="flex items-center gap-2">
