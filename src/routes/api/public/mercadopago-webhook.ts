@@ -151,30 +151,11 @@ export const Route = createFileRoute("/api/public/mercadopago-webhook")({
         if (status === "approved") {
           if (order.status === "paid") return new Response("ok");
 
-          const { data: items } = await admin
-            .from("order_items")
-            .select("campaign_id, quantity")
-            .eq("order_id", order.id);
-          if (items) {
-            for (const it of items) {
-              const { error: allocErr } = await admin.rpc("allocate_lucky_numbers", {
-                _user_id: order.user_id,
-                _campaign_id: it.campaign_id,
-                _order_id: order.id,
-                _quantity: it.quantity,
-              });
-              if (allocErr) console.error("[mp-webhook] alloc err:", allocErr);
-            }
-          }
-
-          await admin
-            .from("orders")
-            .update({
-              status: "paid",
-              paid_at: new Date().toISOString(),
-              asaas_payment_id: String(payment.id),
-            })
-            .eq("id", order.id);
+          const { error: confirmErr } = await admin.rpc("confirm_paid_order", {
+            _order_id: order.id,
+            _gateway_payment_id: String(payment.id),
+          });
+          if (confirmErr) console.error("[mp-webhook] confirm_paid_order err:", confirmErr);
         } else if (status === "cancelled" || status === "rejected" || status === "refunded") {
           await admin
             .from("orders")
