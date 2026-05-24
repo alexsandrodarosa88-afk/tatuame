@@ -512,6 +512,84 @@ export type Database = {
           },
         ]
       }
+      payout_requests: {
+        Row: {
+          admin_notes: string | null
+          artist_id: string
+          campaign_id: string | null
+          created_at: string
+          extra_photo_url: string | null
+          id: string
+          is_partial: boolean
+          notes: string | null
+          paid_at: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sessions_done: number | null
+          sessions_total: number | null
+          signed_term_url: string
+          status: string
+          tattoo_photo_url: string
+          tattoo_value: number
+          updated_at: string
+          user_id: string
+          winner_cpf: string | null
+          winner_email: string | null
+          winner_name: string
+          winner_phone: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          artist_id: string
+          campaign_id?: string | null
+          created_at?: string
+          extra_photo_url?: string | null
+          id?: string
+          is_partial?: boolean
+          notes?: string | null
+          paid_at?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sessions_done?: number | null
+          sessions_total?: number | null
+          signed_term_url: string
+          status?: string
+          tattoo_photo_url: string
+          tattoo_value?: number
+          updated_at?: string
+          user_id: string
+          winner_cpf?: string | null
+          winner_email?: string | null
+          winner_name: string
+          winner_phone?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          artist_id?: string
+          campaign_id?: string | null
+          created_at?: string
+          extra_photo_url?: string | null
+          id?: string
+          is_partial?: boolean
+          notes?: string | null
+          paid_at?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sessions_done?: number | null
+          sessions_total?: number | null
+          signed_term_url?: string
+          status?: string
+          tattoo_photo_url?: string
+          tattoo_value?: number
+          updated_at?: string
+          user_id?: string
+          winner_cpf?: string | null
+          winner_email?: string | null
+          winner_name?: string
+          winner_phone?: string | null
+        }
+        Relationships: []
+      }
       policy_acceptances: {
         Row: {
           accepted_at: string
@@ -519,6 +597,7 @@ export type Database = {
           created_at: string
           id: string
           ip_address: string | null
+          policy_type: string
           user_agent: string | null
           user_id: string
           version: string
@@ -529,6 +608,7 @@ export type Database = {
           created_at?: string
           id?: string
           ip_address?: string | null
+          policy_type?: string
           user_agent?: string | null
           user_id: string
           version: string
@@ -539,6 +619,7 @@ export type Database = {
           created_at?: string
           id?: string
           ip_address?: string | null
+          policy_type?: string
           user_agent?: string | null
           user_id?: string
           version?: string
@@ -578,6 +659,90 @@ export type Database = {
           nome_completo?: string | null
           telefone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      service_terms: {
+        Row: {
+          artist_address: string | null
+          artist_cpf: string | null
+          artist_id: string
+          artist_name: string
+          artist_signature: string | null
+          artist_signed_at: string | null
+          campaign_code: string | null
+          client_address: string | null
+          client_cpf: string | null
+          client_name: string
+          client_phone: string | null
+          client_receipt_signature: string | null
+          client_received_at: string | null
+          client_signature: string | null
+          client_signed_at: string | null
+          created_at: string
+          generated_pdf_url: string | null
+          id: string
+          is_prize: boolean
+          sessions_total: number | null
+          status: string
+          tattoo_description: string
+          tattoo_value: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          artist_address?: string | null
+          artist_cpf?: string | null
+          artist_id: string
+          artist_name: string
+          artist_signature?: string | null
+          artist_signed_at?: string | null
+          campaign_code?: string | null
+          client_address?: string | null
+          client_cpf?: string | null
+          client_name: string
+          client_phone?: string | null
+          client_receipt_signature?: string | null
+          client_received_at?: string | null
+          client_signature?: string | null
+          client_signed_at?: string | null
+          created_at?: string
+          generated_pdf_url?: string | null
+          id?: string
+          is_prize?: boolean
+          sessions_total?: number | null
+          status?: string
+          tattoo_description: string
+          tattoo_value?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          artist_address?: string | null
+          artist_cpf?: string | null
+          artist_id?: string
+          artist_name?: string
+          artist_signature?: string | null
+          artist_signed_at?: string | null
+          campaign_code?: string | null
+          client_address?: string | null
+          client_cpf?: string | null
+          client_name?: string
+          client_phone?: string | null
+          client_receipt_signature?: string | null
+          client_received_at?: string | null
+          client_signature?: string | null
+          client_signed_at?: string | null
+          created_at?: string
+          generated_pdf_url?: string | null
+          id?: string
+          is_prize?: boolean
+          sessions_total?: number | null
+          status?: string
+          tattoo_description?: string
+          tattoo_value?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

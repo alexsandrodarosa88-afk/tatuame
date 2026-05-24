@@ -27,6 +27,8 @@ import { Route as AuthenticatedTatuadorIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as ApiPublicAsaasWebhookRouteImport } from './routes/api/public/asaas-webhook'
+import { Route as AuthenticatedTatuadorTermosRouteImport } from './routes/_authenticated/tatuador.termos'
+import { Route as AuthenticatedTatuadorSolicitarPagamentoRouteImport } from './routes/_authenticated/tatuador.solicitar-pagamento'
 import { Route as AuthenticatedTatuadorRateioRouteImport } from './routes/_authenticated/tatuador.rateio'
 import { Route as AuthenticatedTatuadorPerfilRouteImport } from './routes/_authenticated/tatuador.perfil'
 import { Route as AuthenticatedTatuadorMensalidadeRouteImport } from './routes/_authenticated/tatuador.mensalidade'
@@ -135,6 +137,18 @@ const ApiPublicAsaasWebhookRoute = ApiPublicAsaasWebhookRouteImport.update({
   path: '/api/public/asaas-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTatuadorTermosRoute =
+  AuthenticatedTatuadorTermosRouteImport.update({
+    id: '/termos',
+    path: '/termos',
+    getParentRoute: () => AuthenticatedTatuadorRoute,
+  } as any)
+const AuthenticatedTatuadorSolicitarPagamentoRoute =
+  AuthenticatedTatuadorSolicitarPagamentoRouteImport.update({
+    id: '/solicitar-pagamento',
+    path: '/solicitar-pagamento',
+    getParentRoute: () => AuthenticatedTatuadorRoute,
+  } as any)
 const AuthenticatedTatuadorRateioRoute =
   AuthenticatedTatuadorRateioRouteImport.update({
     id: '/rateio',
@@ -261,6 +275,8 @@ export interface FileRoutesByFullPath {
   '/tatuador/mensalidade': typeof AuthenticatedTatuadorMensalidadeRoute
   '/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
+  '/tatuador/solicitar-pagamento': typeof AuthenticatedTatuadorSolicitarPagamentoRoute
+  '/tatuador/termos': typeof AuthenticatedTatuadorTermosRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -294,6 +310,8 @@ export interface FileRoutesByTo {
   '/tatuador/mensalidade': typeof AuthenticatedTatuadorMensalidadeRoute
   '/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
+  '/tatuador/solicitar-pagamento': typeof AuthenticatedTatuadorSolicitarPagamentoRoute
+  '/tatuador/termos': typeof AuthenticatedTatuadorTermosRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -331,6 +349,8 @@ export interface FileRoutesById {
   '/_authenticated/tatuador/mensalidade': typeof AuthenticatedTatuadorMensalidadeRoute
   '/_authenticated/tatuador/perfil': typeof AuthenticatedTatuadorPerfilRoute
   '/_authenticated/tatuador/rateio': typeof AuthenticatedTatuadorRateioRoute
+  '/_authenticated/tatuador/solicitar-pagamento': typeof AuthenticatedTatuadorSolicitarPagamentoRoute
+  '/_authenticated/tatuador/termos': typeof AuthenticatedTatuadorTermosRoute
   '/api/public/asaas-webhook': typeof ApiPublicAsaasWebhookRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -368,6 +388,8 @@ export interface FileRouteTypes {
     | '/tatuador/mensalidade'
     | '/tatuador/perfil'
     | '/tatuador/rateio'
+    | '/tatuador/solicitar-pagamento'
+    | '/tatuador/termos'
     | '/api/public/asaas-webhook'
     | '/api/public/mercadopago-webhook'
     | '/admin/'
@@ -401,6 +423,8 @@ export interface FileRouteTypes {
     | '/tatuador/mensalidade'
     | '/tatuador/perfil'
     | '/tatuador/rateio'
+    | '/tatuador/solicitar-pagamento'
+    | '/tatuador/termos'
     | '/api/public/asaas-webhook'
     | '/api/public/mercadopago-webhook'
     | '/admin'
@@ -437,6 +461,8 @@ export interface FileRouteTypes {
     | '/_authenticated/tatuador/mensalidade'
     | '/_authenticated/tatuador/perfil'
     | '/_authenticated/tatuador/rateio'
+    | '/_authenticated/tatuador/solicitar-pagamento'
+    | '/_authenticated/tatuador/termos'
     | '/api/public/asaas-webhook'
     | '/api/public/mercadopago-webhook'
     | '/_authenticated/admin/'
@@ -585,6 +611,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/asaas-webhook'
       preLoaderRoute: typeof ApiPublicAsaasWebhookRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/tatuador/termos': {
+      id: '/_authenticated/tatuador/termos'
+      path: '/termos'
+      fullPath: '/tatuador/termos'
+      preLoaderRoute: typeof AuthenticatedTatuadorTermosRouteImport
+      parentRoute: typeof AuthenticatedTatuadorRoute
+    }
+    '/_authenticated/tatuador/solicitar-pagamento': {
+      id: '/_authenticated/tatuador/solicitar-pagamento'
+      path: '/solicitar-pagamento'
+      fullPath: '/tatuador/solicitar-pagamento'
+      preLoaderRoute: typeof AuthenticatedTatuadorSolicitarPagamentoRouteImport
+      parentRoute: typeof AuthenticatedTatuadorRoute
     }
     '/_authenticated/tatuador/rateio': {
       id: '/_authenticated/tatuador/rateio'
@@ -738,6 +778,8 @@ interface AuthenticatedTatuadorRouteChildren {
   AuthenticatedTatuadorMensalidadeRoute: typeof AuthenticatedTatuadorMensalidadeRoute
   AuthenticatedTatuadorPerfilRoute: typeof AuthenticatedTatuadorPerfilRoute
   AuthenticatedTatuadorRateioRoute: typeof AuthenticatedTatuadorRateioRoute
+  AuthenticatedTatuadorSolicitarPagamentoRoute: typeof AuthenticatedTatuadorSolicitarPagamentoRoute
+  AuthenticatedTatuadorTermosRoute: typeof AuthenticatedTatuadorTermosRoute
   AuthenticatedTatuadorIndexRoute: typeof AuthenticatedTatuadorIndexRoute
 }
 
@@ -747,6 +789,9 @@ const AuthenticatedTatuadorRouteChildren: AuthenticatedTatuadorRouteChildren = {
   AuthenticatedTatuadorMensalidadeRoute: AuthenticatedTatuadorMensalidadeRoute,
   AuthenticatedTatuadorPerfilRoute: AuthenticatedTatuadorPerfilRoute,
   AuthenticatedTatuadorRateioRoute: AuthenticatedTatuadorRateioRoute,
+  AuthenticatedTatuadorSolicitarPagamentoRoute:
+    AuthenticatedTatuadorSolicitarPagamentoRoute,
+  AuthenticatedTatuadorTermosRoute: AuthenticatedTatuadorTermosRoute,
   AuthenticatedTatuadorIndexRoute: AuthenticatedTatuadorIndexRoute,
 }
 
