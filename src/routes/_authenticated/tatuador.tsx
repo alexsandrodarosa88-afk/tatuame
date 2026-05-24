@@ -1,11 +1,12 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, UserCircle, Wallet, Palette, CreditCard, FileText } from "lucide-react";
+import { LayoutDashboard, UserCircle, Wallet, Palette, CreditCard, FileText, Banknote, FileSignature } from "lucide-react";
 import { useArtist } from "@/hooks/use-artist";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyArtistSubscription } from "@/lib/artist-subscription.functions";
 import { AssinaturaPage } from "./tatuador.assinatura";
 import { Loader2 } from "lucide-react";
+import { ArtistPolicyAcceptGate } from "@/components/ArtistPolicyAcceptGate";
 
 export const Route = createFileRoute("/_authenticated/tatuador")({ component: TatuadorLayout });
 
@@ -15,6 +16,8 @@ const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/tatuador/dados", label: "Meus dados", icon: FileText },
   { to: "/tatuador/mensalidade", label: "Mensalidade", icon: CreditCard },
   { to: "/tatuador/rateio", label: "Meus rateios", icon: Wallet },
+  { to: "/tatuador/solicitar-pagamento", label: "Solicitar pagamento", icon: Banknote },
+  { to: "/tatuador/termos", label: "Termos", icon: FileSignature },
 ];
 
 function TatuadorLayout() {
@@ -81,6 +84,7 @@ function TatuadorLayout() {
         </nav>
       </aside>
       <main className="min-w-0"><Outlet /></main>
+      <ArtistPolicyAcceptGate />
     </div>
   );
 }
