@@ -85,9 +85,13 @@ function CampaignBuyCard({ c, onAdd, loading }: { c: any; onAdd: (q: number) => 
         <Button size="icon" variant="outline" onClick={() => setQty(Math.min(50, remaining, qty + 1))}><Plus className="h-4 w-4" /></Button>
       </div>
       <div className="text-sm">Total: <span className="font-semibold">{formatBRL(qty * Number(c.price_per_quota))}</span></div>
-      <Button disabled={loading || remaining < 1} onClick={() => onAdd(qty)} className="bg-primary hover:bg-[var(--primary-glow)] mt-auto">
-        Adicionar ao carrinho
-      </Button>
+      {remaining < 1 ? (
+        <Button disabled className="mt-auto">Esgotado</Button>
+      ) : (
+        <Button disabled={loading} onClick={() => onAdd(qty)} className="bg-primary hover:bg-[var(--primary-glow)] mt-auto">
+          Adicionar ao carrinho
+        </Button>
+      )}
     </Card>
   );
 }
