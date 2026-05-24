@@ -58,7 +58,7 @@ function CheckoutStatusPage() {
                   <img
                     src={`data:image/png;base64,${order.pix_qr_code}`}
                     alt="QR Code PIX para pagamento"
-                    className="mx-auto h-56 w-56 rounded bg-white p-3"
+                    className="mx-auto h-56 w-56 rounded bg-card p-3"
                   />
                 )}
                 <Button onClick={copyPix} className="w-full bg-primary hover:bg-[var(--primary-glow)]">
