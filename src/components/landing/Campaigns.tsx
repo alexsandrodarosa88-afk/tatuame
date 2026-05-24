@@ -50,10 +50,14 @@ export function Campaigns() {
                     <div className="font-display text-xl font-semibold mt-1">{formatBRL(Number(c.price_per_quota))}</div>
                   </div>
                   <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground">Cotas vendidas</span>
+                      <span className="font-semibold text-primary">{pct}%</span>
+                    </div>
                     <div className="h-2 rounded-full bg-secondary overflow-hidden">
                       <div className="h-full rounded-full transition-[width] duration-700" style={{ width: `${pct}%`, background: "var(--gradient-primary)" }} />
                     </div>
-                    <div className="text-xs text-muted-foreground">Sorteio quando finalizar as cotas e ter a 100% de cotas</div>
+                    <div className="text-xs text-muted-foreground">Sorteio quando finalizar as cotas</div>
                   </div>
                   <Button asChild className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold w-full mt-auto">
                     <Link to="/cadastro">Participar agora</Link>
