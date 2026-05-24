@@ -714,6 +714,10 @@ export type Database = {
         Returns: string
       }
       bootstrap_first_admin: { Args: never; Returns: boolean }
+      confirm_paid_order: {
+        Args: { _gateway_payment_id?: string; _order_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
