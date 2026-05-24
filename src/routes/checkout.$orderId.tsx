@@ -20,7 +20,7 @@ function CheckoutStatusPage() {
   const checkFn = useServerFn(checkMyOrderPayment);
   const qc = useQueryClient();
 
-  const { data: order, refetch } = useQuery({
+  const { data: order } = useQuery({
     queryKey: ["order", orderId],
     queryFn: async () => {
       const current = await fn({ data: { id: orderId } });
