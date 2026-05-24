@@ -742,6 +742,10 @@ export type Database = {
         Args: { _gateway_payment_id?: string; _order_id: string }
         Returns: boolean
       }
+      distribute_campaign_payouts: {
+        Args: { _campaign_id: string }
+        Returns: number
+      }
       expire_completed_campaigns: { Args: never; Returns: number }
       generate_campaign_code: { Args: never; Returns: string }
       has_role: {
