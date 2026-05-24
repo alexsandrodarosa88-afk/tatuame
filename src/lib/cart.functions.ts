@@ -97,3 +97,19 @@ export const getMyOrder = createServerFn({ method: "GET" })
     }
     return order;
   });
+
+export const getMyProfile = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("nome_completo, email, cpf, telefone, cidade, data_nascimento")
+      .eq("id", userId)
+      .maybeSingle();
+    if (error) {
+      console.error("getMyProfile error:", error);
+      throw new Error("Não foi possível carregar seu perfil.");
+    }
+    return data;
+  });
