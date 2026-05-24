@@ -169,9 +169,20 @@ function AdminConfig() {
         {GROUPS.map((g) => (
           <TabsContent key={g.id} value={g.id} className="mt-4">
             <Card><CardContent className="p-5 space-y-4">
-              {g.fields.map((f) => (
-                <FieldRow key={f.key} field={f} value={values[f.key] ?? ""} onChange={(v) => setValue(f.key, v)} />
-              ))}
+              {g.fields.map((f) =>
+                f.type === "image" ? (
+                  <ImageField
+                    key={f.key}
+                    field={f}
+                    value={values[f.key] ?? ""}
+                    position={values[f.key + POS_SUFFIX] ?? ""}
+                    onChange={(v) => setValue(f.key, v)}
+                    onChangePosition={(v) => setValue(f.key + POS_SUFFIX, v)}
+                  />
+                ) : (
+                  <FieldRow key={f.key} field={f} value={values[f.key] ?? ""} onChange={(v) => setValue(f.key, v)} />
+                )
+              )}
             </CardContent></Card>
           </TabsContent>
         ))}
