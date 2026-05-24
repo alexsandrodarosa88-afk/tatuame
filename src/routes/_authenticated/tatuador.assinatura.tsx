@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { createArtistSubscription, getMyArtistSubscription } from "@/lib/artist-subscription.functions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, CreditCard, QrCode, Lock } from "lucide-react";
+import { Loader2, CreditCard, QrCode, Lock, ShieldAlert, Gift, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -52,7 +52,43 @@ export function AssinaturaPage() {
     );
   }
 
-  const overdue = data.status === "overdue";
+  if ((data as any).isLifetimeFree) {
+    return (
+      <Card className="border-green-500/40 bg-green-500/5 max-w-2xl mx-auto">
+        <CardContent className="p-6 flex items-start gap-3">
+          <Gift className="h-6 w-6 text-green-500 shrink-0" />
+          <div>
+            <p className="font-semibold text-lg">Acesso vitalício gratuito</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Sua conta foi marcada como vitalícia. Você não precisa pagar mensalidade.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (data.status === "blocked") {
+    return (
+      <Card className="border-destructive/50 bg-destructive/5 max-w-2xl mx-auto">
+        <CardContent className="p-6 space-y-3">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="h-6 w-6 text-destructive" />
+            <h2 className="text-xl font-bold">Cadastro bloqueado</h2>
+          </div>
+          <p className="text-sm">
+            Sua mensalidade ficou mais de <strong>5 dias em atraso</strong> e o sistema bloqueou seu acesso automaticamente.
+            Não é mais possível gerar PIX por aqui.
+          </p>
+          <p className="text-sm">
+            Para reativar, <strong>entre em contato com o suporte</strong>. Apenas o admin pode liberar novamente seu cadastro.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const overdue = data.status === "overdue" || ((data as any).daysOverdue ?? 0) > 0;
   const pendingInvoice = data.pendingInvoice;
 
   const handlePick = (t: "PIX" | "CREDIT_CARD") => {
@@ -71,6 +107,15 @@ export function AssinaturaPage() {
 
       <Card>
         <CardContent className="p-6 space-y-4">
+          <div className="flex items-start gap-2 rounded-md border border-primary/30 bg-primary/5 p-3">
+            <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-semibold">Promoção de lançamento</p>
+              <p className="text-muted-foreground">
+                6 primeiros meses por <strong>{brl((data as any).promoFee ?? 39.9)}</strong>, depois <strong>{brl((data as any).regularFee ?? 59.9)}/mês</strong>.
+              </p>
+            </div>
+          </div>
           <div>
             <p className="text-sm text-muted-foreground uppercase tracking-wider">Mensalidade TATUAME</p>
             <p className="text-4xl font-bold mt-1">{brl(data.monthlyFee)}<span className="text-base font-normal text-muted-foreground">/mês</span></p>
