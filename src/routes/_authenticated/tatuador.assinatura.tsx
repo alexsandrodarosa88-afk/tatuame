@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/tatuador/assinatura")({ co
 
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-export function AssinaturaPage() {
+function AssinaturaPage() {
   const statusFn = useServerFn(getMyArtistSubscription);
   const createFn = useServerFn(createArtistSubscription);
   const { data, isLoading, refetch } = useQuery({ queryKey: ["artist-sub"], queryFn: () => statusFn() });
