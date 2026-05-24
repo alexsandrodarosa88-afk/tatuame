@@ -514,6 +514,7 @@ export type Database = {
           cidade: string | null
           cpf: string | null
           created_at: string
+          data_nascimento: string | null
           email: string | null
           id: string
           nome_completo: string | null
@@ -524,6 +525,7 @@ export type Database = {
           cidade?: string | null
           cpf?: string | null
           created_at?: string
+          data_nascimento?: string | null
           email?: string | null
           id: string
           nome_completo?: string | null
@@ -534,6 +536,7 @@ export type Database = {
           cidade?: string | null
           cpf?: string | null
           created_at?: string
+          data_nascimento?: string | null
           email?: string | null
           id?: string
           nome_completo?: string | null
