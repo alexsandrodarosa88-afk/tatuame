@@ -1021,6 +1021,13 @@ export type Database = {
         Args: { _application_id: string; _reason?: string }
         Returns: boolean
       }
+      tattoo_artists_billing_unchanged: {
+        Args: {
+          _new: Database["public"]["Tables"]["tattoo_artists"]["Row"]
+          _old: Database["public"]["Tables"]["tattoo_artists"]["Row"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "client" | "tattoo_artist"
