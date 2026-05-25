@@ -15,13 +15,13 @@ export const Route = createFileRoute("/cadastro")({
 });
 
 const schema = z.object({
-  nome_completo: z.string().min(3, "Nome muito curto").max(120),
-  email: z.string().email("Email inválido").max(255),
-  password: z.string().min(8, "Mínimo 8 caracteres").max(72),
-  cpf: z.string().regex(/^\d{11}$/, "CPF deve ter 11 dígitos"),
-  telefone: z.string().regex(/^\d{10,11}$/, "Telefone com DDD (10 ou 11 dígitos)"),
-  cidade: z.string().min(2).max(80),
-  data_nascimento: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data de nascimento obrigatória"),
+  nome_completo: z.string().trim().min(3, "Nome completo é obrigatório").max(120),
+  email: z.string().trim().email("Email válido é obrigatório").max(255),
+  password: z.string().min(8, "Senha de no mínimo 8 caracteres é obrigatória").max(72),
+  cpf: z.string().regex(/^\d{11}$/, "CPF (11 dígitos) é obrigatório"),
+  telefone: z.string().regex(/^\d{10,11}$/, "Telefone com DDD é obrigatório"),
+  cidade: z.string().trim().min(2, "Cidade é obrigatória").max(80),
+  data_nascimento: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data de nascimento é obrigatória"),
 });
 
 function SignupPage() {
@@ -37,7 +37,17 @@ function SignupPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = schema.safeParse(form);
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    if (!parsed.success) {
+      parsed.error.issues.forEach((i) => toast.error(i.message));
+      return;
+    }
+    // garante que nenhum campo ficou em branco
+    for (const [k, v] of Object.entries(form)) {
+      if (!String(v ?? "").trim()) {
+        toast.error("Preencha todos os campos obrigatórios para criar sua conta.");
+        return;
+      }
+    }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email: form.email,
@@ -78,17 +88,18 @@ function SignupPage() {
         <Button onClick={google} variant="outline" className="w-full">Continuar com Google</Button>
         <div className="flex items-center gap-3 text-xs text-muted-foreground"><div className="h-px bg-border flex-1" />ou<div className="h-px bg-border flex-1" /></div>
         <form onSubmit={submit} className="space-y-3">
-          <div className="space-y-1.5"><Label>Nome completo</Label><Input value={form.nome_completo} onChange={set("nome_completo")} required /></div>
-          <div className="space-y-1.5"><Label>Email</Label><Input type="email" value={form.email} onChange={set("email")} required /></div>
-          <div className="space-y-1.5"><Label>Senha (mín. 8)</Label><Input type="password" value={form.password} onChange={set("password")} required /></div>
+          <div className="space-y-1.5"><Label>Nome completo *</Label><Input value={form.nome_completo} onChange={set("nome_completo")} required /></div>
+          <div className="space-y-1.5"><Label>Email *</Label><Input type="email" value={form.email} onChange={set("email")} required /></div>
+          <div className="space-y-1.5"><Label>Senha (mín. 8) *</Label><Input type="password" value={form.password} onChange={set("password")} required /></div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5"><Label>CPF</Label><Input value={form.cpf} onChange={onlyDigits("cpf")} maxLength={11} placeholder="00000000000" required /></div>
-            <div className="space-y-1.5"><Label>Telefone</Label><Input value={form.telefone} onChange={onlyDigits("telefone")} maxLength={11} placeholder="11999999999" required /></div>
+            <div className="space-y-1.5"><Label>CPF *</Label><Input value={form.cpf} onChange={onlyDigits("cpf")} maxLength={11} placeholder="00000000000" required /></div>
+            <div className="space-y-1.5"><Label>Telefone *</Label><Input value={form.telefone} onChange={onlyDigits("telefone")} maxLength={11} placeholder="11999999999" required /></div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5"><Label>Data de nascimento</Label><Input type="date" value={form.data_nascimento} onChange={set("data_nascimento")} required /></div>
-            <div className="space-y-1.5"><Label>Cidade</Label><Input value={form.cidade} onChange={set("cidade")} required /></div>
+            <div className="space-y-1.5"><Label>Data de nascimento *</Label><Input type="date" value={form.data_nascimento} onChange={set("data_nascimento")} required /></div>
+            <div className="space-y-1.5"><Label>Cidade *</Label><Input value={form.cidade} onChange={set("cidade")} required /></div>
           </div>
+          <p className="text-xs text-muted-foreground">* Todos os campos são obrigatórios.</p>
           <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-[var(--primary-glow)] mt-2">{loading ? "Criando..." : "Criar conta"}</Button>
         </form>
         <div className="text-sm text-muted-foreground text-center">
