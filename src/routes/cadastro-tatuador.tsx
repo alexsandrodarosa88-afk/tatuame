@@ -40,8 +40,16 @@ function SignupArtistPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    for (const [k, v] of Object.entries(form)) {
+      if (!String(v ?? "").trim()) {
+        return toast.error("Preencha todos os campos obrigatórios para enviar seu cadastro.");
+      }
+    }
     const parsed = schema.safeParse(form);
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    if (!parsed.success) {
+      parsed.error.issues.forEach((i) => toast.error(i.message));
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email: form.email,
