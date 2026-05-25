@@ -201,6 +201,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "artist_payouts_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "tattoo_artists_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "artist_payouts_campaign_id_fkey"
             columns: ["campaign_id"]
             isOneToOne: false
@@ -261,6 +268,13 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "tattoo_artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_subscriptions_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "tattoo_artists_public"
             referencedColumns: ["id"]
           },
         ]
@@ -925,7 +939,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      tattoo_artists_public: {
+        Row: {
+          address: string | null
+          bio: string | null
+          city: string | null
+          id: string | null
+          instagram: string | null
+          name: string | null
+          photo_url: string | null
+          state: string | null
+          styles: string[] | null
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          bio?: string | null
+          city?: string | null
+          id?: string | null
+          instagram?: string | null
+          name?: string | null
+          photo_url?: string | null
+          state?: string | null
+          styles?: string[] | null
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string | null
+          bio?: string | null
+          city?: string | null
+          id?: string | null
+          instagram?: string | null
+          name?: string | null
+          photo_url?: string | null
+          state?: string | null
+          styles?: string[] | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_unblock_artist: { Args: { _artist_id: string }; Returns: boolean }
