@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TatuadoresRouteImport } from './routes/tatuadores'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CadastroTatuadorRouteImport } from './routes/cadastro-tatuador'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -59,6 +60,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroTatuadorRoute = CadastroTatuadorRouteImport.update({
+  id: '/cadastro-tatuador',
+  path: '/cadastro-tatuador',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CadastroRoute = CadastroRouteImport.update({
@@ -249,6 +255,7 @@ const ApiPublicPaymentsWebhookRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cadastro': typeof CadastroRoute
+  '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/tatuadores': typeof TatuadoresRoute
@@ -286,6 +293,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cadastro': typeof CadastroRoute
+  '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/tatuadores': typeof TatuadoresRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/cadastro': typeof CadastroRoute
+  '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/tatuadores': typeof TatuadoresRoute
@@ -362,6 +371,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cadastro'
+    | '/cadastro-tatuador'
     | '/login'
     | '/reset-password'
     | '/tatuadores'
@@ -399,6 +409,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/cadastro'
+    | '/cadastro-tatuador'
     | '/login'
     | '/reset-password'
     | '/tatuadores'
@@ -435,6 +446,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/cadastro'
+    | '/cadastro-tatuador'
     | '/login'
     | '/reset-password'
     | '/tatuadores'
@@ -474,6 +486,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   CadastroRoute: typeof CadastroRoute
+  CadastroTatuadorRoute: typeof CadastroTatuadorRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TatuadoresRoute: typeof TatuadoresRoute
@@ -505,6 +518,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro-tatuador': {
+      id: '/cadastro-tatuador'
+      path: '/cadastro-tatuador'
+      fullPath: '/cadastro-tatuador'
+      preLoaderRoute: typeof CadastroTatuadorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cadastro': {
@@ -826,6 +846,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   CadastroRoute: CadastroRoute,
+  CadastroTatuadorRoute: CadastroTatuadorRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TatuadoresRoute: TatuadoresRoute,
