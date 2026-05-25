@@ -154,6 +154,29 @@ export const checkMyOrderPayment = createServerFn({ method: "POST" })
     return confirmOrderWithGateway(order);
   });
 
+export const reconcileMyPendingOrders = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: pending } = await supabase
+      .from("orders")
+      .select("id, status, asaas_payment_id")
+      .eq("user_id", userId)
+      .eq("status", "pending")
+      .gte("created_at", since);
+    let confirmed = 0;
+    for (const o of pending ?? []) {
+      try {
+        const r = await confirmOrderWithGateway(o);
+        if (r.changed) confirmed += 1;
+      } catch (e) {
+        console.warn("reconcileMyPendingOrders fail", o.id, e);
+      }
+    }
+    return { confirmed };
+  });
+
 export const getMyProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
