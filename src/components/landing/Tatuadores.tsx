@@ -51,12 +51,12 @@ export function Tatuadores() {
 
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="aspect-square rounded-lg bg-muted animate-pulse" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+          <div className={`grid gap-3 md:gap-4 ${artists.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : artists.length === 2 ? 'grid-cols-2 max-w-md mx-auto' : 'grid-cols-2 md:grid-cols-4 lg:grid-cols-6'}`}>
             {artists.map((a) => (
               <Link
                 key={a.id}
