@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useRealtimeCallback } from "@/hooks/use-realtime-invalidate";
 
 export const Route = createFileRoute("/_authenticated/admin/campanhas")({ component: AdminCampanhas });
 
@@ -74,6 +75,8 @@ function AdminCampanhas() {
     setSalesByCampaign(grouped);
   };
   useEffect(() => { load(); }, []);
+  useRealtimeCallback("campaigns", () => { load(); });
+  useRealtimeCallback("orders", () => { load(); });
 
   const openNew = () => { setEditing(null); setForm(empty); setOpen(true); };
   const openEdit = (c: Campaign) => {

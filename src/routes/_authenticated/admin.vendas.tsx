@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { useRealtimeCallback } from "@/hooks/use-realtime-invalidate";
 
 export const Route = createFileRoute("/_authenticated/admin/vendas")({ component: AdminVendas });
 
@@ -17,16 +18,16 @@ function AdminVendas() {
   const [rows, setRows] = useState<Order[]>([]);
   const [filter, setFilter] = useState<string>("all");
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase
-        .from("orders")
-        .select("id,user_id,status,total_amount,created_at,paid_at,profiles(nome_completo,email),order_items(quantity,unit_price,campaigns(title))")
-        .order("created_at", { ascending: false })
-        .limit(500);
-      if (data) setRows(data as any);
-    })();
-  }, []);
+  const load = async () => {
+    const { data } = await supabase
+      .from("orders")
+      .select("id,user_id,status,total_amount,created_at,paid_at,profiles(nome_completo,email),order_items(quantity,unit_price,campaigns(title))")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (data) setRows(data as any);
+  };
+  useEffect(() => { load(); }, []);
+  useRealtimeCallback("orders", () => { load(); });
 
   const filtered = filter === "all" ? rows : rows.filter((r) => r.status === filter);
 
