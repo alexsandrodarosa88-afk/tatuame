@@ -21,8 +21,8 @@ function Index() {
       <Navbar />
       <main>
         <Hero />
-        <Campaigns />
         <Tatuadores />
+        <Campaigns />
         <Suspense fallback={null}>
           <HowItWorks />
           <Guarantee />

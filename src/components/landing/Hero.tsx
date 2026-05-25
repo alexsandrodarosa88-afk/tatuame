@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, ShieldCheck, Users } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import heroImage from "@/assets/hero-tattoo.jpg";
 import { useSiteSettings } from "@/hooks/use-site-settings";
@@ -38,6 +38,9 @@ export function Hero() {
             </Button>
             <Button asChild size="lg" variant="outline" className="border-border bg-card/60 backdrop-blur hover:bg-card">
               <a href="#como-funciona">{get("hero.cta_secondary", "Como funciona")}</a>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="border-primary/40 text-primary hover:bg-primary/10">
+              <Link to="/tatuadores"><Users className="mr-2 h-4 w-4" /> Ver tatuadores</Link>
             </Button>
           </div>
           <div className="flex flex-wrap gap-8 pt-6 text-sm">
