@@ -42,11 +42,10 @@ function TatuadoresPage() {
   useEffect(() => {
     (async () => {
       const { data, error } = await supabase
-        .from("tattoo_artists")
+        .from("tattoo_artists_public" as any)
         .select("id,name,photo_url,styles,city,state,address,instagram,whatsapp")
-        .eq("is_active", true)
         .order("name", { ascending: true });
-      if (!error && data) setArtists(data as Artist[]);
+      if (!error && data) setArtists(data as unknown as Artist[]);
       setLoading(false);
     })();
   }, []);
