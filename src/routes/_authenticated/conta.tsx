@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getMyParticipations, getMyCredits, getMyProfile } from "@/lib/cart.functions";
+import { useEffect } from "react";
+import { getMyParticipations, getMyCredits, getMyProfile, reconcileMyPendingOrders } from "@/lib/cart.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Ticket, Wallet, User as UserIcon, FileText } from "lucide-react";
@@ -15,9 +16,24 @@ function AccountPage() {
   const partsFn = useServerFn(getMyParticipations);
   const credFn = useServerFn(getMyCredits);
   const profFn = useServerFn(getMyProfile);
+  const reconcileFn = useServerFn(reconcileMyPendingOrders);
+  const qc = useQueryClient();
   const { data: parts } = useQuery({ queryKey: ["participations"], queryFn: () => partsFn() });
   const { data: credits } = useQuery({ queryKey: ["credits"], queryFn: () => credFn() });
   const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => profFn() });
+
+  useEffect(() => {
+    let cancelled = false;
+    reconcileFn()
+      .then((r) => {
+        if (!cancelled && r?.confirmed && r.confirmed > 0) {
+          qc.invalidateQueries({ queryKey: ["participations"] });
+          qc.invalidateQueries({ queryKey: ["credits"] });
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [reconcileFn, qc]);
 
   const totalCredit = (credits ?? []).reduce((a, c) => a + (Number(c.amount) - Number(c.used_amount)), 0);
 
