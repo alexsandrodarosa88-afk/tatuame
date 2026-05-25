@@ -939,6 +939,33 @@ export type Database = {
       }
     }
     Views: {
+      policy_acceptances_self: {
+        Row: {
+          accepted_at: string | null
+          created_at: string | null
+          id: string | null
+          policy_type: string | null
+          user_id: string | null
+          version: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string | null
+          id?: string | null
+          policy_type?: string | null
+          user_id?: string | null
+          version?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string | null
+          id?: string | null
+          policy_type?: string | null
+          user_id?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       tattoo_artists_public: {
         Row: {
           address: string | null
