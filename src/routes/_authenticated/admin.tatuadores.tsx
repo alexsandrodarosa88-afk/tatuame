@@ -21,6 +21,8 @@ type Artist = {
   user_id?: string | null;
 };
 
+type SubInfo = { last_paid_at: string | null; last_amount: number | null; next_due: string | null };
+
 const empty = {
   name: "", photo_url: "", bio: "", styles: [] as string[],
   city: "", state: "", address: "", instagram: "", whatsapp: "", is_active: true,
@@ -28,6 +30,7 @@ const empty = {
 
 function AdminTatuadores() {
   const [rows, setRows] = useState<Artist[]>([]);
+  const [subs, setSubs] = useState<Record<string, SubInfo>>({});
   const [styles, setStyles] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Artist | null>(null);
@@ -38,7 +41,23 @@ function AdminTatuadores() {
 
   const load = async () => {
     const { data } = await supabase.from("tattoo_artists").select("*").order("name");
-    if (data) setRows(data as Artist[]);
+    if (data) {
+      setRows(data as Artist[]);
+      const ids = (data as Artist[]).map((a) => a.id);
+      if (ids.length) {
+        const { data: sub } = await supabase
+          .from("artist_subscriptions")
+          .select("artist_id, paid_at, amount, due_date, status")
+          .in("artist_id", ids)
+          .eq("status", "paid")
+          .order("paid_at", { ascending: false });
+        const map: Record<string, SubInfo> = {};
+        (sub ?? []).forEach((s: any) => {
+          if (!map[s.artist_id]) map[s.artist_id] = { last_paid_at: s.paid_at, last_amount: Number(s.amount), next_due: s.due_date };
+        });
+        setSubs(map);
+      }
+    }
   };
   useEffect(() => {
     load();
@@ -219,6 +238,16 @@ function AdminTatuadores() {
                   {a.is_lifetime_free && <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/15 text-green-600 dark:text-green-400 font-medium">Vitalício</span>}
                   {a.subscription_status === "blocked" && <span className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/15 text-destructive font-medium">Bloqueado</span>}
                   {a.subscription_status === "active" && !a.is_lifetime_free && <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/15 text-primary font-medium">Ativo</span>}
+                  {subs[a.id]?.last_paid_at && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-medium" title={`R$ ${subs[a.id].last_amount?.toFixed(2)}`}>
+                      Mensalidade paga {new Date(subs[a.id].last_paid_at!).toLocaleDateString("pt-BR")}
+                    </span>
+                  )}
+                  {!subs[a.id]?.last_paid_at && !a.is_lifetime_free && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 font-medium">
+                      Sem pagamento
+                    </span>
+                  )}
                 </div>
                 <div className="flex gap-1 mt-1">
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(a)}><Pencil className="h-3.5 w-3.5" /></Button>
