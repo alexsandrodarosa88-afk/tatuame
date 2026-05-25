@@ -24,7 +24,7 @@ export function Tatuadores() {
         .select("id,name,photo_url,styles,city,state")
         .order("name", { ascending: true })
         .limit(12);
-      if (data) setArtists(data as Artist[]);
+      if (data) setArtists(data as unknown as Artist[]);
       setLoading(false);
     })();
   }, []);
