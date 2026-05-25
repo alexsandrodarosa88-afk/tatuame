@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { useRealtimeCallback } from "@/hooks/use-realtime-invalidate";
@@ -142,8 +142,8 @@ function AdminVendas() {
             {filtered.map((r) => {
               const isOpen = !!open[r.id];
               return (
-                <>
-                  <tr key={r.id} className="border-t border-border align-top">
+                <Fragment key={r.id}>
+                  <tr className="border-t border-border align-top">
                     <td className="p-3 whitespace-nowrap text-xs">
                       <div>{new Date(r.created_at).toLocaleString("pt-BR")}</div>
                       {r.paid_at && <div className="text-muted-foreground">pago: {new Date(r.paid_at).toLocaleString("pt-BR")}</div>}
@@ -173,7 +173,7 @@ function AdminVendas() {
                     </td>
                   </tr>
                   {isOpen && r.numbers.length > 0 && (
-                    <tr key={r.id + "-n"} className="bg-muted/20">
+                    <tr className="bg-muted/20">
                       <td colSpan={8} className="p-3 text-xs">
                         <div className="flex flex-wrap gap-1">
                           {r.numbers.map((n, i) => (
@@ -183,7 +183,7 @@ function AdminVendas() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               );
             })}
             {filtered.length === 0 && <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">Nenhuma venda.</td></tr>}
