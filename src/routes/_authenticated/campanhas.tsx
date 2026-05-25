@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { useRealtimeInvalidate } from "@/hooks/use-realtime-invalidate";
 
 export const Route = createFileRoute("/_authenticated/campanhas")({ component: CampanhasPage });
 
@@ -23,6 +24,8 @@ function CampanhasPage() {
 
   const { data: campaigns } = useQuery({ queryKey: ["campaigns"], queryFn: () => list() });
   const { data: cart } = useQuery({ queryKey: ["cart"], queryFn: () => cartFn() });
+  useRealtimeInvalidate("campaigns", [["campaigns"]]);
+  useRealtimeInvalidate("orders", [["cart"]]);
 
   const add = useMutation({
     mutationFn: (input: { campaign_id: string; quantity: number }) => upsert({ data: input }),

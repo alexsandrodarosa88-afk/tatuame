@@ -7,13 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { Ticket, Users } from "lucide-react";
 import { listActiveCampaigns } from "@/lib/campaigns.functions";
 import { useSiteSettings } from "@/hooks/use-site-settings";
+import { useRealtimeInvalidate } from "@/hooks/use-realtime-invalidate";
 
 const formatBRL = (n: number) => Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export function Campaigns() {
   const { get } = useSiteSettings();
   const fn = useServerFn(listActiveCampaigns);
-  const { data: campaigns } = useQuery({ queryKey: ["public_campaigns"], queryFn: () => fn(), refetchInterval: 60_000 });
+  const { data: campaigns } = useQuery({ queryKey: ["public_campaigns"], queryFn: () => fn(), refetchInterval: 15_000, refetchOnWindowFocus: true });
+  useRealtimeInvalidate("campaigns", [["public_campaigns"]]);
   const list = (campaigns ?? []).filter((c: any) => new Date(c.ends_at).getTime() > Date.now() && c.sold_quotas < c.total_quotas);
   return (
     <section id="campanhas" className="py-24 border-t border-border">
