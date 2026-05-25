@@ -53,18 +53,18 @@ export function Navbar() {
             <Button asChild size="sm" variant="ghost" className="md:hidden text-primary">
               <Link to="/tatuadores"><Brush className="h-4 w-4" /></Link>
             </Button>
-            <a href="https://instagram.com/tatuameoficial" target="_blank" rel="noopener noreferrer" aria-label="Instagram @tatuameoficial" className="p-2 text-muted-foreground hover:text-foreground transition-colors">
+            <a href="https://instagram.com/tatuameoficial" target="_blank" rel="noopener noreferrer" aria-label="Instagram @tatuameoficial" className="hidden md:inline-flex p-2 text-muted-foreground hover:text-foreground transition-colors">
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 1 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
             </a>
-            <a href="https://tiktok.com/@tatuameoficial" target="_blank" rel="noopener noreferrer" aria-label="TikTok @tatuameoficial" className="p-2 text-muted-foreground hover:text-foreground transition-colors">
+            <a href="https://tiktok.com/@tatuameoficial" target="_blank" rel="noopener noreferrer" aria-label="TikTok @tatuameoficial" className="hidden md:inline-flex p-2 text-muted-foreground hover:text-foreground transition-colors">
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
             </a>
             <Button asChild size="sm" variant="ghost"><Link to="/login">Entrar</Link></Button>
-            <Button asChild size="sm" variant="outline" className="border-primary/40 text-primary hover:bg-primary/10">
+            <Button asChild size="sm" variant="outline" className="hidden md:inline-flex border-primary/40 text-primary hover:bg-primary/10">
               <Link to="/cadastro-tatuador"><Brush className="h-4 w-4 mr-1" /> Cadastro Tatuador</Link>
             </Button>
             <Button asChild size="sm" className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold">
-              <Link to="/cadastro">Garantir minha vaga</Link>
+              <Link to="/cadastro"><span className="md:hidden">Garantir vaga</span><span className="hidden md:inline">Garantir minha vaga</span></Link>
             </Button>
           </div>
         )}
