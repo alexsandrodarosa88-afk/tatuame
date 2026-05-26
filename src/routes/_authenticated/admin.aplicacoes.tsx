@@ -4,8 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Check, X, Loader2, Clock } from "lucide-react";
+import { Check, X, Loader2, Clock, Gift } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/aplicacoes")({ component: AdminAplicacoes });
 
@@ -20,6 +23,9 @@ function AdminAplicacoes() {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [reason, setReason] = useState<Record<string, string>>({});
+  const [freeMonth, setFreeMonth] = useState<Record<string, boolean>>({});
+  const [grantEmail, setGrantEmail] = useState("");
+  const [granting, setGranting] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -31,10 +37,13 @@ function AdminAplicacoes() {
 
   const approve = async (id: string) => {
     setBusyId(id);
-    const { error } = await supabase.rpc("approve_artist_application", { _application_id: id });
+    const { error } = await supabase.rpc("approve_artist_application", {
+      _application_id: id,
+      _grant_free_month: !!freeMonth[id],
+    } as any);
     setBusyId(null);
     if (error) { toast.error("Erro ao aprovar: " + error.message); return; }
-    toast.success("Tatuador aprovado.");
+    toast.success(freeMonth[id] ? "Tatuador aprovado com 1 mês grátis." : "Tatuador aprovado.");
     load();
   };
   const reject = async (id: string) => {
@@ -46,6 +55,17 @@ function AdminAplicacoes() {
     load();
   };
 
+  const grantByEmail = async () => {
+    const email = grantEmail.trim();
+    if (!email) { toast.error("Digite o email do tatuador."); return; }
+    setGranting(true);
+    const { error } = await supabase.rpc("admin_grant_free_month", { _email: email } as any);
+    setGranting(false);
+    if (error) { toast.error("Erro: " + error.message); return; }
+    toast.success("1 mês grátis liberado para " + email);
+    setGrantEmail("");
+  };
+
   const counts = { pending: 0, approved: 0, rejected: 0 };
   rows.forEach(r => counts[r.status]++);
   const filtered = rows.filter(r => r.status === filter);
@@ -53,6 +73,34 @@ function AdminAplicacoes() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Cadastros de tatuadores</h1>
+
+      <Card className="border-primary/30 bg-primary/5">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Gift className="h-5 w-5 text-primary" />
+            <h2 className="font-semibold">Dar 1 mês grátis para um tatuador existente</h2>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Use isto para liberar 1 mês grátis a um tatuador <strong>já aprovado</strong>. Ele verá uma mensagem dizendo que é muito importante para o TATUAME.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex-1 space-y-1">
+              <Label className="text-xs">Email do tatuador</Label>
+              <Input
+                type="email"
+                value={grantEmail}
+                onChange={(e) => setGrantEmail(e.target.value)}
+                placeholder="tatuador@exemplo.com"
+              />
+            </div>
+            <Button onClick={grantByEmail} disabled={granting} className="sm:self-end">
+              {granting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Gift className="h-4 w-4 mr-1" />}
+              Liberar 1 mês grátis
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="flex gap-2 flex-wrap">
         {(["pending", "approved", "rejected"] as const).map(s => (
           <Button key={s} variant={filter === s ? "default" : "outline"} size="sm" onClick={() => setFilter(s)}>
@@ -90,6 +138,16 @@ function AdminAplicacoes() {
                       rows={2} placeholder="Motivo da reprovação (opcional)"
                       value={reason[a.id] ?? ""} onChange={(e) => setReason({ ...reason, [a.id]: e.target.value })}
                     />
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <Checkbox
+                        checked={!!freeMonth[a.id]}
+                        onCheckedChange={(v) => setFreeMonth({ ...freeMonth, [a.id]: !!v })}
+                      />
+                      <span className="inline-flex items-center gap-1">
+                        <Gift className="h-3.5 w-3.5 text-primary" />
+                        Aprovar com <strong>1 mês grátis</strong> de mensalidade
+                      </span>
+                    </label>
                     <div className="flex gap-2">
                       <Button size="sm" onClick={() => approve(a.id)} disabled={busyId === a.id}>
                         {busyId === a.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Check className="h-3.5 w-3.5 mr-1" />}
