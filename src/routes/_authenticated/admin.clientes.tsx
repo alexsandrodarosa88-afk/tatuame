@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { adminGetUserAcceptances } from "@/lib/policy.functions";
-import { adminUpdateUserPassword, adminDeleteUser, adminUpdateProfile } from "@/lib/admin-users.functions";
-import { FileText, X, Pencil, Trash2, KeyRound } from "lucide-react";
+import { adminUpdateUserPassword, adminDeleteUser, adminUpdateProfile, adminConvertToArtist } from "@/lib/admin-users.functions";
+import { FileText, X, Pencil, Trash2, KeyRound, Brush } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 
@@ -24,11 +24,14 @@ function AdminClientes() {
   const updatePwd = useServerFn(adminUpdateUserPassword);
   const deleteUser = useServerFn(adminDeleteUser);
   const updateProfile = useServerFn(adminUpdateProfile);
+  const convertToArtist = useServerFn(adminConvertToArtist);
   const [editing, setEditing] = useState<Profile | null>(null);
   const [editForm, setEditForm] = useState<any>({});
   const [pwdUser, setPwdUser] = useState<Profile | null>(null);
   const [pwd, setPwd] = useState("");
   const [saving, setSaving] = useState(false);
+  const [convertUser, setConvertUser] = useState<Profile | null>(null);
+  const [convertForm, setConvertForm] = useState<any>({ address: "", instagram: "", phone: "", cpf: "", grantFreeMonth: false });
 
   const load = async () => {
     const { data } = await supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(1000);
@@ -84,6 +87,38 @@ function AdminClientes() {
     }
   };
 
+  const openConvert = (p: Profile) => {
+    setConvertUser(p);
+    setConvertForm({
+      address: "",
+      instagram: "",
+      phone: p.telefone ?? "",
+      cpf: p.cpf ?? "",
+      grantFreeMonth: false,
+    });
+  };
+
+  const saveConvert = async () => {
+    if (!convertUser) return;
+    setSaving(true);
+    try {
+      await convertToArtist({ data: {
+        userId: convertUser.id,
+        fullName: convertUser.nome_completo ?? undefined,
+        address: convertForm.address,
+        instagram: convertForm.instagram || null,
+        phone: convertForm.phone || null,
+        cpf: convertForm.cpf,
+        grantFreeMonth: !!convertForm.grantFreeMonth,
+      } });
+      toast.success("Cliente convertido em tatuador aprovado.");
+      setConvertUser(null);
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao converter.");
+    } finally { setSaving(false); }
+  };
+
   async function openAcceptances(p: Profile) {
     setViewing(p);
     setAcceptances(null);
@@ -137,6 +172,9 @@ function AdminClientes() {
                     </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8" title="Redefinir senha" onClick={() => setPwdUser(r)}>
                       <KeyRound className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" title="Converter em tatuador" onClick={() => openConvert(r)}>
+                      <Brush className="h-3.5 w-3.5 text-primary" />
                     </Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8" title="Ver aceites" onClick={() => openAcceptances(r)}>
                       <FileText className="h-3.5 w-3.5" />
