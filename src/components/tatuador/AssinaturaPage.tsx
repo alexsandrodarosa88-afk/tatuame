@@ -65,6 +65,36 @@ export function AssinaturaPage() {
     );
   }
 
+  const freeMonthGrantedAt: string | null = (data as any).freeMonthGrantedAt ?? null;
+  const nextDue: string | null = (data as any).nextDue ?? null;
+  const freeMonthActive =
+    !!freeMonthGrantedAt &&
+    nextDue !== null &&
+    new Date(nextDue).getTime() > Date.now() &&
+    data.status === "active";
+
+  if (freeMonthActive) {
+    return (
+      <Card className="border-primary/40 bg-primary/5 max-w-2xl mx-auto">
+        <CardContent className="p-6 space-y-3">
+          <div className="flex items-start gap-3">
+            <Gift className="h-6 w-6 text-primary shrink-0" />
+            <div>
+              <p className="font-semibold text-lg">Você é muito importante para o TATUAME 🎁</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Como agradecimento, liberamos <strong>1 mês de mensalidade grátis</strong> para você.
+                Aproveite a área do tatuador sem custo neste período.
+              </p>
+              <p className="text-sm mt-2">
+                Próxima cobrança: <strong>{new Date(nextDue!).toLocaleDateString("pt-BR")}</strong>
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (data.status === "blocked") {
     return (
       <Card className="border-destructive/50 bg-destructive/5 max-w-2xl mx-auto">
