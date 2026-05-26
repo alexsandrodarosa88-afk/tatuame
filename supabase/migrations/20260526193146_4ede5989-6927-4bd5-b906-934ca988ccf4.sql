@@ -1,0 +1,1 @@
+UPDATE public.tattoo_artists SET is_active = true, updated_at = now() WHERE subscription_status = 'active' AND is_active = false;

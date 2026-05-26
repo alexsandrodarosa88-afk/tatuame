@@ -21,6 +21,7 @@ type Artist = {
   instagram: string | null; whatsapp: string | null; is_active: boolean;
   subscription_status?: string | null; is_lifetime_free?: boolean | null;
   user_id?: string | null;
+  subscription_next_due?: string | null;
 };
 
 type SubInfo = { last_paid_at: string | null; last_amount: number | null; next_due: string | null };
@@ -287,7 +288,12 @@ function AdminTatuadores() {
                       Mensalidade paga {new Date(subs[a.id].last_paid_at!).toLocaleDateString("pt-BR")}
                     </span>
                   )}
-                  {!subs[a.id]?.last_paid_at && !a.is_lifetime_free && (
+                  {!subs[a.id]?.last_paid_at && !a.is_lifetime_free && a.subscription_status === "active" && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-medium">
+                      Mês grátis até {a.subscription_next_due ? new Date(a.subscription_next_due).toLocaleDateString("pt-BR") : ""}
+                    </span>
+                  )}
+                  {!subs[a.id]?.last_paid_at && !a.is_lifetime_free && a.subscription_status !== "active" && a.subscription_status !== "blocked" && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 font-medium">
                       Sem pagamento
                     </span>

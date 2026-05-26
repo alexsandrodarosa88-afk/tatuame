@@ -122,7 +122,7 @@ export const adminConvertToArtist = createServerFn({ method: "POST" })
     let artistId = existingArtist?.id as string | undefined;
     if (!artistId) {
       const { data: ins, error } = await supabaseAdmin.from("tattoo_artists").insert({
-        user_id: data.userId, name: fullName, address: data.address || null, is_active: false,
+        user_id: data.userId, name: fullName, address: data.address || null, is_active: true,
       } as any).select("id").single();
       if (error) throw new Error("Erro ao criar tatuador: " + error.message);
       artistId = ins!.id;
@@ -131,6 +131,7 @@ export const adminConvertToArtist = createServerFn({ method: "POST" })
     if (data.grantFreeMonth && artistId) {
       const { error } = await supabaseAdmin.from("tattoo_artists").update({
         subscription_status: "active",
+        is_active: true,
         subscription_started_at: new Date().toISOString(),
         subscription_next_due: new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().slice(0, 10),
         free_month_granted_at: new Date().toISOString(),
@@ -217,7 +218,7 @@ export const adminCreateArtistAccount = createServerFn({ method: "POST" })
       const { data: ins, error } = await supabaseAdmin.from("tattoo_artists").insert({
         user_id: newUserId, name: data.fullName, address: data.address || null,
         city: data.cidade || null, instagram: (data.instagram || "").replace(/^@/, "") || null,
-        whatsapp: data.phone || null, is_active: false,
+        whatsapp: data.phone || null, is_active: true,
       } as any).select("id").single();
       if (error) throw new Error("Erro ao criar tatuador: " + error.message);
       artistId = ins!.id;
@@ -226,6 +227,7 @@ export const adminCreateArtistAccount = createServerFn({ method: "POST" })
     if (data.grantFreeMonth && artistId) {
       await supabaseAdmin.from("tattoo_artists").update({
         subscription_status: "active",
+        is_active: true,
         subscription_started_at: new Date().toISOString(),
         subscription_next_due: new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().slice(0, 10),
         free_month_granted_at: new Date().toISOString(),
