@@ -52,8 +52,27 @@ function AdminMensalidades() {
   };
 
   const markPaid = async (s: Sub) => {
-    await supabase.from("artist_subscriptions").update({ status: "paid", paid_at: new Date().toISOString() }).eq("id", s.id);
-    toast.success("Marcada como paga."); load();
+    const nowIso = new Date().toISOString();
+    const nextDue = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+    const { error: e1 } = await supabase
+      .from("artist_subscriptions")
+      .update({ status: "paid", paid_at: nowIso })
+      .eq("id", s.id);
+    if (e1) { toast.error("Erro: " + e1.message); return; }
+    // Ativa o tatuador automaticamente e libera o acesso
+    const { error: e2 } = await supabase
+      .from("tattoo_artists")
+      .update({
+        subscription_status: "active",
+        is_active: true,
+        subscription_next_due: nextDue,
+        subscription_started_at: nowIso,
+        updated_at: nowIso,
+      } as any)
+      .eq("id", s.artist_id);
+    if (e2) { toast.error("Pagamento marcado, mas erro ao liberar acesso: " + e2.message); return; }
+    toast.success("Pagamento confirmado e tatuador liberado.");
+    load();
   };
   const remove = async (id: string) => {
     if (!confirm("Excluir?")) return;
