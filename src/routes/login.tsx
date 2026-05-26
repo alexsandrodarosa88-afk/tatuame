@@ -80,7 +80,7 @@ function LoginPage() {
             <p className="font-medium text-foreground">É tatuador?</p>
             <p className="text-xs text-muted-foreground">
               A conta de tatuador é separada da conta de cliente.{" "}
-              <Link to="/cadastro-tatuador" className="text-primary font-medium">Fazer cadastro de tatuador</Link>.
+              <Link to="/tatuador-acesso" className="text-primary font-medium">Fazer cadastro de tatuador</Link>.
             </p>
           </div>
         </div>
