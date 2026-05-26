@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Brush } from "lucide-react";
 
 export const Route = createFileRoute("/cadastro")({
   component: SignupPage,
@@ -105,6 +106,16 @@ function SignupPage() {
         <div className="text-sm text-muted-foreground text-center">
           Já tem conta?{" "}
           <Link to="/login" search={next ? { next } as any : undefined} className="text-primary font-medium">Entrar</Link>
+        </div>
+        <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-sm flex items-start gap-2">
+          <Brush className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+          <div>
+            <p className="font-medium text-foreground">É tatuador?</p>
+            <p className="text-xs text-muted-foreground">
+              Use um email diferente do de cliente.{" "}
+              <Link to="/cadastro-tatuador" className="text-primary font-medium">Cadastrar como tatuador</Link>.
+            </p>
+          </div>
         </div>
       </Card>
     </div>
