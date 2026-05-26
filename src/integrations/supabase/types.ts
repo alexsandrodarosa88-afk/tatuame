@@ -789,6 +789,7 @@ export type Database = {
           bio: string | null
           city: string | null
           created_at: string
+          free_month_granted_at: string | null
           id: string
           instagram: string | null
           is_active: boolean
@@ -812,6 +813,7 @@ export type Database = {
           bio?: string | null
           city?: string | null
           created_at?: string
+          free_month_granted_at?: string | null
           id?: string
           instagram?: string | null
           is_active?: boolean
@@ -835,6 +837,7 @@ export type Database = {
           bio?: string | null
           city?: string | null
           created_at?: string
+          free_month_granted_at?: string | null
           id?: string
           instagram?: string | null
           is_active?: boolean
@@ -1007,6 +1010,7 @@ export type Database = {
       }
     }
     Functions: {
+      admin_grant_free_month: { Args: { _email: string }; Returns: string }
       admin_unblock_artist: { Args: { _artist_id: string }; Returns: boolean }
       allocate_lucky_numbers: {
         Args: {
@@ -1018,7 +1022,7 @@ export type Database = {
         Returns: number[]
       }
       approve_artist_application: {
-        Args: { _application_id: string }
+        Args: { _application_id: string; _grant_free_month?: boolean }
         Returns: string
       }
       block_overdue_artists: { Args: never; Returns: number }
