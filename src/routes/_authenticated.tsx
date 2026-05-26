@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Navbar } from "@/components/landing/Navbar";
 import { PolicyAcceptGate } from "@/components/PolicyAcceptGate";
+import { ForcePasswordChangeGate } from "@/components/ForcePasswordChangeGate";
 
 export const Route = createFileRoute("/_authenticated")({ component: AuthLayout });
 
@@ -23,6 +24,7 @@ function AuthLayout() {
       <Navbar />
       <main className="pt-20"><Outlet /></main>
       <PolicyAcceptGate />
+      <ForcePasswordChangeGate />
     </div>
   );
 }

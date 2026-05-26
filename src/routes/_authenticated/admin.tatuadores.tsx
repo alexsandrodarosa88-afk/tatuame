@@ -8,10 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2, Power, Upload, Loader2, ShieldCheck, Gift, FileText, KeyRound, UserX } from "lucide-react";
+import { Pencil, Plus, Trash2, Power, Upload, Loader2, ShieldCheck, Gift, FileText, KeyRound, UserX, UserPlus } from "lucide-react";
 import { UserAcceptancesDialog } from "@/components/admin/UserAcceptancesDialog";
 import { useServerFn } from "@tanstack/react-start";
-import { adminUpdateUserPassword, adminDeleteUser } from "@/lib/admin-users.functions";
+import { adminUpdateUserPassword, adminDeleteUser, adminCreateArtistAccount } from "@/lib/admin-users.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/tatuadores")({ component: AdminTatuadores });
 
@@ -45,6 +45,13 @@ function AdminTatuadores() {
   const [pwdSaving, setPwdSaving] = useState(false);
   const updatePwd = useServerFn(adminUpdateUserPassword);
   const deleteUserFn = useServerFn(adminDeleteUser);
+  const createArtistAccountFn = useServerFn(adminCreateArtistAccount);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createForm, setCreateForm] = useState<any>({
+    email: "", password: "", fullName: "", cpf: "", phone: "",
+    cidade: "", address: "", instagram: "", grantFreeMonth: false,
+  });
+  const [creating, setCreating] = useState(false);
 
   const load = async () => {
     const { data } = await supabase.from("tattoo_artists").select("*").order("name");
@@ -193,6 +200,10 @@ function AdminTatuadores() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Tatuadores ({rows.length})</h1>
+        <div className="flex gap-2">
+        <Button variant="outline" onClick={() => setCreateOpen(true)}>
+          <UserPlus className="h-4 w-4 mr-1" /> Criar conta de tatuador
+        </Button>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button onClick={openNew}><Plus className="h-4 w-4 mr-1" /> Novo tatuador</Button></DialogTrigger>
           <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
@@ -254,6 +265,7 @@ function AdminTatuadores() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map((a) => (
@@ -328,6 +340,51 @@ function AdminTatuadores() {
             <p className="text-xs text-muted-foreground">{pwdArtist?.name}</p>
             <div><Label>Nova senha</Label><Input type="text" value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Mínimo 6 caracteres" /></div>
             <Button className="w-full" disabled={pwdSaving} onClick={savePwd}>{pwdSaving ? "Salvando..." : "Redefinir senha"}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Criar conta de tatuador</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              A conta é criada já aprovada. No primeiro acesso, o tatuador será obrigado a definir uma senha pessoal.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="md:col-span-2"><Label>Nome completo *</Label><Input value={createForm.fullName} onChange={(e) => setCreateForm({ ...createForm, fullName: e.target.value })} /></div>
+              <div><Label>Email (login) *</Label><Input type="email" value={createForm.email} onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })} /></div>
+              <div><Label>Senha temporária *</Label><Input type="text" value={createForm.password} onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })} placeholder="mín. 6 caracteres" /></div>
+              <div><Label>CPF</Label><Input value={createForm.cpf} onChange={(e) => setCreateForm({ ...createForm, cpf: e.target.value })} /></div>
+              <div><Label>Telefone / WhatsApp</Label><Input value={createForm.phone} onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })} /></div>
+              <div><Label>Cidade</Label><Input value={createForm.cidade} onChange={(e) => setCreateForm({ ...createForm, cidade: e.target.value })} /></div>
+              <div><Label>Instagram</Label><Input value={createForm.instagram} onChange={(e) => setCreateForm({ ...createForm, instagram: e.target.value })} placeholder="@tatuador" /></div>
+              <div className="md:col-span-2"><Label>Endereço do estúdio</Label><Input value={createForm.address} onChange={(e) => setCreateForm({ ...createForm, address: e.target.value })} /></div>
+            </div>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={createForm.grantFreeMonth} onChange={(e) => setCreateForm({ ...createForm, grantFreeMonth: e.target.checked })} />
+              Conceder 1 mês de mensalidade grátis
+            </label>
+            <Button
+              className="w-full"
+              disabled={creating}
+              onClick={async () => {
+                if (!createForm.email || !createForm.password || !createForm.fullName) { toast.error("Preencha nome, email e senha."); return; }
+                if (String(createForm.password).length < 6) { toast.error("Senha mínima de 6 caracteres."); return; }
+                setCreating(true);
+                try {
+                  await createArtistAccountFn({ data: createForm });
+                  toast.success("Conta de tatuador criada. Envie o login e a senha temporária para o tatuador.");
+                  setCreateOpen(false);
+                  setCreateForm({ email: "", password: "", fullName: "", cpf: "", phone: "", cidade: "", address: "", instagram: "", grantFreeMonth: false });
+                  load();
+                } catch (e: any) {
+                  toast.error(e.message || "Erro ao criar conta.");
+                } finally { setCreating(false); }
+              }}
+            >
+              {creating ? "Criando..." : "Criar conta de tatuador"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
