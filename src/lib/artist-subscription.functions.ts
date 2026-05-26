@@ -39,7 +39,7 @@ export const getMyArtistSubscription = createServerFn({ method: "GET" })
 
     const { data: artist } = await supabase
       .from("tattoo_artists")
-      .select("id, subscription_status, subscription_next_due, subscription_billing_type, asaas_subscription_id, is_lifetime_free, subscription_started_at")
+      .select("id, subscription_status, subscription_next_due, subscription_billing_type, asaas_subscription_id, is_lifetime_free, subscription_started_at, free_month_granted_at")
       .eq("user_id", userId)
       .maybeSingle();
     if (!artist) return { artistFound: false as const };
@@ -68,6 +68,7 @@ export const getMyArtistSubscription = createServerFn({ method: "GET" })
       promoFee: ARTIST_PROMO_FEE,
       regularFee: ARTIST_REGULAR_FEE,
       isLifetimeFree: !!(artist as any).is_lifetime_free,
+      freeMonthGrantedAt: (artist as any).free_month_granted_at ?? null,
       subscriptionStartedAt: artist.subscription_started_at as any,
       daysOverdue,
       pendingInvoice: pending
