@@ -35,7 +35,7 @@ export function Navbar() {
               <Link to="/tatuadores" className="hover:text-foreground transition-colors">Tatuadores</Link>
               <Link to="/" hash="como-funciona" className="hover:text-foreground transition-colors">Como funciona</Link>
               <Link to="/" hash="garantia" className="hover:text-foreground transition-colors">Garantia</Link>
-            <Link to={tatuadorHref as any} className="hover:text-foreground transition-colors inline-flex items-center gap-1"><Brush className="h-3.5 w-3.5" /> Cadastro Tatuador</Link>
+            <Link to={tatuadorHref as any} className="hover:text-foreground transition-colors inline-flex items-center gap-1"><Brush className="h-3.5 w-3.5" /> Área do Tatuador</Link>
             </>
           )}
         </nav>
@@ -61,7 +61,7 @@ export function Navbar() {
             </a>
             <Button asChild size="sm" variant="ghost"><Link to="/login">Entrar</Link></Button>
             <Button asChild size="sm" variant="outline" className="hidden md:inline-flex border-primary/40 text-primary hover:bg-primary/10">
-              <Link to="/tatuador-acesso"><Brush className="h-4 w-4 mr-1" /> Cadastro Tatuador</Link>
+              <Link to="/tatuador-acesso"><Brush className="h-4 w-4 mr-1" /> Área do Tatuador</Link>
             </Button>
             <Button asChild size="sm" className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold">
               <Link to="/cadastro"><span className="md:hidden">Garantir vaga</span><span className="hidden md:inline">Garantir minha vaga</span></Link>
