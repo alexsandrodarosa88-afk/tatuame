@@ -21,6 +21,7 @@ type Artist = {
   instagram: string | null; whatsapp: string | null; is_active: boolean;
   subscription_status?: string | null; is_lifetime_free?: boolean | null;
   user_id?: string | null;
+  subscription_next_due?: string | null;
 };
 
 type SubInfo = { last_paid_at: string | null; last_amount: number | null; next_due: string | null };
