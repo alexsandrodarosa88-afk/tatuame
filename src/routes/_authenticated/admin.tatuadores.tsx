@@ -8,8 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2, Power, Upload, Loader2, ShieldCheck, Gift, FileText } from "lucide-react";
+import { Pencil, Plus, Trash2, Power, Upload, Loader2, ShieldCheck, Gift, FileText, KeyRound, UserX } from "lucide-react";
 import { UserAcceptancesDialog } from "@/components/admin/UserAcceptancesDialog";
+import { useServerFn } from "@tanstack/react-start";
+import { adminUpdateUserPassword, adminDeleteUser } from "@/lib/admin-users.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/tatuadores")({ component: AdminTatuadores });
 
@@ -38,6 +40,11 @@ function AdminTatuadores() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [acceptUser, setAcceptUser] = useState<{ userId: string; name: string } | null>(null);
+  const [pwdArtist, setPwdArtist] = useState<Artist | null>(null);
+  const [pwd, setPwd] = useState("");
+  const [pwdSaving, setPwdSaving] = useState(false);
+  const updatePwd = useServerFn(adminUpdateUserPassword);
+  const deleteUserFn = useServerFn(adminDeleteUser);
 
   const load = async () => {
     const { data } = await supabase.from("tattoo_artists").select("*").order("name");
@@ -132,6 +139,31 @@ function AdminTatuadores() {
     const { error } = await supabase.from("tattoo_artists").delete().eq("id", id);
     if (error) { toast.error("Erro ao excluir."); return; }
     toast.success("Excluído."); load();
+  };
+
+  const removeUserAccount = async (a: Artist) => {
+    if (!a.user_id) { toast.error("Sem conta de usuário vinculada."); return; }
+    if (!confirm(`Excluir definitivamente a conta de ${a.name}? Isto remove o login, perfil e cadastro de tatuador. Esta ação não pode ser desfeita.`)) return;
+    try {
+      await deleteUserFn({ data: { userId: a.user_id } });
+      toast.success("Conta excluída.");
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao excluir conta.");
+    }
+  };
+
+  const savePwd = async () => {
+    if (!pwdArtist?.user_id) return;
+    if (pwd.length < 6) { toast.error("Senha deve ter pelo menos 6 caracteres."); return; }
+    setPwdSaving(true);
+    try {
+      await updatePwd({ data: { userId: pwdArtist.user_id, newPassword: pwd } });
+      toast.success("Senha redefinida.");
+      setPwdArtist(null); setPwd("");
+    } catch (e: any) {
+      toast.error(e.message || "Erro.");
+    } finally { setPwdSaving(false); }
   };
 
   const toggleActive = async (a: Artist) => {
@@ -265,6 +297,16 @@ function AdminTatuadores() {
                       <FileText className="h-3.5 w-3.5" />
                     </Button>
                   )}
+                  {a.user_id && (
+                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Redefinir senha" onClick={() => setPwdArtist(a)}>
+                      <KeyRound className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                  {a.user_id && (
+                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Excluir conta de usuário" onClick={() => removeUserAccount(a)}>
+                      <UserX className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  )}
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remove(a.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
                 </div>
               </div>
@@ -279,6 +321,16 @@ function AdminTatuadores() {
         userId={acceptUser?.userId ?? null}
         userName={acceptUser?.name}
       />
+      <Dialog open={!!pwdArtist} onOpenChange={(v) => { if (!v) { setPwdArtist(null); setPwd(""); } }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Redefinir senha</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">{pwdArtist?.name}</p>
+            <div><Label>Nova senha</Label><Input type="text" value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Mínimo 6 caracteres" /></div>
+            <Button className="w-full" disabled={pwdSaving} onClick={savePwd}>{pwdSaving ? "Salvando..." : "Redefinir senha"}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

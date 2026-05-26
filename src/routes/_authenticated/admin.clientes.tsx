@@ -5,7 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { adminGetUserAcceptances } from "@/lib/policy.functions";
-import { FileText, X } from "lucide-react";
+import { adminUpdateUserPassword, adminDeleteUser, adminUpdateProfile } from "@/lib/admin-users.functions";
+import { FileText, X, Pencil, Trash2, KeyRound } from "lucide-react";
+import { toast } from "sonner";
+import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/_authenticated/admin/clientes")({ component: AdminClientes });
 
@@ -18,13 +21,68 @@ function AdminClientes() {
   const [acceptances, setAcceptances] = useState<any[] | null>(null);
   const [loadingAcc, setLoadingAcc] = useState(false);
   const getAcc = useServerFn(adminGetUserAcceptances);
+  const updatePwd = useServerFn(adminUpdateUserPassword);
+  const deleteUser = useServerFn(adminDeleteUser);
+  const updateProfile = useServerFn(adminUpdateProfile);
+  const [editing, setEditing] = useState<Profile | null>(null);
+  const [editForm, setEditForm] = useState<any>({});
+  const [pwdUser, setPwdUser] = useState<Profile | null>(null);
+  const [pwd, setPwd] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(1000);
-      if (data) setRows(data as Profile[]);
-    })();
-  }, []);
+  const load = async () => {
+    const { data } = await supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(1000);
+    if (data) setRows(data as Profile[]);
+  };
+  useEffect(() => { load(); }, []);
+
+  const openEdit = (p: Profile) => {
+    setEditing(p);
+    setEditForm({
+      email: p.email ?? "",
+      nome_completo: p.nome_completo ?? "",
+      telefone: p.telefone ?? "",
+      cpf: p.cpf ?? "",
+      cidade: p.cidade ?? "",
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    setSaving(true);
+    try {
+      await updateProfile({ data: { userId: editing.id, ...editForm } });
+      toast.success("Cliente atualizado.");
+      setEditing(null);
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao atualizar.");
+    } finally { setSaving(false); }
+  };
+
+  const savePwd = async () => {
+    if (!pwdUser) return;
+    if (pwd.length < 6) { toast.error("Senha deve ter pelo menos 6 caracteres."); return; }
+    setSaving(true);
+    try {
+      await updatePwd({ data: { userId: pwdUser.id, newPassword: pwd } });
+      toast.success("Senha redefinida.");
+      setPwdUser(null); setPwd("");
+    } catch (e: any) {
+      toast.error(e.message || "Erro.");
+    } finally { setSaving(false); }
+  };
+
+  const removeUser = async (p: Profile) => {
+    if (!confirm(`Excluir definitivamente o cliente ${p.nome_completo || p.email}? Esta ação não pode ser desfeita.`)) return;
+    try {
+      await deleteUser({ data: { userId: p.id } });
+      toast.success("Cliente excluído.");
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao excluir.");
+    }
+  };
 
   async function openAcceptances(p: Profile) {
     setViewing(p);
@@ -60,7 +118,7 @@ function AdminClientes() {
               <th className="text-left p-3">CPF</th>
               <th className="text-left p-3">Cidade</th>
               <th className="text-left p-3">Cadastrado</th>
-              <th className="text-left p-3">Políticas</th>
+              <th className="text-left p-3">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -73,9 +131,20 @@ function AdminClientes() {
                 <td className="p-3">{r.cidade || "—"}</td>
                 <td className="p-3 text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</td>
                 <td className="p-3">
-                  <Button variant="outline" size="sm" onClick={() => openAcceptances(r)}>
-                    <FileText className="h-3.5 w-3.5 mr-1" /> Ver aceites
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" title="Editar" onClick={() => openEdit(r)}>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" title="Redefinir senha" onClick={() => setPwdUser(r)}>
+                      <KeyRound className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" title="Ver aceites" onClick={() => openAcceptances(r)}>
+                      <FileText className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" title="Excluir" onClick={() => removeUser(r)}>
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -83,6 +152,41 @@ function AdminClientes() {
           </tbody>
         </table>
       </div>
+
+      {editing && (
+        <div className="fixed inset-0 z-[100] bg-background/90 backdrop-blur-sm grid place-items-center p-4" onClick={() => setEditing(null)}>
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5 border-b border-border flex items-center justify-between">
+              <h2 className="font-bold">Editar cliente</h2>
+              <Button variant="ghost" size="sm" onClick={() => setEditing(null)}><X className="h-4 w-4" /></Button>
+            </div>
+            <div className="p-5 space-y-3">
+              <div><Label>Nome completo</Label><Input value={editForm.nome_completo} onChange={(e) => setEditForm({ ...editForm, nome_completo: e.target.value })} /></div>
+              <div><Label>Email (login)</Label><Input type="email" value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} /></div>
+              <div><Label>Telefone</Label><Input value={editForm.telefone} onChange={(e) => setEditForm({ ...editForm, telefone: e.target.value })} /></div>
+              <div><Label>CPF</Label><Input value={editForm.cpf} onChange={(e) => setEditForm({ ...editForm, cpf: e.target.value })} /></div>
+              <div><Label>Cidade</Label><Input value={editForm.cidade} onChange={(e) => setEditForm({ ...editForm, cidade: e.target.value })} /></div>
+              <Button className="w-full" disabled={saving} onClick={saveEdit}>{saving ? "Salvando..." : "Salvar"}</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {pwdUser && (
+        <div className="fixed inset-0 z-[100] bg-background/90 backdrop-blur-sm grid place-items-center p-4" onClick={() => { setPwdUser(null); setPwd(""); }}>
+          <div className="w-full max-w-sm rounded-2xl border border-border bg-card shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5 border-b border-border flex items-center justify-between">
+              <h2 className="font-bold">Redefinir senha</h2>
+              <Button variant="ghost" size="sm" onClick={() => { setPwdUser(null); setPwd(""); }}><X className="h-4 w-4" /></Button>
+            </div>
+            <div className="p-5 space-y-3">
+              <p className="text-xs text-muted-foreground">{pwdUser.nome_completo || pwdUser.email}</p>
+              <div><Label>Nova senha</Label><Input type="text" value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Mínimo 6 caracteres" /></div>
+              <Button className="w-full" disabled={saving} onClick={savePwd}>{saving ? "Salvando..." : "Redefinir senha"}</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {viewing && (
         <div className="fixed inset-0 z-[100] bg-background/90 backdrop-blur-sm grid place-items-center p-4" onClick={() => setViewing(null)}>
