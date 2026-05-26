@@ -257,6 +257,38 @@ function AdminClientes() {
           </div>
         </div>
       )}
+
+      {convertUser && (
+        <div className="fixed inset-0 z-[100] bg-background/90 backdrop-blur-sm grid place-items-center p-4" onClick={() => setConvertUser(null)}>
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5 border-b border-border flex items-center justify-between">
+              <div>
+                <h2 className="font-bold">Converter em tatuador</h2>
+                <p className="text-xs text-muted-foreground">{convertUser.nome_completo || convertUser.email}</p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setConvertUser(null)}><X className="h-4 w-4" /></Button>
+            </div>
+            <div className="p-5 space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Este cliente passará a ter acesso à área do tatuador (já aprovado). Você pode complementar os dados abaixo — depois ele pode editar.
+              </p>
+              <div><Label>Endereço do estúdio</Label><Input value={convertForm.address} onChange={(e) => setConvertForm({ ...convertForm, address: e.target.value })} placeholder="Rua, número, bairro, cidade/UF, CEP" /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Instagram</Label><Input value={convertForm.instagram} onChange={(e) => setConvertForm({ ...convertForm, instagram: e.target.value })} placeholder="@tatuador" /></div>
+                <div><Label>Telefone</Label><Input value={convertForm.phone} onChange={(e) => setConvertForm({ ...convertForm, phone: e.target.value })} /></div>
+              </div>
+              <div><Label>CPF</Label><Input value={convertForm.cpf} onChange={(e) => setConvertForm({ ...convertForm, cpf: e.target.value })} /></div>
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={convertForm.grantFreeMonth} onChange={(e) => setConvertForm({ ...convertForm, grantFreeMonth: e.target.checked })} />
+                Conceder 1 mês de mensalidade grátis
+              </label>
+              <Button className="w-full" disabled={saving} onClick={saveConvert}>
+                {saving ? "Convertendo..." : "Converter em tatuador"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
