@@ -113,7 +113,7 @@ function SignupPage() {
             <p className="font-medium text-foreground">É tatuador?</p>
             <p className="text-xs text-muted-foreground">
               Use um email diferente do de cliente.{" "}
-              <Link to="/cadastro-tatuador" className="text-primary font-medium">Cadastrar como tatuador</Link>.
+              <Link to="/tatuador-acesso" className="text-primary font-medium">Cadastrar como tatuador</Link>.
             </p>
           </div>
         </div>
