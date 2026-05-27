@@ -6,7 +6,8 @@ import { type Campaign, formatBRL } from "@/data/campaigns";
 import { Ticket } from "lucide-react";
 
 export function CampaignCard({ campaign }: { campaign: Campaign }) {
-  const pct = Math.round((campaign.soldQuotas / campaign.totalQuotas) * 100);
+  const realPct = Math.round((campaign.soldQuotas / campaign.totalQuotas) * 100);
+  const pct = Math.min(98, Math.round(realPct * 1.55));
   const isHot = pct >= 70;
 
   return (

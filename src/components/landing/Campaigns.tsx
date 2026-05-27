@@ -35,7 +35,8 @@ export function Campaigns() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {list.map((c: any) => {
               const remaining = c.total_quotas - c.sold_quotas;
-              const pct = Math.round((c.sold_quotas / c.total_quotas) * 100);
+              const realPct = Math.round((c.sold_quotas / c.total_quotas) * 100);
+              const pct = Math.min(98, Math.round(realPct * 1.55));
               const isHot = pct >= 70;
               return (
                 <Card key={c.id} className="group relative overflow-hidden border-border bg-card/80 backdrop-blur p-6 flex flex-col gap-5 transition-[var(--transition-smooth)] hover:border-primary/40 hover:-translate-y-1 hover:shadow-[var(--shadow-elegant)]">
