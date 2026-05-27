@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.tattoo_artists_billing_unchanged(tattoo_artists, tattoo_artists) TO authenticated, anon, service_role;
