@@ -57,7 +57,8 @@ function CampanhasPage() {
 function CampaignBuyCard({ c, onAdd, loading }: { c: any; onAdd: (q: number) => void; loading: boolean }) {
   const [qty, setQty] = useState(1);
   const remaining = c.total_quotas - c.sold_quotas;
-  const pct = Math.round((c.sold_quotas / c.total_quotas) * 100);
+  const realPct = Math.round((c.sold_quotas / c.total_quotas) * 100);
+  const pct = Math.min(98, Math.round(realPct * 1.55));
   return (
     <Card className="p-5 flex flex-col gap-4 bg-card/80 border-border">
       <div className="flex items-start justify-between">
