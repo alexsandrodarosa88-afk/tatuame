@@ -36,7 +36,7 @@ export function Campaigns() {
             {list.map((c: any) => {
               const remaining = c.total_quotas - c.sold_quotas;
               const realPct = Math.round((c.sold_quotas / c.total_quotas) * 100);
-              const pct = Math.min(98, Math.round(realPct * 1.55));
+              const pct = Math.min(98, Math.round(realPct * 12));
               const isHot = pct >= 70;
               return (
                 <Card key={c.id} className="group relative overflow-hidden border-border bg-card/80 backdrop-blur p-6 flex flex-col gap-5 transition-[var(--transition-smooth)] hover:border-primary/40 hover:-translate-y-1 hover:shadow-[var(--shadow-elegant)]">
