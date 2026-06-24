@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { createMpPreference, isMpSandbox } from "./mercadopago.server";
+import { createMpPreference, createMpPreapproval, cancelMpPreapproval, isMpSandbox } from "./mercadopago.server";
 
 export const PREMIUM_MONTHLY = 49.9;
 export const PREMIUM_6 = +(PREMIUM_MONTHLY * 6).toFixed(2); // 299.40
@@ -31,7 +31,7 @@ export const getMyArtistPlan = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data: artist } = await supabase
       .from("tattoo_artists")
-      .select("id, name, plan, plan_term_months, plan_expires_at, is_lifetime_free, subscription_status")
+      .select("id, name, plan, plan_term_months, plan_expires_at, is_lifetime_free, subscription_status, plan_billing, mp_preapproval_id")
       .eq("user_id", userId)
       .maybeSingle();
     if (!artist) return { artistFound: false as const };
@@ -47,6 +47,8 @@ export const getMyArtistPlan = createServerFn({ method: "GET" })
       plan: (artist.plan ?? "free") as "free" | "premium",
       planTermMonths: artist.plan_term_months,
       planExpiresAt: artist.plan_expires_at,
+      planBilling: (artist.plan_billing ?? null) as "recurring" | "onetime" | null,
+      hasRecurring: !!artist.mp_preapproval_id,
       premiumActive,
       isLifetimeFree: !!artist.is_lifetime_free,
       prices: { monthly: PREMIUM_MONTHLY, six: PREMIUM_6, twelve: PREMIUM_12 },
