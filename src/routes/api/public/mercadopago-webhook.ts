@@ -1,7 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { fetchMpPayment, verifyMpSignature } from "@/lib/mercadopago.server";
+import {
+  fetchMpPayment,
+  verifyMpSignature,
+  fetchMpPreapproval,
+  fetchMpAuthorizedPayment,
+} from "@/lib/mercadopago.server";
 
 function adminClient() {
   return createClient<Database>(
@@ -51,7 +56,62 @@ export const Route = createFileRoute("/api/public/mercadopago-webhook")({
           return new Response("Invalid signature", { status: 401 });
         }
 
-        if (!dataId || !/payment/i.test(type)) {
+        if (!dataId) {
+          return new Response("ok");
+        }
+
+        // ===== PREAPPROVAL (assinatura recorrente) — mudança de status =====
+        if (/^preapproval$/i.test(type)) {
+          let pre: any;
+          try { pre = await fetchMpPreapproval(dataId); }
+          catch (e) { console.error("[mp-webhook] fetch preapproval:", e); return new Response("ok"); }
+          const extRef: string = pre?.external_reference ?? "";
+          const m = extRef.match(/^artist_preapproval:(.+)$/);
+          if (!m) return new Response("ok");
+          const artistId = m[1];
+          const admin = adminClient();
+          const preStatus: string = pre?.status ?? "";
+          if (preStatus === "cancelled" || preStatus === "paused") {
+            await admin
+              .from("tattoo_artists")
+              .update({ mp_preapproval_id: null, plan_billing: null })
+              .eq("id", artistId);
+          } else if (preStatus === "authorized") {
+            await admin
+              .from("tattoo_artists")
+              .update({ mp_preapproval_id: String(pre.id), plan_billing: "recurring" })
+              .eq("id", artistId);
+          }
+          return new Response("ok");
+        }
+
+        // ===== AUTHORIZED_PAYMENT — cada cobrança recorrente gerada =====
+        if (/authorized_payment/i.test(type)) {
+          let ap: any;
+          try { ap = await fetchMpAuthorizedPayment(dataId); }
+          catch (e) { console.error("[mp-webhook] fetch auth payment:", e); return new Response("ok"); }
+          const apStatus: string = ap?.status ?? "";
+          const preId: string = ap?.preapproval_id ? String(ap.preapproval_id) : "";
+          if (!preId || apStatus !== "approved") return new Response("ok");
+          const admin = adminClient();
+          const { data: artist } = await admin
+            .from("tattoo_artists")
+            .select("id")
+            .eq("mp_preapproval_id", preId)
+            .maybeSingle();
+          if (!artist) return new Response("ok");
+          const amount = Number(ap?.transaction_amount ?? ap?.debit_date ? 0 : 0) || Number(ap?.transaction_amount ?? 0);
+          await admin.rpc("record_premium_recurring_payment", {
+            _artist_id: artist.id,
+            _mp_payment_id: `mp_auth_${dataId}`,
+            _amount: amount || 49.9,
+            _billing_type: ap?.payment_method_id ?? null,
+            _preapproval_id: preId,
+          });
+          return new Response("ok");
+        }
+
+        if (!/payment/i.test(type)) {
           return new Response("ok");
         }
 
