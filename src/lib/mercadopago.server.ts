@@ -195,3 +195,53 @@ export async function createMpPreference(input: {
     body: JSON.stringify(body),
   });
 }
+
+/**
+ * Cria uma assinatura recorrente (preapproval) no Mercado Pago.
+ * O cliente é redirecionado ao init_point para autorizar o cartão/PIX recorrente.
+ * O MP cobra automaticamente conforme frequency/frequency_type e envia
+ * webhooks `topic=preapproval` (mudança de status) e
+ * `topic=authorized_payment` (cada cobrança gerada).
+ */
+export async function createMpPreapproval(input: {
+  reason: string;
+  amount: number;
+  payerEmail: string;
+  externalReference: string;
+  backUrl: string;
+  frequency?: number;
+  frequencyType?: "days" | "months";
+}) {
+  const body = {
+    reason: input.reason,
+    auto_recurring: {
+      frequency: input.frequency ?? 1,
+      frequency_type: input.frequencyType ?? "months",
+      transaction_amount: Number(input.amount.toFixed(2)),
+      currency_id: "BRL",
+    },
+    payer_email: input.payerEmail,
+    back_url: input.backUrl,
+    external_reference: input.externalReference,
+    status: "pending",
+  };
+  return mpFetch(`/preapproval`, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function fetchMpPreapproval(preapprovalId: string) {
+  return mpFetch(`/preapproval/${preapprovalId}`, { method: "GET" });
+}
+
+export async function cancelMpPreapproval(preapprovalId: string) {
+  return mpFetch(`/preapproval/${preapprovalId}`, {
+    method: "PUT",
+    body: JSON.stringify({ status: "cancelled" }),
+  });
+}
+
+export async function fetchMpAuthorizedPayment(authorizedPaymentId: string) {
+  return mpFetch(`/authorized_payments/${authorizedPaymentId}`, { method: "GET" });
+}
