@@ -198,6 +198,92 @@ export const createPremiumCheckout = createServerFn({ method: "POST" })
     return { invoiceUrl, invoiceId };
   });
 
+/** Tatuador assina o Premium em modalidade recorrente (cartão ou PIX mensal automático). */
+export const createPremiumRecurring = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { returnUrl?: string }) => data)
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const admin = adminClient();
+
+    const { data: artist } = await supabase
+      .from("tattoo_artists")
+      .select("id, name, mp_preapproval_id, plan_expires_at")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!artist) throw new Error("Cadastro de tatuador não aprovado.");
+    if (artist.mp_preapproval_id) {
+      throw new Error("Você já possui uma assinatura recorrente ativa.");
+    }
+
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("nome_completo, email, cpf")
+      .eq("id", userId)
+      .maybeSingle();
+    const { data: application } = await admin
+      .from("artist_applications")
+      .select("full_name, email, cpf")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const email = profile?.email ?? application?.email;
+    if (!email) throw new Error("Cadastre seu e-mail antes de assinar.");
+
+    const returnUrl = data.returnUrl ?? "https://tatuame.com/tatuador/plano";
+
+    const preapproval = await createMpPreapproval({
+      reason: "TATUAME Premium — assinatura mensal",
+      amount: PREMIUM_MONTHLY,
+      payerEmail: email,
+      externalReference: `artist_preapproval:${artist.id}`,
+      backUrl: `${returnUrl}?recurring=1`,
+    });
+
+    const initPoint: string | undefined = preapproval?.init_point || preapproval?.sandbox_init_point;
+    if (!initPoint || !preapproval?.id) {
+      throw new Error("Mercado Pago não retornou link de assinatura.");
+    }
+
+    // grava o preapproval_id; o webhook 'authorized_payment' renova mês a mês
+    await admin
+      .from("tattoo_artists")
+      .update({
+        mp_preapproval_id: String(preapproval.id),
+        plan_billing: "recurring",
+      })
+      .eq("id", artist.id);
+
+    return { initPoint, preapprovalId: String(preapproval.id) };
+  });
+
+/** Tatuador cancela sua assinatura recorrente (acesso vale até plan_expires_at). */
+export const cancelPremiumRecurring = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const admin = adminClient();
+    const { data: artist } = await supabase
+      .from("tattoo_artists")
+      .select("id, mp_preapproval_id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!artist?.mp_preapproval_id) throw new Error("Nenhuma assinatura recorrente ativa.");
+
+    try {
+      await cancelMpPreapproval(artist.mp_preapproval_id);
+    } catch (e) {
+      console.error("[cancel preapproval] MP error:", e);
+      // mesmo se MP falhar (já cancelada lá), seguimos limpando local
+    }
+
+    await admin
+      .from("tattoo_artists")
+      .update({ mp_preapproval_id: null, plan_billing: null })
+      .eq("id", artist.id);
+
+    return { ok: true };
+  });
+
 /** ===== Promotion tasks ===== */
 
 export const getMyPromotionWeek = createServerFn({ method: "GET" })
