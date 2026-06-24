@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getMyArtistPlan, chooseFreePlan, createPremiumCheckout } from "@/lib/artist-plan.functions";
+import { getMyArtistPlan, chooseFreePlan, createPremiumCheckout, createPremiumRecurring, cancelPremiumRecurring } from "@/lib/artist-plan.functions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Crown, Check, X, Loader2, Sparkles } from "lucide-react";
+import { Crown, Check, X, Loader2, Sparkles, Repeat, Ban } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -17,8 +17,10 @@ function PlanoPage() {
   const planFn = useServerFn(getMyArtistPlan);
   const freeFn = useServerFn(chooseFreePlan);
   const premiumFn = useServerFn(createPremiumCheckout);
+  const recurringFn = useServerFn(createPremiumRecurring);
+  const cancelRecurringFn = useServerFn(cancelPremiumRecurring);
   const { data, isLoading, refetch } = useQuery({ queryKey: ["artist-plan"], queryFn: () => planFn() });
-  const [picking, setPicking] = useState<6 | 12 | "free" | null>(null);
+  const [picking, setPicking] = useState<6 | 12 | "free" | "recurring" | null>(null);
 
   const buyPremium = useMutation({
     mutationFn: (term: 6 | 12) =>
@@ -38,6 +40,24 @@ function PlanoPage() {
       setPicking(null);
     },
     onError: (e: Error) => { setPicking(null); toast.error(e.message); },
+  });
+
+  const buyRecurring = useMutation({
+    mutationFn: () => recurringFn({ data: { returnUrl: `${window.location.origin}/tatuador/plano` } }),
+    onSuccess: (r: any) => {
+      if (r?.initPoint) window.location.href = r.initPoint;
+    },
+    onError: (e: Error) => { setPicking(null); toast.error(e.message); },
+  });
+
+  const cancelRecurring = useMutation({
+    mutationFn: () => cancelRecurringFn(),
+    onSuccess: () => {
+      toast.success("Assinatura recorrente cancelada. Seu acesso vale até o vencimento atual.");
+      qc.invalidateQueries({ queryKey: ["artist-plan"] });
+      refetch();
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   if (isLoading || !data) {
@@ -150,6 +170,57 @@ function PlanoPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ASSINATURA RECORRENTE — Mercado Pago preapproval */}
+      {!data.isLifetimeFree && (
+        <Card className="border-primary/40 bg-gradient-to-br from-primary/5 to-amber-500/5">
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-start justify-between flex-wrap gap-3">
+              <div className="flex items-start gap-3">
+                <Repeat className="h-6 w-6 text-primary mt-0.5" />
+                <div>
+                  <p className="font-semibold">Assinatura mensal automática</p>
+                  <p className="text-sm text-muted-foreground">
+                    Cobrança recorrente de <strong>{brl(data.prices.monthly)}/mês</strong> via Mercado Pago
+                    (cartão de crédito ou PIX automático). Sem precisar renovar manualmente.
+                  </p>
+                </div>
+              </div>
+              {data.hasRecurring ? (
+                <span className="text-xs font-semibold px-2 py-1 rounded bg-green-500/15 text-green-700 dark:text-green-400">
+                  Recorrência ativa
+                </span>
+              ) : null}
+            </div>
+
+            {data.hasRecurring ? (
+              <Button
+                variant="outline"
+                className="border-red-500/40 text-red-600 hover:bg-red-500/10"
+                disabled={cancelRecurring.isPending}
+                onClick={() => {
+                  if (!confirm("Cancelar a assinatura recorrente? Seu acesso Premium continua até o vencimento atual, mas você só poderá retornar à plataforma 12 meses após a saída.")) return;
+                  cancelRecurring.mutate();
+                }}
+              >
+                <Ban className="h-4 w-4 mr-2" />
+                {cancelRecurring.isPending ? "Cancelando…" : "Cancelar assinatura"}
+              </Button>
+            ) : (
+              <Button
+                className="bg-primary hover:bg-[var(--primary-glow)]"
+                disabled={buyRecurring.isPending}
+                onClick={() => { setPicking("recurring"); buyRecurring.mutate(); }}
+              >
+                {picking === "recurring" && buyRecurring.isPending ? "Gerando…" : `Assinar ${brl(data.prices.monthly)}/mês recorrente`}
+              </Button>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Você autoriza uma vez no Mercado Pago e ele cobra automaticamente todo mês. Pode cancelar a qualquer momento.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="bg-muted/30">
         <CardContent className="p-5 text-sm">
