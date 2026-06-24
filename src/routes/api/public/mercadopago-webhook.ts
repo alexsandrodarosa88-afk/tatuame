@@ -143,6 +143,35 @@ export const Route = createFileRoute("/api/public/mercadopago-webhook")({
           return new Response("ok");
         }
 
+        // ===== PACOTE PREMIUM (6/12 meses) =====
+        if (externalRef.startsWith("artist_plan:")) {
+          // format: artist_plan:<artistId>:<term>:<invoiceId>
+          const parts = externalRef.split(":");
+          const artistId = parts[1];
+          const term = parseInt(parts[2] ?? "0", 10);
+          const invoiceId = parts[3];
+          if (!artistId || (term !== 6 && term !== 12) || !invoiceId) {
+            return new Response("ok");
+          }
+          if (status === "approved") {
+            await admin
+              .from("artist_subscriptions")
+              .update({
+                status: "paid",
+                paid_at: new Date().toISOString(),
+                asaas_payment_id: String(payment.id),
+                billing_type: payment.payment_type_id ?? null,
+                term_months: term,
+              })
+              .eq("id", invoiceId);
+            await admin.rpc("activate_premium_plan", {
+              _artist_id: artistId,
+              _term_months: term,
+            });
+          }
+          return new Response("ok");
+        }
+
         // ===== PEDIDO DE COTAS =====
         const orderId = externalRef || null;
         let order: { id: string; user_id: string; status: string } | null = null;
