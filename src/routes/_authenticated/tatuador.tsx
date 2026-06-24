@@ -17,7 +17,7 @@ const nav: NavItem[] = [
   { to: "/tatuador/plano", label: "Meu plano", icon: Crown },
   { to: "/tatuador/divulgacao", label: "Divulgação", icon: Megaphone, premiumOnly: true },
   { to: "/tatuador/rateio", label: "Meus rateios", icon: Wallet, premiumOnly: true },
-  { to: "/tatuador/solicitar-pagamento", label: "Solicitar pagamento", icon: Banknote, premiumOnly: true },
+  { to: "/tatuador/solicitar-pagamento", label: "Solicitar pagamento", icon: Banknote },
   { to: "/tatuador/termos", label: "Termos", icon: FileSignature },
 ];
 

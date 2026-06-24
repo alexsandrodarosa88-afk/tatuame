@@ -5,7 +5,8 @@ import { getMyPromotionWeek, submitPromotionTask } from "@/lib/artist-plan.funct
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Megaphone, Check, Clock, X, Instagram } from "lucide-react";
+import { Loader2, Megaphone, Check, Clock, X, Instagram, Target, TrendingUp } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -42,6 +43,8 @@ function DivulgacaoPage() {
 
   const tasks = data.tasks as Task[];
   const approved = tasks.filter((t) => t.status === "approved").length;
+  const submitted = tasks.filter((t) => t.status === "submitted").length;
+  const remaining = tasks.length - approved;
   const pct = tasks.length ? Math.round((approved / tasks.length) * 100) : 0;
   const weekDate = new Date(data.weekStart);
   const weekEnd = new Date(data.weekStart); weekEnd.setDate(weekEnd.getDate() + 6);
@@ -63,6 +66,63 @@ function DivulgacaoPage() {
           <p className="text-xs text-muted-foreground">{approved}/{tasks.length} aprovados</p>
         </div>
       </div>
+
+      {/* Painel de progresso do rateio */}
+      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-amber-500/5">
+        <CardContent className="p-5 space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              <h2 className="font-semibold">Progresso para 100% do rateio</h2>
+            </div>
+            <span className={`text-sm font-semibold ${pct === 100 ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-400"}`}>
+              Você receberá <strong>{pct}%</strong> do rateio
+            </span>
+          </div>
+          <Progress value={pct} className="h-3" />
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="rounded-md bg-green-500/10 p-2">
+              <p className="text-xl font-bold text-green-600 dark:text-green-400">{approved}</p>
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Aprovados</p>
+            </div>
+            <div className="rounded-md bg-blue-500/10 p-2">
+              <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{submitted}</p>
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Em análise</p>
+            </div>
+            <div className="rounded-md bg-muted p-2">
+              <p className="text-xl font-bold">{remaining}</p>
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Faltam</p>
+            </div>
+          </div>
+          {pct === 100 ? (
+            <p className="text-sm text-green-700 dark:text-green-400 flex items-center gap-1">
+              <TrendingUp className="h-4 w-4" /> Parabéns! Você bateu todas as metas e receberá 100% do rateio neste mês.
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Faltam <strong>{remaining}</strong> {remaining === 1 ? "publicação aprovada" : "publicações aprovadas"} para atingir 100% do rateio nesta semana.
+            </p>
+          )}
+          <div className="grid grid-cols-3 gap-2 pt-2 border-t">
+            {(["story", "reel", "post"] as const).map((type) => {
+              const g = groups[type];
+              const a = g.filter((t) => t.status === "approved").length;
+              const left = g.length - a;
+              return (
+                <div key={type} className="text-center">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">{typeLabel(type)}s</p>
+                  <p className="text-lg font-semibold">{a}/{g.length}</p>
+                  {left > 0 ? (
+                    <p className="text-[11px] text-amber-600 dark:text-amber-400">faltam {left}</p>
+                  ) : (
+                    <p className="text-[11px] text-green-600 dark:text-green-400">completo ✓</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="bg-amber-500/5 border-amber-500/30">
         <CardContent className="p-4 text-sm">
