@@ -860,9 +860,11 @@ export type Database = {
           instagram: string | null
           is_active: boolean
           is_lifetime_free: boolean
+          mp_preapproval_id: string | null
           name: string
           photo_url: string | null
           plan: string
+          plan_billing: string | null
           plan_expires_at: string | null
           plan_term_months: number | null
           state: string | null
@@ -887,9 +889,11 @@ export type Database = {
           instagram?: string | null
           is_active?: boolean
           is_lifetime_free?: boolean
+          mp_preapproval_id?: string | null
           name: string
           photo_url?: string | null
           plan?: string
+          plan_billing?: string | null
           plan_expires_at?: string | null
           plan_term_months?: number | null
           state?: string | null
@@ -914,9 +918,11 @@ export type Database = {
           instagram?: string | null
           is_active?: boolean
           is_lifetime_free?: boolean
+          mp_preapproval_id?: string | null
           name?: string
           photo_url?: string | null
           plan?: string
+          plan_billing?: string | null
           plan_expires_at?: string | null
           plan_term_months?: number | null
           state?: string | null
@@ -1134,6 +1140,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      record_premium_recurring_payment: {
+        Args: {
+          _amount: number
+          _artist_id: string
+          _billing_type?: string
+          _mp_payment_id: string
+          _preapproval_id?: string
+        }
+        Returns: undefined
       }
       reject_artist_application: {
         Args: { _application_id: string; _reason?: string }
