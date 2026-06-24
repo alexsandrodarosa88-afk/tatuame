@@ -1,63 +1,65 @@
+## Visão geral
 
-# Área do Tatuador — Mensalidade, Dados Bancários e Saques
+Criar dois planos de assinatura para tatuadores: **Free** (sem rateio) e **Premium** (com rateio condicionado a metas de divulgação). O Premium é vendido em pacotes de 6 ou 12 meses, e o rateio do mês é proporcional às metas semanais cumpridas.
 
-## 1. Banco de dados (migration)
+## Regras de negócio
 
-**Nova tabela `artist_bank_details`** (1 por tatuador, bloqueada após preenchimento)
-- artist_id (uuid, unique), full_name, address, phone, email, cpf, rg, birth_date
-- bank_name, bank_agency, bank_account, pix_key
-- is_locked (boolean, default true depois do primeiro insert via trigger)
-- RLS: tatuador vê/insere o seu; update só admin (para liberar via chamado)
+**Plano Free**
+- R$ 0/mês, acesso completo à plataforma EXCETO a aba "Rateio"
+- Tatuador some da lista de elegíveis quando o admin distribui rateio de uma campanha
+- Aba "Rateio" e "Solicitar pagamento" ficam ocultas no menu lateral do tatuador Free
 
-**Nova tabela `withdrawal_requests`**
-- artist_id, amount, status (pending/approved/paid/rejected), notes, requested_at, processed_at
-- RLS: tatuador vê/cria os seus; admin gerencia tudo
+**Plano Premium**
+- R$ 49,90/mês, vendido em pacote de **6 meses (R$ 299,40)** ou **12 meses (R$ 598,80)** pago de uma vez
+- Tatuador escolhe o pacote no momento da assinatura
+- Acesso completo + direito ao rateio (condicionado às metas)
 
-**Nova tabela `admin_notifications`**
-- type (withdrawal_request / artist_application / support_ticket), title, message, link, is_read, related_id
-- RLS: só admin
+**Metas semanais de divulgação (Premium)**
+- 8 stories + 1 reel + 1 post **por semana**
+- Cada item é auto-declarado pelo tatuador no painel dele (botão "marquei como feito" + link opcional do Instagram)
+- Admin valida/rejeita cada item no painel novo "Metas de Divulgação"
+- Cada semana fechada vira um registro com % de metas aprovadas (0–100%)
 
-**Tabela `artist_subscriptions` já existe** — usar para mensalidade. Adicionar coluna `due_date` e `stripe_payment_intent_id` se faltar.
+**Rateio proporcional**
+- Quando uma campanha fecha e o rateio é distribuído, para cada tatuador Premium ativo o sistema calcula a média de % de aprovação das semanas do mês de referência
+- O valor que ele recebe = `valor_padrão_por_artista × (% médio aprovado / 100)`
+- A diferença (o que ele não recebeu) volta para o caixa do sistema (não é redistribuída)
+- Tatuadores Free não entram no cálculo nem aparecem na lista
 
-**Triggers**
-- `lock_bank_details`: ao UPDATE em artist_bank_details, se is_locked=true e quem edita não é admin → bloquear
-- `notify_admin_on_withdrawal`: AFTER INSERT em withdrawal_requests → insert em admin_notifications
-- `notify_admin_on_application`: AFTER INSERT em artist_applications → insert em admin_notifications
+**Migração de tatuadores existentes**
+- Mantém todos como Premium ativo até a data atual do `subscription_next_due`
+- Quando vencer, eles escolhem renovar em pacote (6 ou 12 meses) ou descer pra Free
 
-## 2. Área do Tatuador (frontend)
+## Mudanças no banco
 
-**Sidebar** ganha 2 abas novas:
-- **Meus dados** (`/tatuador/dados`) — formulário completo (pessoal + bancário + PIX). Após salvar, campos ficam read-only com aviso "Para alterar, abra um chamado".
-- **Mensalidade** (`/tatuador/mensalidade`) — mostra valor, vencimento, status, botão "Pagar mensalidade" (Stripe checkout).
+1. **`tattoo_artists`**: adicionar `plan` (`'free' | 'premium'`, default `'free'`), `plan_expires_at` (data fim do pacote Premium), `plan_term_months` (6 ou 12)
+2. **`artist_subscriptions`**: adicionar `term_months` (6 ou 12), `amount` passa a guardar o valor total do pacote
+3. **Nova tabela `artist_promotion_tasks`**: registra cada item de divulgação
+   - `artist_id`, `week_start` (segunda-feira), `task_type` (`story | reel | post`), `task_index` (1..N do tipo na semana), `status` (`pending | submitted | approved | rejected`), `instagram_url`, `submitted_at`, `reviewed_at`, `reviewer_id`, `notes`
+   - Único por (artist_id, week_start, task_type, task_index)
+4. **Nova view/função `artist_week_completion(artist_id, week_start)`** retorna % aprovado da semana
+5. **Função `compute_artist_payout_factor(artist_id, reference_month)`**: média das semanas do mês
+6. **Atualizar `distribute_campaign_payouts`**: só considera Premium ativo, aplica fator de divulgação
 
-**Meus rateios** (`/tatuador/rateio`) — adicionar:
-- Aviso azul: "Após solicitar seu saque, ele será pago em até 48h. Pagamentos apenas em dias úteis."
-- Aviso vermelho se dados bancários incompletos: "Complete seus dados em **Meus dados** para poder solicitar saque."
-- Botão **Solicitar saque** (habilitado só se: dados completos E saldo a receber > 0)
-- Lista de solicitações de saque com status
+## Mudanças no frontend
 
-## 3. Área do Admin
+**Tatuador**
+- Nova página `/tatuador/plano` para escolher Free vs Premium (6 ou 12 meses) e pagar via PIX
+- Página `/tatuador/divulgacao`: lista a semana atual com checkboxes de cada story/reel/post + campo de link e botão "Enviar". Mostra status de cada item e % da semana
+- Menu lateral: esconde "Rateio" e "Solicitar pagamento" quando `plan = 'free'`
 
-- Sino de notificações no header do admin layout com badge de não-lidas, abre dropdown com últimas notificações e link para a página relacionada
-- Nova rota `/admin/saques` para aprovar/marcar como pago os pedidos de saque
-- Notificações são marcadas como lidas ao clicar
+**Admin**
+- Página `/admin/divulgacao`: fila de itens `submitted` para aprovar/rejeitar com link clicável pro Instagram
+- `/admin/tatuadores`: badge do plano e botão "Mudar plano" / "Estender Premium"
+- `/admin/rateios`: mostra para cada artista Premium o % médio do mês e o valor final calculado
 
-## 4. Detalhes técnicos
+## Pagamento dos pacotes Premium
 
-- Stripe: usar `createCheckoutSession` existente adaptado para "subscription_payment" (one-shot da mensalidade) — ou marcar manualmente como pago no admin por enquanto se Stripe não estiver pronto. **Vou usar: registrar pagamento manual + botão "marcar como pago" no admin** para evitar reescrever Stripe agora. (Confirmar com usuário se quer Stripe já.)
-- Avisos: usar `Card` com cores `border-amber-500/30 bg-amber-500/10` etc.
+Usar a integração Asaas existente, gerando uma única cobrança PIX do valor total (R$ 299,40 ou R$ 598,80). Ao confirmar, define `plan='premium'`, `plan_term_months`, `plan_expires_at = now() + N meses`. Webhook já existente trata a confirmação.
 
-## Arquivos
+## Não muda
+- Sistema de campanhas, cotas, números da sorte, vendas para clientes
+- Inflação x12 das % visíveis ao cliente nas campanhas
+- Cadastro/aprovação de tatuadores (continua, mas o aprovado entra como Free)
 
-**Novos**
-- `supabase/migrations/<ts>_artist_finance.sql`
-- `src/routes/_authenticated/tatuador.dados.tsx`
-- `src/routes/_authenticated/tatuador.mensalidade.tsx`
-- `src/routes/_authenticated/admin.saques.tsx`
-- `src/components/admin/NotificationsBell.tsx`
-- `src/hooks/use-admin-notifications.ts`
-
-**Editados**
-- `src/routes/_authenticated/tatuador.tsx` (sidebar + 2 itens)
-- `src/routes/_authenticated/tatuador.rateio.tsx` (avisos + botão saque + lista)
-- `src/routes/_authenticated/admin.tsx` (sino no header + link "Saques")
+Posso seguir com a implementação?
