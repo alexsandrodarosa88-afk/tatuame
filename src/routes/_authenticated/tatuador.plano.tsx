@@ -72,8 +72,8 @@ function PlanoPage() {
             <ul className="text-sm space-y-2">
               <li className="flex gap-2"><Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />Perfil público na plataforma</li>
               <li className="flex gap-2"><Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />Aparece em buscas e campanhas</li>
+              <li className="flex gap-2"><Check className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />Solicitação de pagamento de tatuagens de ganhadores</li>
               <li className="flex gap-2"><X className="h-4 w-4 text-red-500 mt-0.5 shrink-0" /><span><strong>Sem direito a rateio</strong> das campanhas</span></li>
-              <li className="flex gap-2"><X className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />Sem solicitação de pagamento</li>
             </ul>
             {!data.premiumActive ? (
               <div className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">Você está no plano Free.</div>
@@ -141,6 +141,12 @@ function PlanoPage() {
                 Renovar antes do vencimento estende o período Premium.
               </p>
             )}
+            <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
+              <strong>Formas de pagamento:</strong> cartão de crédito recorrente ou PIX recorrente — você escolhe na próxima etapa.
+            </div>
+            <div className="rounded-md border border-red-500/40 bg-red-500/5 px-3 py-2 text-xs text-red-700 dark:text-red-300">
+              ⚠️ <strong>Importante:</strong> em caso de desistência ou cancelamento do Premium, você só poderá retornar à plataforma <strong>12 meses após a data de saída</strong>.
+            </div>
           </CardContent>
         </Card>
       </div>
