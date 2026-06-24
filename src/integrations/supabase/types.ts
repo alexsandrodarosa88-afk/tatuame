@@ -216,6 +216,69 @@ export type Database = {
           },
         ]
       }
+      artist_promotion_tasks: {
+        Row: {
+          artist_id: string
+          created_at: string
+          id: string
+          instagram_url: string | null
+          notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string | null
+          task_index: number
+          task_type: string
+          updated_at: string
+          week_start: string
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          id?: string
+          instagram_url?: string | null
+          notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          task_index: number
+          task_type: string
+          updated_at?: string
+          week_start: string
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          id?: string
+          instagram_url?: string | null
+          notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string | null
+          task_index?: number
+          task_type?: string
+          updated_at?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_promotion_tasks_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "tattoo_artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_promotion_tasks_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "tattoo_artists_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_subscriptions: {
         Row: {
           amount: number
@@ -230,6 +293,7 @@ export type Database = {
           paid_at: string | null
           reference_month: string
           status: string
+          term_months: number
           updated_at: string
         }
         Insert: {
@@ -245,6 +309,7 @@ export type Database = {
           paid_at?: string | null
           reference_month: string
           status?: string
+          term_months?: number
           updated_at?: string
         }
         Update: {
@@ -260,6 +325,7 @@ export type Database = {
           paid_at?: string | null
           reference_month?: string
           status?: string
+          term_months?: number
           updated_at?: string
         }
         Relationships: [
@@ -796,6 +862,9 @@ export type Database = {
           is_lifetime_free: boolean
           name: string
           photo_url: string | null
+          plan: string
+          plan_expires_at: string | null
+          plan_term_months: number | null
           state: string | null
           styles: string[]
           subscription_billing_type: string | null
@@ -820,6 +889,9 @@ export type Database = {
           is_lifetime_free?: boolean
           name: string
           photo_url?: string | null
+          plan?: string
+          plan_expires_at?: string | null
+          plan_term_months?: number | null
           state?: string | null
           styles?: string[]
           subscription_billing_type?: string | null
@@ -844,6 +916,9 @@ export type Database = {
           is_lifetime_free?: boolean
           name?: string
           photo_url?: string | null
+          plan?: string
+          plan_expires_at?: string | null
+          plan_term_months?: number | null
           state?: string | null
           styles?: string[]
           subscription_billing_type?: string | null
@@ -1010,6 +1085,10 @@ export type Database = {
       }
     }
     Functions: {
+      activate_premium_plan: {
+        Args: { _artist_id: string; _term_months: number }
+        Returns: undefined
+      }
       admin_grant_free_month: { Args: { _email: string }; Returns: string }
       admin_unblock_artist: { Args: { _artist_id: string }; Returns: boolean }
       allocate_lucky_numbers: {
@@ -1031,6 +1110,10 @@ export type Database = {
         Args: { _artist_id: string }
         Returns: number
       }
+      compute_artist_payout_factor: {
+        Args: { _artist_id: string; _reference_period: string }
+        Returns: number
+      }
       confirm_paid_order: {
         Args: { _gateway_payment_id?: string; _order_id: string }
         Returns: boolean
@@ -1038,6 +1121,10 @@ export type Database = {
       distribute_campaign_payouts: {
         Args: { _campaign_id: string }
         Returns: number
+      }
+      ensure_week_promotion_tasks: {
+        Args: { _artist_id: string; _week_start: string }
+        Returns: undefined
       }
       expire_completed_campaigns: { Args: never; Returns: number }
       generate_campaign_code: { Args: never; Returns: string }

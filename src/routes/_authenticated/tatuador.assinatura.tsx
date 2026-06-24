@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { AssinaturaPage } from "@/components/tatuador/AssinaturaPage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authenticated/tatuador/assinatura")({ component: AssinaturaPage });
+export const Route = createFileRoute("/_authenticated/tatuador/assinatura")({
+  beforeLoad: () => { throw redirect({ to: "/tatuador/plano" }); },
+});
