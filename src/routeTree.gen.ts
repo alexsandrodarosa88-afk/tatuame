@@ -44,6 +44,7 @@ import { Route as AuthenticatedAdminSaquesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminRateiosRouteImport } from './routes/_authenticated/admin.rateios'
 import { Route as AuthenticatedAdminMensalidadesRouteImport } from './routes/_authenticated/admin.mensalidades'
 import { Route as AuthenticatedAdminEstilosRouteImport } from './routes/_authenticated/admin.estilos'
+import { Route as AuthenticatedAdminDivulgacaoRouteImport } from './routes/_authenticated/admin.divulgacao'
 import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminCampanhasRouteImport } from './routes/_authenticated/admin.campanhas'
@@ -241,6 +242,12 @@ const AuthenticatedAdminEstilosRoute =
     path: '/estilos',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminDivulgacaoRoute =
+  AuthenticatedAdminDivulgacaoRouteImport.update({
+    id: '/divulgacao',
+    path: '/divulgacao',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminConfiguracoesRoute =
   AuthenticatedAdminConfiguracoesRouteImport.update({
     id: '/configuracoes',
@@ -292,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/divulgacao': typeof AuthenticatedAdminDivulgacaoRoute
   '/admin/estilos': typeof AuthenticatedAdminEstilosRoute
   '/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/admin/rateios': typeof AuthenticatedAdminRateiosRoute
@@ -331,6 +339,7 @@ export interface FileRoutesByTo {
   '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/divulgacao': typeof AuthenticatedAdminDivulgacaoRoute
   '/admin/estilos': typeof AuthenticatedAdminEstilosRoute
   '/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/admin/rateios': typeof AuthenticatedAdminRateiosRoute
@@ -374,6 +383,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/_authenticated/admin/divulgacao': typeof AuthenticatedAdminDivulgacaoRoute
   '/_authenticated/admin/estilos': typeof AuthenticatedAdminEstilosRoute
   '/_authenticated/admin/mensalidades': typeof AuthenticatedAdminMensalidadesRoute
   '/_authenticated/admin/rateios': typeof AuthenticatedAdminRateiosRoute
@@ -417,6 +427,7 @@ export interface FileRouteTypes {
     | '/admin/campanhas'
     | '/admin/clientes'
     | '/admin/configuracoes'
+    | '/admin/divulgacao'
     | '/admin/estilos'
     | '/admin/mensalidades'
     | '/admin/rateios'
@@ -456,6 +467,7 @@ export interface FileRouteTypes {
     | '/admin/campanhas'
     | '/admin/clientes'
     | '/admin/configuracoes'
+    | '/admin/divulgacao'
     | '/admin/estilos'
     | '/admin/mensalidades'
     | '/admin/rateios'
@@ -498,6 +510,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/campanhas'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/configuracoes'
+    | '/_authenticated/admin/divulgacao'
     | '/_authenticated/admin/estilos'
     | '/_authenticated/admin/mensalidades'
     | '/_authenticated/admin/rateios'
@@ -783,6 +796,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminEstilosRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/divulgacao': {
+      id: '/_authenticated/admin/divulgacao'
+      path: '/divulgacao'
+      fullPath: '/admin/divulgacao'
+      preLoaderRoute: typeof AuthenticatedAdminDivulgacaoRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/configuracoes': {
       id: '/_authenticated/admin/configuracoes'
       path: '/configuracoes'
@@ -826,6 +846,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCampanhasRoute: typeof AuthenticatedAdminCampanhasRoute
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
   AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
+  AuthenticatedAdminDivulgacaoRoute: typeof AuthenticatedAdminDivulgacaoRoute
   AuthenticatedAdminEstilosRoute: typeof AuthenticatedAdminEstilosRoute
   AuthenticatedAdminMensalidadesRoute: typeof AuthenticatedAdminMensalidadesRoute
   AuthenticatedAdminRateiosRoute: typeof AuthenticatedAdminRateiosRoute
@@ -840,6 +861,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCampanhasRoute: AuthenticatedAdminCampanhasRoute,
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
   AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
+  AuthenticatedAdminDivulgacaoRoute: AuthenticatedAdminDivulgacaoRoute,
   AuthenticatedAdminEstilosRoute: AuthenticatedAdminEstilosRoute,
   AuthenticatedAdminMensalidadesRoute: AuthenticatedAdminMensalidadesRoute,
   AuthenticatedAdminRateiosRoute: AuthenticatedAdminRateiosRoute,
