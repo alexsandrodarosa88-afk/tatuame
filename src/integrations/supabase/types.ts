@@ -347,6 +347,7 @@ export type Database = {
       }
       campaigns: {
         Row: {
+          campaign_type: string
           code: string
           created_at: string
           description: string | null
@@ -361,6 +362,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          campaign_type?: string
           code?: string
           created_at?: string
           description?: string | null
@@ -375,6 +377,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          campaign_type?: string
           code?: string
           created_at?: string
           description?: string | null
