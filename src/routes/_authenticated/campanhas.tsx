@@ -71,6 +71,14 @@ function CampaignBuyCard({ c, onAdd, loading }: { c: any; onAdd: (q: number) => 
         </div>
         {pct >= 70 && <Badge className="bg-primary/15 text-primary border border-primary/30">Quase fechando</Badge>}
       </div>
+      <div className={`rounded-md px-3 py-2 text-xs border ${c.campaign_type === "simple" ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"}`}>
+        <div className="font-semibold">{c.campaign_type === "simple" ? "Sorteio Simples" : "Sorteio Premium — reverte em crédito"}</div>
+        <div className="text-[11px] opacity-90">
+          {c.campaign_type === "simple"
+            ? "Sem crédito de volta se não ganhar."
+            : "Não ganhou? Vira crédito para uma tatuagem."}
+        </div>
+      </div>
       <div className="text-sm text-muted-foreground">
         Cota: <span className="text-foreground font-semibold">{formatBRL(Number(c.price_per_quota))}</span>
       </div>

@@ -16,6 +16,7 @@ export const Route = createFileRoute("/_authenticated/admin/campanhas")({ compon
 type Campaign = {
   id: string; code: string; title: string | null; description: string | null; status: string;
   tattoo_value: number; price_per_quota: number; total_quotas: number; sold_quotas: number; ends_at: string;
+  campaign_type: "premium" | "simple";
 };
 
 type CampaignSale = {
@@ -27,7 +28,7 @@ type CampaignSale = {
 };
 
 const brl = (n: number) => Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const empty = { title: "", description: "", tattoo_value: 0, price_per_quota: 0, total_quotas: 999, ends_at: "", status: "active" };
+const empty = { title: "", description: "", tattoo_value: 0, price_per_quota: 0, total_quotas: 999, ends_at: "", status: "active", campaign_type: "premium" as "premium" | "simple" };
 
 function AdminCampanhas() {
   const [rows, setRows] = useState<Campaign[]>([]);
@@ -35,6 +36,7 @@ function AdminCampanhas() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Campaign | null>(null);
   const [form, setForm] = useState<any>(empty);
+  const [tab, setTab] = useState<"premium" | "simple">("premium");
 
   const load = async () => {
     const { data } = await supabase.from("campaigns").select("*").order("created_at", { ascending: false });
@@ -78,13 +80,18 @@ function AdminCampanhas() {
   useRealtimeCallback("campaigns", () => { load(); });
   useRealtimeCallback("orders", () => { load(); });
 
-  const openNew = () => { setEditing(null); setForm(empty); setOpen(true); };
+  const openNew = (type: "premium" | "simple" = tab) => {
+    setEditing(null);
+    setForm({ ...empty, campaign_type: type });
+    setOpen(true);
+  };
   const openEdit = (c: Campaign) => {
     setEditing(c);
     setForm({
       title: c.title ?? "", description: c.description ?? "", tattoo_value: c.tattoo_value,
       price_per_quota: c.price_per_quota, total_quotas: c.total_quotas,
       ends_at: c.ends_at ? c.ends_at.slice(0, 16) : "", status: c.status,
+      campaign_type: c.campaign_type ?? "premium",
     });
     setOpen(true);
   };
@@ -96,6 +103,7 @@ function AdminCampanhas() {
       total_quotas: Number(form.total_quotas),
       ends_at: form.ends_at ? new Date(form.ends_at).toISOString() : undefined,
       status: form.status,
+      campaign_type: form.campaign_type,
     };
     if (!payload.title || !payload.ends_at) { toast.error("Preencha título e data de encerramento."); return; }
     const { error } = editing
@@ -115,13 +123,29 @@ function AdminCampanhas() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-bold">Campanhas ({rows.length})</h1>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button onClick={openNew}><Plus className="h-4 w-4 mr-1" /> Nova campanha</Button></DialogTrigger>
+          <DialogTrigger asChild><Button onClick={() => openNew(tab)}><Plus className="h-4 w-4 mr-1" /> Novo sorteio {tab === "premium" ? "Premium" : "Simples"}</Button></DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader><DialogTitle>{editing ? "Editar campanha" : "Nova campanha"}</DialogTitle></DialogHeader>
             <div className="space-y-3">
+              <div>
+                <Label>Tipo de sorteio</Label>
+                <select
+                  value={form.campaign_type}
+                  onChange={(e) => setForm({ ...form, campaign_type: e.target.value })}
+                  className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+                >
+                  <option value="premium">Premium — reverte em crédito (cliente não perde o valor)</option>
+                  <option value="simple">Simples — sem crédito de volta</option>
+                </select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {form.campaign_type === "premium"
+                    ? "Se o cliente não ganhar, o valor pago vira crédito para fazer uma tatuagem."
+                    : "Sorteio tradicional: quem não ganhar não recebe crédito."}
+                </p>
+              </div>
               <div><Label>Título</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
               <div><Label>Descrição</Label><Textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
               <div className="grid grid-cols-2 gap-3">
@@ -141,8 +165,22 @@ function AdminCampanhas() {
           </DialogContent>
         </Dialog>
       </div>
+      <div className="inline-flex rounded-md border border-border bg-muted/30 p-1">
+        <button
+          onClick={() => setTab("premium")}
+          className={`px-4 py-1.5 text-sm rounded-md transition-colors ${tab === "premium" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          Premium (com crédito)
+        </button>
+        <button
+          onClick={() => setTab("simple")}
+          className={`px-4 py-1.5 text-sm rounded-md transition-colors ${tab === "simple" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          Simples (sem crédito)
+        </button>
+      </div>
       <div className="grid gap-3">
-        {rows.map((c) => {
+        {rows.filter((c) => (c.campaign_type ?? "premium") === tab).map((c) => {
           const pct = c.total_quotas ? (c.sold_quotas / c.total_quotas) * 100 : 0;
           return (
             <Card key={c.id}>
@@ -152,6 +190,9 @@ function AdminCampanhas() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-mono font-semibold text-primary border border-primary/20">{c.code}</span>
                       <h3 className="font-semibold truncate">{c.title}</h3>
+                      <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide border ${c.campaign_type === "simple" ? "bg-amber-500/10 text-amber-600 border-amber-500/30" : "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"}`}>
+                        {c.campaign_type === "simple" ? "Simples" : "Premium"}
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">Encerra: {c.ends_at ? new Date(c.ends_at).toLocaleString("pt-BR") : "—"} · Status: {c.status}</p>
                   </div>

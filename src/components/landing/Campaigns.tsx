@@ -48,6 +48,14 @@ export function Campaigns() {
                     </div>
                     {isHot && <Badge className="bg-primary/15 text-primary border border-primary/30 hover:bg-primary/15">Quase fechando</Badge>}
                   </div>
+                  <div className={`rounded-md px-3 py-2 text-xs border ${c.campaign_type === "simple" ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"}`}>
+                    <div className="font-semibold mb-0.5">{c.campaign_type === "simple" ? "Sorteio Simples" : "Sorteio Premium — reverte em crédito"}</div>
+                    <div className="text-[11px] opacity-90">
+                      {c.campaign_type === "simple"
+                        ? "Se não for sorteado, o valor pago não retorna."
+                        : "Não ganhou? O valor pago vira crédito para você fazer uma tatuagem."}
+                    </div>
+                  </div>
                   <div className="rounded-lg bg-secondary/40 border border-border p-3">
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Ticket className="h-3.5 w-3.5" /> Por cota</div>
                     <div className="font-display text-xl font-semibold mt-1">{formatBRL(Number(c.price_per_quota))}</div>
