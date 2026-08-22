@@ -5,7 +5,8 @@ import { useEffect } from "react";
 import { getMyParticipations, getMyCredits, getMyProfile, reconcileMyPendingOrders } from "@/lib/cart.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Ticket, Wallet, User as UserIcon, FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Ticket, Wallet, User as UserIcon, FileText, ArrowRight, History, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/conta")({ component: AccountPage });
 
@@ -43,88 +44,157 @@ function AccountPage() {
   const historico = (parts ?? []).filter(isEnded);
 
   return (
-    <div className="container mx-auto px-4 py-10 max-w-4xl">
-      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
-        <h1 className="font-display text-3xl font-bold">Minha conta</h1>
-        <Button asChild variant="outline" size="sm">
-          <Link to="/politicas"><FileText className="h-4 w-4 mr-1" /> Políticas</Link>
+    <div className="container mx-auto px-4 py-12 max-w-5xl animate-fade-in">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="space-y-2">
+          <div className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Minha Área</div>
+          <h1 className="font-display text-4xl md:text-5xl font-black text-white italic uppercase leading-none">
+            Olá, <span className="text-glow">{profile?.nome_completo?.split(" ")[0] || "Usuário"}</span>
+          </h1>
+        </div>
+        <Button asChild variant="outline" className="glass h-10 px-6 font-bold uppercase tracking-widest text-xs">
+          <Link to="/politicas"><FileText className="h-4 w-4 mr-2" /> Políticas da Plataforma</Link>
         </Button>
-      </div>
+      </header>
 
-      {profile && (
-        <Card className="p-6 mb-6">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider mb-3"><UserIcon className="h-4 w-4" /> Seus dados</div>
-          <div className="grid sm:grid-cols-2 gap-3 text-sm">
-            <div><span className="text-muted-foreground">Nome:</span> <span className="font-medium">{profile.nome_completo ?? "—"}</span></div>
-            <div><span className="text-muted-foreground">Email:</span> <span className="font-medium">{profile.email ?? "—"}</span></div>
-            <div><span className="text-muted-foreground">CPF:</span> <span className="font-medium">{profile.cpf ?? "—"}</span></div>
-            <div><span className="text-muted-foreground">Telefone:</span> <span className="font-medium">{profile.telefone ?? "—"}</span></div>
-            <div><span className="text-muted-foreground">Nascimento:</span> <span className="font-medium">{profile.data_nascimento ? formatDate(profile.data_nascimento) : "—"}</span></div>
-            <div><span className="text-muted-foreground">Cidade:</span> <span className="font-medium">{profile.cidade ?? "—"}</span></div>
+      {/* Overview Cards */}
+      <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <Card className="glass p-8 relative overflow-hidden group transition-premium hover:border-primary/40">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -z-10" />
+          <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-4">
+            <Wallet className="h-4 w-4 text-primary" /> Crédito Disponível
           </div>
+          <div className="font-display text-4xl font-black text-white italic tracking-tighter tabular-nums">
+            {formatBRL(totalCredit)}
+          </div>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase mt-4 italic">Válidos por 12 meses</p>
         </Card>
-      )}
+        
+        <Card className="glass p-8 relative overflow-hidden group transition-premium hover:border-primary/40">
+          <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-4">
+            <Ticket className="h-4 w-4 text-primary" /> Números Ativos
+          </div>
+          <div className="font-display text-4xl font-black text-white italic tracking-tighter tabular-nums">
+            {ativos.length}
+          </div>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase mt-4 italic">Participando agora</p>
+        </Card>
 
-      <div className="grid sm:grid-cols-2 gap-4 mb-8">
-        <Card className="p-6">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider"><Wallet className="h-4 w-4" /> Crédito disponível</div>
-          <div className="font-display text-3xl font-bold mt-2">{formatBRL(totalCredit)}</div>
-          <div className="text-xs text-muted-foreground mt-1">Válidos por 12 meses · Use até 70% da sua próxima tatuagem</div>
-        </Card>
-        <Card className="p-6">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider"><Ticket className="h-4 w-4" /> Números da sorte</div>
-          <div className="font-display text-3xl font-bold mt-2">{ativos.length}</div>
-          <div className="text-xs text-muted-foreground mt-1">Participações ativas</div>
+        <Card className="glass p-8 relative overflow-hidden group transition-premium hover:border-primary/40">
+          <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-4">
+            <CreditCard className="h-4 w-4 text-primary" /> Uso do Crédito
+          </div>
+          <div className="font-display text-4xl font-black text-white italic tracking-tighter">70%</div>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase mt-4 italic">Limite por tatuagem</p>
         </Card>
       </div>
 
-      <h2 className="font-display text-xl font-semibold mb-3">Sorteios ativos</h2>
-      {ativos.length === 0 && (
-        <Card className="p-8 text-center">
-          <p className="text-muted-foreground mb-4">Você ainda não tem participações ativas.</p>
-          <Button asChild className="bg-primary hover:bg-[var(--primary-glow)]"><Link to="/campanhas">Ver campanhas</Link></Button>
-        </Card>
-      )}
-      <div className="space-y-2">
-        {ativos.map((p: any) => (
-          <Card key={p.id} className="p-4 flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                {p.campaigns?.code && <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-mono font-semibold text-primary border border-primary/20">{p.campaigns.code}</span>}
-                <span className="font-semibold">{p.campaigns?.title ?? "Campanha"}</span>
-              </div>
-              <div className="text-xs text-muted-foreground mt-1">Sorteio quando finalizar as cotas</div>
-            </div>
-            <div className="text-right">
-              <div className="text-xs text-muted-foreground">Seu número</div>
-              <div className="font-display text-2xl font-bold text-primary tabular-nums">{String(p.lucky_number).padStart(3, "0")}</div>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {historico.length > 0 && (
-        <>
-          <h2 className="font-display text-xl font-semibold mt-10 mb-3">Histórico de sorteios</h2>
-          <div className="space-y-2">
-            {historico.map((p: any) => (
-              <Card key={p.id} className="p-4 flex items-center justify-between opacity-80">
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {p.campaigns?.code && <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-[10px] font-mono font-semibold text-muted-foreground border border-border">{p.campaigns.code}</span>}
-                    <span className="font-semibold">{p.campaigns?.title ?? "Campanha"}</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Encerrado em {formatDate(p.campaigns?.ends_at)}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xs text-muted-foreground">Número</div>
-                  <div className="font-display text-2xl font-bold tabular-nums">{String(p.lucky_number).padStart(3, "0")}</div>
-                </div>
+      <div className="grid lg:grid-cols-3 gap-12">
+        {/* Left Column: Participations */}
+        <div className="lg:col-span-2 space-y-12">
+          <section>
+            <h2 className="font-display text-2xl font-black text-white italic uppercase mb-6 flex items-center gap-3">
+              <Ticket className="h-6 w-6 text-primary" /> Sorteios em Aberto
+            </h2>
+            
+            {ativos.length === 0 ? (
+              <Card className="glass p-12 text-center rounded-[2rem]">
+                <p className="text-muted-foreground font-medium italic mb-6">Você ainda não tem participações ativas.</p>
+                <Button asChild className="bg-primary hover:bg-[oklch(0.6_0.23_27)] text-primary-foreground font-black italic uppercase h-12 px-8">
+                  <Link to="/campanhas">Explorar Campanhas <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                </Button>
               </Card>
-            ))}
-          </div>
-        </>
-      )}
+            ) : (
+              <div className="grid md:grid-cols-2 gap-4">
+                {ativos.map((p: any) => (
+                  <ParticipationCard key={p.id} participation={p} />
+                ))}
+              </div>
+            )}
+          </section>
+
+          {historico.length > 0 && (
+            <section>
+              <h2 className="font-display text-2xl font-black text-white italic uppercase mb-6 flex items-center gap-3">
+                <History className="h-6 w-6 text-muted-foreground" /> Histórico
+              </h2>
+              <div className="space-y-3">
+                {historico.map((p: any) => (
+                  <ParticipationCard key={p.id} participation={p} isHistory />
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Right Column: Profile & Info */}
+        <aside className="space-y-6">
+          <Card className="glass p-8 rounded-[2rem]">
+            <h3 className="font-display text-xs font-black text-white uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
+              <UserIcon className="h-4 w-4 text-primary" /> Perfil Verificado
+            </h3>
+            {profile && (
+              <div className="space-y-6">
+                <ProfileItem label="Email" value={profile.email} />
+                <ProfileItem label="CPF" value={profile.cpf} />
+                <ProfileItem label="Telefone" value={profile.telefone} />
+                <ProfileItem label="Cidade" value={profile.cidade} />
+                <Button variant="outline" className="w-full h-11 glass text-[10px] font-black uppercase tracking-widest hover:text-primary transition-premium">
+                  Editar Dados
+                </Button>
+              </div>
+            )}
+          </Card>
+
+          <Card className="glass p-8 rounded-[2rem] border-primary/20 bg-primary/5">
+            <h3 className="font-display text-xs font-black text-white uppercase tracking-[0.3em] mb-4">Central de Ajuda</h3>
+            <p className="text-[11px] text-muted-foreground font-medium italic mb-6">Dúvidas sobre o funcionamento das campanhas ou créditos?</p>
+            <Button variant="link" className="p-0 h-auto text-[10px] font-black uppercase tracking-widest text-primary hover:text-white transition-colors">
+              Falar com Suporte <ArrowRight className="ml-2 h-3 w-3" />
+            </Button>
+          </Card>
+        </aside>
+      </div>
     </div>
   );
 }
+
+function ParticipationCard({ participation, isHistory }: { participation: any, isHistory?: boolean }) {
+  return (
+    <Card className={`glass rounded-2xl p-6 transition-premium hover:border-primary/40 group ${isHistory ? 'opacity-60' : ''}`}>
+      <div className="flex justify-between items-start gap-4 mb-4">
+        <div className="space-y-1">
+          {participation.campaigns?.code && (
+            <span className="inline-block px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase font-mono tracking-tighter">
+              {participation.campaigns.code}
+            </span>
+          )}
+          <h4 className="font-display text-lg font-black text-white italic uppercase tracking-tight leading-tight group-hover:text-primary transition-colors">
+            {participation.campaigns?.title || "Campanha Tatuame"}
+          </h4>
+        </div>
+        <div className="text-right shrink-0">
+          <div className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Cota</div>
+          <div className={`font-display text-3xl font-black italic tracking-tighter tabular-nums leading-none ${isHistory ? 'text-muted-foreground' : 'text-primary text-glow'}`}>
+            {String(participation.lucky_number).padStart(3, "0")}
+          </div>
+        </div>
+      </div>
+      
+      <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[10px] font-bold text-muted-foreground uppercase italic">
+        <span>{isHistory ? 'Sorteio Realizado' : 'Aguardando Sorteio'}</span>
+        <span>{isHistory ? formatDate(participation.campaigns?.ends_at) : 'Em progresso'}</span>
+      </div>
+    </Card>
+  );
+}
+
+function ProfileItem({ label, value }: { label: string, value: string | null }) {
+  return (
+    <div className="space-y-1">
+      <div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">{label}</div>
+      <div className="text-sm font-bold text-white truncate">{value || "—"}</div>
+    </div>
+  );
+}
+
