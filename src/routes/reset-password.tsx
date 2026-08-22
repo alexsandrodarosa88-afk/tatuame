@@ -24,7 +24,7 @@ function ResetPasswordPage() {
     setLoading(false);
     if (error) return toast.error(error.message);
     toast.success("Senha redefinida com sucesso.");
-    navigate({ to: "/login" });
+    navigate({ to: "/login", search: { next: "/campanhas" } });
   };
 
   return (

@@ -95,7 +95,7 @@ function SignupArtistPage() {
               </p>
             </div>
           </div>
-          <Button asChild className="w-full"><Link to="/login">Ir para o login</Link></Button>
+          <Button asChild className="w-full"><Link to="/login" search={{ next: "/tatuador" }}>Ir para o login</Link></Button>
         </Card>
       </div>
     );
@@ -134,9 +134,9 @@ function SignupArtistPage() {
         </form>
         <div className="text-sm text-muted-foreground text-center">
           Já tem conta de tatuador?{" "}
-          <Link to="/login" className="text-primary font-medium">Entrar</Link>
+          <Link to="/login" search={{ next: "/tatuador" }} className="text-primary font-medium">Entrar</Link>
           {" · "}
-          <Link to="/cadastro" className="text-primary font-medium">Sou cliente</Link>
+          <Link to="/cadastro" search={{ next: "/" }} className="text-primary font-medium">Sou cliente</Link>
         </div>
       </Card>
     </div>

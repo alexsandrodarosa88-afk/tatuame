@@ -12,7 +12,7 @@ function AuthLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !user) navigate({ to: "/login" });
+    if (!loading && !user) navigate({ to: "/login", search: { next: window.location.pathname } });
   }, [loading, user, navigate]);
 
   if (loading || !user) {

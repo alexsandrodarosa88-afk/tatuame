@@ -32,7 +32,7 @@ export function Hero() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Button asChild size="lg" className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold shadow-[var(--shadow-elegant)] transition-[var(--transition-smooth)]">
-              <Link to="/cadastro">
+              <Link to="/cadastro" search={{ next: "/" }}>
                 {get("hero.cta_primary", "Garantir minha vaga")} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

@@ -21,7 +21,7 @@ export function FinalCTA() {
               {get("finalcta.subtitle", "Entre agora, garanta seu número e transforme cada real em arte.")}
             </p>
             <Button asChild size="lg" className="mt-8 bg-background text-foreground hover:bg-background/90 font-semibold">
-              <Link to="/cadastro">
+              <Link to="/cadastro" search={{ next: "/" }}>
                 {get("finalcta.button", "Entrar agora")} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
