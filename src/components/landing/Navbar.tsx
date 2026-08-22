@@ -28,7 +28,7 @@ export function Navbar() {
     <header className={`fixed top-0 inset-x-0 z-[100] transition-premium duration-500 ${isScrolled ? 'h-20 bg-background/80 backdrop-blur-2xl border-b border-white/5' : 'h-24 bg-transparent'}`}>
       <div className="container mx-auto h-full flex items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2 group relative z-10" aria-label="TATUAME — página inicial">
-          <img src={logoTatuame} alt="TATUAME" className="h-9 md:h-10 w-auto invert grayscale brightness-200 transition-premium group-hover:scale-105" />
+          <img src={logoTatuame} alt="TATUAME" className="h-9 md:h-10 w-auto brightness-0 invert transition-premium group-hover:scale-105 mix-blend-screen" />
           <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-premium" />
         </Link>
 
