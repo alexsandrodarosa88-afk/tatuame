@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { MapPin, ArrowRight } from "lucide-react";
+import { MapPin, ArrowRight, Instagram } from "lucide-react";
 
 type Artist = {
   id: string;
@@ -32,76 +32,88 @@ export function Tatuadores() {
   if (!loading && artists.length === 0) return null;
 
   return (
-    <section id="tatuadores" className="py-16 md:py-24 bg-muted/20 border-y border-border">
+    <section id="tatuadores" className="py-32 relative">
       <div className="container mx-auto px-4">
-        <header className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <header className="mb-20 flex flex-col md:flex-row md:items-end md:justify-between gap-8 animate-reveal">
           <div className="max-w-2xl">
-            <p className="text-xs md:text-sm uppercase tracking-widest text-primary font-semibold mb-2">Artistas parceiros</p>
-            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">
-              Tatuadores participantes do TATUAME
+            <div className="inline-block px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-4">
+              Curadoria Select
+            </div>
+            <h2 className="font-display text-4xl md:text-6xl font-black text-white italic uppercase leading-tight">
+              Artistas <span className="text-primary text-glow">Tatuame</span>
             </h2>
-            <p className="mt-3 text-muted-foreground text-sm md:text-base">
-              Conheça os artistas que fazem parte da nossa rede. Escolha seu estilo, sua cidade e seu tatuador.
+            <p className="mt-4 text-muted-foreground text-lg md:text-xl font-medium">
+              Conheça os profissionais que transformam ideias em obras de arte exclusivas.
             </p>
           </div>
-          <Button asChild size="lg" variant="outline" className="self-start md:self-auto shrink-0">
-            <Link to="/tatuadores">Ver todos <ArrowRight className="h-4 w-4 ml-1" /></Link>
+          <Button asChild size="lg" variant="outline" className="glass h-12 px-8 font-bold uppercase tracking-widest transition-premium group">
+            <Link to="/tatuadores">Ver todos os artistas <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" /></Link>
           </Button>
         </header>
 
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-square rounded-lg bg-muted animate-pulse" />
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="aspect-[3/4] rounded-3xl bg-white/5 animate-pulse border border-white/5" />
             ))}
           </div>
         ) : (
-          <div className={`grid gap-3 md:gap-4 ${artists.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : artists.length === 2 ? 'grid-cols-2 max-w-md mx-auto' : 'grid-cols-2 md:grid-cols-4 lg:grid-cols-6'}`}>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {artists.map((a) => (
-              <Link
-                key={a.id}
-                to="/tatuadores"
-                className="group block rounded-lg overflow-hidden bg-card border border-border hover:border-primary/60 hover:shadow-[var(--shadow-elegant)] transition-all"
-              >
-                <div className="aspect-square bg-muted overflow-hidden">
-                  {a.photo_url ? (
-                    <img
-                      src={a.photo_url}
-                      alt={a.name}
-                      loading="lazy"
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="h-full w-full grid place-items-center text-4xl text-muted-foreground font-display">
-                      {a.name.charAt(0)}
-                    </div>
-                  )}
-                </div>
-                <div className="p-2 md:p-3">
-                  <h3 className="font-semibold text-sm md:text-base leading-tight truncate">{a.name}</h3>
-                  {a.styles && a.styles.length > 0 && (
-                    <p className="text-[11px] md:text-xs text-muted-foreground truncate mt-0.5">
-                      {a.styles.slice(0, 2).join(" • ")}
-                    </p>
-                  )}
-                  {(a.city || a.state) && (
-                    <p className="flex items-center gap-1 text-[11px] md:text-xs text-muted-foreground mt-1">
-                      <MapPin className="h-3 w-3 shrink-0" />
-                      <span className="truncate">{[a.city, a.state].filter(Boolean).join("/")}</span>
-                    </p>
-                  )}
-                </div>
-              </Link>
+              <ArtistCard key={a.id} artist={a} />
             ))}
           </div>
         )}
-
-        <div className="mt-8 text-center md:hidden">
-          <Button asChild size="lg" className="w-full">
-            <Link to="/tatuadores">Ver todos os tatuadores <ArrowRight className="h-4 w-4 ml-1" /></Link>
-          </Button>
-        </div>
       </div>
     </section>
+  );
+}
+
+function ArtistCard({ artist }: { artist: Artist }) {
+  return (
+    <Link
+      to="/tatuadores"
+      className="group relative flex flex-col glass rounded-[2rem] overflow-hidden transition-premium hover:-translate-y-2 hover:border-primary/40 hover:shadow-elegant"
+    >
+      <div className="aspect-[3/4] bg-muted overflow-hidden relative">
+        {artist.photo_url ? (
+          <img
+            src={artist.photo_url}
+            alt={artist.name}
+            loading="lazy"
+            className="h-full w-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-premium duration-700 scale-100 group-hover:scale-110"
+          />
+        ) : (
+          <div className="h-full w-full grid place-items-center text-5xl text-white/10 font-black italic uppercase">
+            {artist.name.charAt(0)}
+          </div>
+        )}
+        {/* Overlay info */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80" />
+        
+        <div className="absolute bottom-4 inset-x-4">
+          <h3 className="font-display text-lg font-black text-white italic uppercase truncate tracking-tight">{artist.name}</h3>
+          {(artist.city || artist.state) && (
+            <div className="flex items-center gap-1 text-[9px] text-white/70 font-bold uppercase tracking-widest mt-0.5">
+              <MapPin className="h-2.5 w-2.5 text-primary" />
+              <span className="truncate">{[artist.city, artist.state].filter(Boolean).join(" / ")}</span>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <div className="p-4 bg-card/50">
+        <div className="flex flex-wrap gap-1 mb-3 min-h-[1.5rem]">
+          {artist.styles?.slice(0, 2).map(style => (
+            <span key={style} className="text-[8px] font-black uppercase border border-white/10 px-1.5 py-0.5 rounded text-muted-foreground tracking-tighter">
+              {style}
+            </span>
+          ))}
+        </div>
+        <Button variant="ghost" size="sm" className="w-full h-8 text-[9px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-premium border border-primary/20">
+          Ver Perfil
+        </Button>
+      </div>
+    </Link>
   );
 }

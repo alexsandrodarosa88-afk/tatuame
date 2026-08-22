@@ -49,39 +49,67 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen grid place-items-center bg-background px-4">
-      <Card className="w-full max-w-md p-8 space-y-6">
-        <div>
-          <h1 className="font-display text-3xl font-bold">Entrar</h1>
-          <p className="text-muted-foreground text-sm mt-1">Acesse sua conta TATUAME</p>
-        </div>
-        {next === "/tatuador" && (
-          <div className="rounded-md border border-primary/40 bg-primary/5 p-3 text-sm">
-            <strong>Área do Tatuador.</strong> Entre ou crie sua conta para enviar seu cadastro de tatuador parceiro.
+    <div className="min-h-screen grid place-items-center bg-background px-4 relative overflow-hidden animate-fade-in">
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 blur-[120px] rounded-full -z-10" />
+      
+      <Card className="w-full max-w-md glass p-8 md:p-10 rounded-[2.5rem] relative overflow-hidden transition-premium hover:border-primary/40">
+        <div className="space-y-8">
+          <header className="space-y-2">
+            <h1 className="font-display text-4xl font-black text-white italic uppercase leading-none">Acessar</h1>
+            <p className="text-muted-foreground font-medium italic text-sm">Bem-vindo de volta ao universo TATUAME.</p>
+          </header>
+
+          {next === "/tatuador" && (
+            <div className="glass bg-primary/5 border-primary/20 p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest leading-relaxed text-white">
+              <span className="text-primary">Área do Artista.</span> Faça o login para acessar seu painel profissional.
+            </div>
+          )}
+
+          <Button onClick={google} variant="outline" className="w-full h-12 glass font-bold uppercase tracking-widest text-xs transition-premium">
+            Entrar com Google
+          </Button>
+
+          <div className="flex items-center gap-3 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+            <div className="h-px bg-white/5 flex-1" /> ou <div className="h-px bg-white/5 flex-1" />
           </div>
-        )}
-        <Button onClick={google} variant="outline" className="w-full">Entrar com Google</Button>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground"><div className="h-px bg-border flex-1" />ou<div className="h-px bg-border flex-1" /></div>
-        <form onSubmit={submit} className="space-y-4">
-          <div className="space-y-2"><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
-          <div className="space-y-2"><Label>Senha</Label><Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
-          <button type="button" onClick={forgotPassword} disabled={resetLoading} className="text-sm text-primary hover:underline">
-            {resetLoading ? "Enviando..." : "Esqueci minha senha"}
-          </button>
-          <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-[var(--primary-glow)]">{loading ? "Entrando..." : "Entrar"}</Button>
-        </form>
-        <div className="text-sm text-muted-foreground text-center">
-          Não tem conta?{" "}
-          <Link to="/cadastro" search={next ? { next } as any : undefined} className="text-primary font-medium">Criar agora</Link>
-        </div>
-        <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-sm flex items-start gap-2">
-          <Brush className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-          <div>
-            <p className="font-medium text-foreground">É tatuador?</p>
-            <p className="text-xs text-muted-foreground">
-              A conta de tatuador é separada da conta de cliente.{" "}
-              <Link to="/tatuador-acesso" className="text-primary font-medium">Fazer cadastro de tatuador</Link>.
-            </p>
+
+          <form onSubmit={submit} className="space-y-5">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase tracking-widest ml-1">Email Profissional</Label>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 glass rounded-xl border-white/5 px-4 font-medium italic" required />
+            </div>
+            
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center px-1">
+                <Label className="text-[10px] font-black uppercase tracking-widest">Senha</Label>
+                <button type="button" onClick={forgotPassword} disabled={resetLoading} className="text-[9px] font-black text-primary uppercase tracking-widest hover:text-white transition-colors">
+                  {resetLoading ? "Enviando..." : "Esqueci a senha"}
+                </button>
+              </div>
+              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 glass rounded-xl border-white/5 px-4 font-medium italic" required />
+            </div>
+
+            <Button type="submit" disabled={loading} className="w-full h-14 bg-primary hover:bg-[oklch(0.6_0.23_27)] text-primary-foreground font-black italic uppercase shadow-glow transition-premium mt-4">
+              {loading ? "Autenticando..." : "Entrar na plataforma"}
+            </Button>
+          </form>
+
+          <div className="text-xs font-bold text-muted-foreground text-center uppercase tracking-widest">
+            Novo por aqui?{" "}
+            <Link to="/cadastro" search={next ? { next } as any : undefined} className="text-primary hover:text-white transition-colors">Criar conta agora</Link>
+          </div>
+
+          <div className="pt-6 border-t border-white/5 flex items-start gap-4">
+            <div className="h-10 w-10 rounded-xl glass grid place-items-center shrink-0">
+              <Brush className="h-5 w-5 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-[10px] font-black text-white uppercase tracking-widest">Sou Artista</p>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase leading-relaxed tracking-tighter italic">
+                A conta de artista é exclusiva para tatuadores.{" "}
+                <Link to="/tatuador-acesso" className="text-primary hover:text-white transition-colors">Cadastrar Estúdio</Link>
+              </p>
+            </div>
           </div>
         </div>
       </Card>

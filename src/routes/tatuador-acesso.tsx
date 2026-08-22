@@ -194,7 +194,7 @@ function TatuadorAcessoPage() {
 
         <div className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
           É cliente, não tatuador?{" "}
-          <Link to="/login" className="text-primary font-medium">Acessar como cliente</Link>
+          <Link to="/login" search={{ next: "/" }} className="text-primary font-medium">Acessar como cliente</Link>
         </div>
       </Card>
     </div>

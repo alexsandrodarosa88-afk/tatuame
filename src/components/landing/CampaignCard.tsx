@@ -46,7 +46,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
       </div>
 
       <Button asChild className="bg-primary hover:bg-[var(--primary-glow)] text-primary-foreground font-semibold w-full mt-auto">
-        <Link to="/cadastro">Participar agora</Link>
+        <Link to="/cadastro" search={{ next: "/" }}>Participar agora</Link>
       </Button>
     </Card>
   );
