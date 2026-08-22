@@ -40,13 +40,13 @@ export function Hero() {
           </div>
 
           <div className="flex flex-wrap gap-4 pt-4">
-            <Button asChild size="xl" className="h-14 px-8 bg-primary hover:bg-[oklch(0.6_0.23_27)] text-primary-foreground font-bold shadow-glow transition-premium group">
+            <Button asChild size="lg" className="h-14 px-8 bg-primary hover:bg-[oklch(0.6_0.23_27)] text-primary-foreground font-bold shadow-glow transition-premium group">
               <Link to="/cadastro" search={{ next: "/" }}>
                 EXPLORAR CAMPANHAS <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
             
-            <Button asChild size="xl" variant="outline" className="h-14 px-8 glass hover:bg-white/5 font-semibold transition-premium">
+            <Button asChild size="lg" variant="outline" className="h-14 px-8 glass hover:bg-white/5 font-semibold transition-premium">
               <a href="#como-funciona" className="flex items-center">
                 <Play className="mr-2 h-4 w-4 fill-current" /> COMO FUNCIONA
               </a>
