@@ -1,65 +1,38 @@
-## Visão geral
+# Redesign Visual TATUAME
 
-Criar dois planos de assinatura para tatuadores: **Free** (sem rateio) e **Premium** (com rateio condicionado a metas de divulgação). O Premium é vendido em pacotes de 6 ou 12 meses, e o rateio do mês é proporcional às metas semanais cumpridas.
+Transformação radical da interface para uma estética "Fintech Premium + Marketplace Moderno", focada em tecnologia, confiança e exclusividade.
 
-## Regras de negócio
+## Mudanças Visuais
+- **Paleta**: Preto profundo, grafite, cinza escuro, branco e Vermelho TATUAME estratégico.
+- **Efeitos**: Glassmorphism, transparências, blur, sombras profundas e micro-interações suaves.
+- **Tipografia**: Hierarquia clara com títulos impactantes e fontes modernas.
+- **Mobile First**: Experiência fluida tipo app com CTAs fixos e cards otimizados.
 
-**Plano Free**
-- R$ 0/mês, acesso completo à plataforma EXCETO a aba "Rateio"
-- Tatuador some da lista de elegíveis quando o admin distribui rateio de uma campanha
-- Aba "Rateio" e "Solicitar pagamento" ficam ocultas no menu lateral do tatuador Free
+## Ações por Página
 
-**Plano Premium**
-- R$ 49,90/mês, vendido em pacote de **6 meses (R$ 299,40)** ou **12 meses (R$ 598,80)** pago de uma vez
-- Tatuador escolhe o pacote no momento da assinatura
-- Acesso completo + direito ao rateio (condicionado às metas)
+### 1. Global & Core
+- Atualizar `src/styles.css` com novos tokens de design e variáveis de tema.
+- Ajustar `src/routes/__root.tsx` para garantir fontes e metadados consistentes.
+- Criar componentes utilitários de UI conforme necessário.
 
-**Metas semanais de divulgação (Premium)**
-- 8 stories + 1 reel + 1 post **por semana**
-- Cada item é auto-declarado pelo tatuador no painel dele (botão "marquei como feito" + link opcional do Instagram)
-- Admin valida/rejeita cada item no painel novo "Metas de Divulgação"
-- Cada semana fechada vira um registro com % de metas aprovadas (0–100%)
+### 2. Home Page (`src/routes/index.tsx`)
+- **Hero**: Seção tela cheia, headline gigante, imagem integrada com profundidade.
+- **Tatuadores**: Grid moderno valorizando a fotografia dos artistas.
+- **Campanhas**: Cards premium com progresso visual, valores destacados e hover effects.
+- **Como Funciona**: Redesenho para 3 etapas simples e visuais.
+- **Crédito**: Seção de destaque para o ecossistema de benefícios.
 
-**Rateio proporcional**
-- Quando uma campanha fecha e o rateio é distribuído, para cada tatuador Premium ativo o sistema calcula a média de % de aprovação das semanas do mês de referência
-- O valor que ele recebe = `valor_padrão_por_artista × (% médio aprovado / 100)`
-- A diferença (o que ele não recebeu) volta para o caixa do sistema (não é redistribuída)
-- Tatuadores Free não entram no cálculo nem aparecem na lista
+### 3. Tatuadores (`src/routes/tatuadores.tsx`)
+- Visual de marketplace de talentos, busca aprimorada e filtros discretos.
 
-**Migração de tatuadores existentes**
-- Mantém todos como Premium ativo até a data atual do `subscription_next_due`
-- Quando vencer, eles escolhem renovar em pacote (6 ou 12 meses) ou descer pra Free
+### 4. Checkout & Campanha (`src/routes/checkout.$orderId.tsx`)
+- Fluxo simplificado (Escolher -> Participar -> Confirmar).
+- Mobile: Botão "Quero Participar" fixo no rodapé.
 
-## Mudanças no banco
+### 5. Dashboards (`src/routes/_authenticated/conta.tsx`, etc.)
+- Aparência de aplicativo SaaS, cards de resumo e histórico limpo.
 
-1. **`tattoo_artists`**: adicionar `plan` (`'free' | 'premium'`, default `'free'`), `plan_expires_at` (data fim do pacote Premium), `plan_term_months` (6 ou 12)
-2. **`artist_subscriptions`**: adicionar `term_months` (6 ou 12), `amount` passa a guardar o valor total do pacote
-3. **Nova tabela `artist_promotion_tasks`**: registra cada item de divulgação
-   - `artist_id`, `week_start` (segunda-feira), `task_type` (`story | reel | post`), `task_index` (1..N do tipo na semana), `status` (`pending | submitted | approved | rejected`), `instagram_url`, `submitted_at`, `reviewed_at`, `reviewer_id`, `notes`
-   - Único por (artist_id, week_start, task_type, task_index)
-4. **Nova view/função `artist_week_completion(artist_id, week_start)`** retorna % aprovado da semana
-5. **Função `compute_artist_payout_factor(artist_id, reference_month)`**: média das semanas do mês
-6. **Atualizar `distribute_campaign_payouts`**: só considera Premium ativo, aplica fator de divulgação
-
-## Mudanças no frontend
-
-**Tatuador**
-- Nova página `/tatuador/plano` para escolher Free vs Premium (6 ou 12 meses) e pagar via PIX
-- Página `/tatuador/divulgacao`: lista a semana atual com checkboxes de cada story/reel/post + campo de link e botão "Enviar". Mostra status de cada item e % da semana
-- Menu lateral: esconde "Rateio" e "Solicitar pagamento" quando `plan = 'free'`
-
-**Admin**
-- Página `/admin/divulgacao`: fila de itens `submitted` para aprovar/rejeitar com link clicável pro Instagram
-- `/admin/tatuadores`: badge do plano e botão "Mudar plano" / "Estender Premium"
-- `/admin/rateios`: mostra para cada artista Premium o % médio do mês e o valor final calculado
-
-## Pagamento dos pacotes Premium
-
-Usar a integração Asaas existente, gerando uma única cobrança PIX do valor total (R$ 299,40 ou R$ 598,80). Ao confirmar, define `plan='premium'`, `plan_term_months`, `plan_expires_at = now() + N meses`. Webhook já existente trata a confirmação.
-
-## Não muda
-- Sistema de campanhas, cotas, números da sorte, vendas para clientes
-- Inflação x12 das % visíveis ao cliente nas campanhas
-- Cadastro/aprovação de tatuadores (continua, mas o aprovado entra como Free)
-
-Posso seguir com a implementação?
+## Detalhes Técnicos
+- Utilização de Tailwind v4 com `@theme inline`.
+- Preservação total de lógica de banco (Supabase), autenticação e integrações (Asaas/Mercado Pago).
+- Otimização de performance com lazy loading e imagens eficientes.
