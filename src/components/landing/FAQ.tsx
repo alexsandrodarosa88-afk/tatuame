@@ -13,7 +13,11 @@ export function FAQ() {
     },
     {
       question: "Como funcionam as campanhas?",
-      answer: "Cada campanha tem um objetivo de participantes. Ao atingir a meta, um dos participantes é selecionado para realizar a tatuagem com o artista responsável. Todos os participantes também acumulam benefícios ou créditos dependendo do tipo da campanha."
+      answer: "Temos campanhas Simples e Premium. Na Simples, seu valor não acumula caso não seja sorteado. Já na Premium, tudo o que você comprar se torna crédito para você utilizar futuramente."
+    },
+    {
+      question: "Eu posso participar de qualquer lugar do Brasil?",
+      answer: "Sim! Você pode participar de qualquer lugar do Brasil, pois sempre haverá um tatuador parceiro na sua cidade ou região para te atender através da nossa plataforma."
     },
     {
       question: "O crédito que ganho tem validade?",
@@ -21,11 +25,7 @@ export function FAQ() {
     },
     {
       question: "O TATUAME é seguro?",
-      answer: "Sim! Somos uma empresa registrada, com termos de uso claros e parcerias com os melhores estúdios do Brasil. Todos os pagamentos são processados por gateways seguros (Mercado Pago) e a entrega das tatuagens é garantida pelo nosso ecossistema."
-    },
-    {
-      question: "Qual a diferença entre Plano Free e Premium para tatuadores?",
-      answer: "O Plano Free permite que o tatuador esteja na plataforma e seja descoberto por clientes. O Plano Premium oferece participação no rateio das campanhas, maior visibilidade e acesso a ferramentas exclusivas de gestão e marketing."
+      answer: "Sim! Somos uma empresa registrada, com termos de uso claros e parcerias com os melhores estúdios do Brasil. Todos os pagamentos são processados por gateways seguros e a entrega das tatuagens é garantida pelo nosso ecossistema."
     }
   ];
 
