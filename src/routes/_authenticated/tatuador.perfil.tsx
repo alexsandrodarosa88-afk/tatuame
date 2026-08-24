@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, Upload } from "lucide-react";
+import { AvailabilityEditor } from "@/components/artists/AvailabilityEditor";
 
 export const Route = createFileRoute("/_authenticated/tatuador/perfil")({ component: TatuadorPerfil });
 
@@ -37,6 +38,7 @@ function TatuadorPerfil() {
         address: artist.address ?? "",
         instagram: artist.instagram ?? "",
         whatsapp: artist.whatsapp ?? "",
+        booking_notes: (artist as any).booking_notes ?? "",
         is_active: artist.is_active,
       });
     }
@@ -89,6 +91,7 @@ function TatuadorPerfil() {
       address: form.address?.trim() || null,
       instagram: form.instagram?.trim() || null,
       whatsapp: form.whatsapp?.trim() || null,
+      booking_notes: form.booking_notes?.trim() || null,
       is_active: form.is_active,
     }).eq("id", artist.id);
     setSaving(false);
@@ -143,6 +146,7 @@ function TatuadorPerfil() {
             {styles.length === 0 && <p className="text-xs text-muted-foreground p-2">Nenhum estilo disponível.</p>}
           </div>
         </div>
+        <div><Label>Observações de agendamento (opcional)</Label><Input placeholder="Ex.: atendo apenas com hora marcada" value={form.booking_notes} onChange={(e) => setForm({ ...form, booking_notes: e.target.value })} /></div>
         <div><Label>Bio (opcional)</Label><Textarea rows={3} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} /></div>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} />
@@ -152,6 +156,7 @@ function TatuadorPerfil() {
           {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null} Salvar perfil
         </Button>
       </CardContent></Card>
+      <AvailabilityEditor artistId={artist.id} />
     </div>
   );
 }

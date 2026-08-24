@@ -5,7 +5,8 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Instagram, MapPin, MessageCircle, Search, Filter, X } from "lucide-react";
+import { Instagram, MapPin, MessageCircle, Search, Filter, X, CalendarClock } from "lucide-react";
+import { AvailabilityDialog } from "@/components/artists/AvailabilityDialog";
 
 export const Route = createFileRoute("/tatuadores")({
   head: () => ({
@@ -29,6 +30,7 @@ type Artist = {
   address: string | null;
   instagram: string | null;
   whatsapp: string | null;
+  booking_notes: string | null;
 };
 
 function TatuadoresPage() {
@@ -44,7 +46,7 @@ function TatuadoresPage() {
     (async () => {
       const { data, error } = await supabase
         .from("tattoo_artists_public" as any)
-        .select("id,name,photo_url,styles,city,state,address,instagram,whatsapp")
+        .select("id,name,photo_url,styles,city,state,address,instagram,whatsapp,booking_notes")
         .order("name", { ascending: true });
       if (!error && data) setArtists(data as unknown as Artist[]);
       setLoading(false);
@@ -250,9 +252,17 @@ function ArtistCard({ artist }: { artist: Artist }) {
               </a>
             </Button>
           )}
-          <Button variant="ghost" className="flex-1 h-10 glass rounded-xl text-[9px] font-black uppercase tracking-widest hover:text-white hover:bg-primary transition-premium border-white/5">
-            VER PERFIL
-          </Button>
+          <AvailabilityDialog
+            artistId={artist.id}
+            artistName={artist.name}
+            whatsapp={artist.whatsapp}
+            bookingNotes={artist.booking_notes}
+            trigger={
+              <Button variant="ghost" className="flex-1 h-10 glass rounded-xl text-[9px] font-black uppercase tracking-widest hover:text-white hover:bg-primary transition-premium border-white/5">
+                <CalendarClock className="h-3.5 w-3.5 mr-1.5" /> HORÁRIOS
+              </Button>
+            }
+          />
         </div>
       </div>
     </Card>
