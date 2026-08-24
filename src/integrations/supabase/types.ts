@@ -98,6 +98,54 @@ export type Database = {
         }
         Relationships: []
       }
+      artist_availability: {
+        Row: {
+          artist_id: string
+          created_at: string
+          end_time: string
+          id: string
+          note: string | null
+          start_time: string
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          end_time: string
+          id?: string
+          note?: string | null
+          start_time: string
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          end_time?: string
+          id?: string
+          note?: string | null
+          start_time?: string
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_availability_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "tattoo_artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_availability_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "tattoo_artists_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_bank_details: {
         Row: {
           address: string
@@ -856,6 +904,7 @@ export type Database = {
           asaas_customer_id: string | null
           asaas_subscription_id: string | null
           bio: string | null
+          booking_notes: string | null
           city: string | null
           created_at: string
           free_month_granted_at: string | null
@@ -885,6 +934,7 @@ export type Database = {
           asaas_customer_id?: string | null
           asaas_subscription_id?: string | null
           bio?: string | null
+          booking_notes?: string | null
           city?: string | null
           created_at?: string
           free_month_granted_at?: string | null
@@ -914,6 +964,7 @@ export type Database = {
           asaas_customer_id?: string | null
           asaas_subscription_id?: string | null
           bio?: string | null
+          booking_notes?: string | null
           city?: string | null
           created_at?: string
           free_month_granted_at?: string | null
