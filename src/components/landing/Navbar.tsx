@@ -38,6 +38,7 @@ export function Navbar() {
           <NavLink to="/tatuadores">Artistas</NavLink>
           <NavLink to="/" hash="como-funciona">Como funciona</NavLink>
           <NavLink to="/" hash="garantia">Garantia</NavLink>
+          <NavLink to="/" hash="faq">FAQ</NavLink>
           
           <div className="h-4 w-px bg-white/10 mx-2" />
           
