@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, User as UserIcon, ShieldCheck, Brush, Menu, X } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
-import logoTatuame from "@/assets/tatuame-logo.png";
+import logoTatuame from "@/assets/tatuame-logo-new.png.asset.json";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { useArtist } from "@/hooks/use-artist";
