@@ -1108,7 +1108,9 @@ export type Database = {
         Row: {
           address: string | null
           bio: string | null
+          booking_notes: string | null
           city: string | null
+          created_at: string | null
           id: string | null
           instagram: string | null
           name: string | null
@@ -1120,7 +1122,9 @@ export type Database = {
         Insert: {
           address?: string | null
           bio?: string | null
+          booking_notes?: string | null
           city?: string | null
+          created_at?: string | null
           id?: string | null
           instagram?: string | null
           name?: string | null
@@ -1132,7 +1136,9 @@ export type Database = {
         Update: {
           address?: string | null
           bio?: string | null
+          booking_notes?: string | null
           city?: string | null
+          created_at?: string | null
           id?: string | null
           instagram?: string | null
           name?: string | null
