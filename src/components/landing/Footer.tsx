@@ -48,6 +48,7 @@ export function Footer() {
               <Link to="/tatuadores" className="text-muted-foreground font-bold text-sm uppercase tracking-widest hover:text-primary transition-colors">Artistas</Link>
               <a href="#como-funciona" className="text-muted-foreground font-bold text-sm uppercase tracking-widest hover:text-primary transition-colors">Como funciona</a>
               <Link to="/cadastro" search={{ next: "/" }} className="text-muted-foreground font-bold text-sm uppercase tracking-widest hover:text-primary transition-colors">Participar</Link>
+              <a href="#faq" className="text-muted-foreground font-bold text-sm uppercase tracking-widest hover:text-primary transition-colors">FAQ</a>
             </nav>
           </div>
 
