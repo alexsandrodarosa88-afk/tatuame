@@ -94,6 +94,7 @@ export function Navbar() {
           <MobileNavLink to="/tatuadores" onClick={() => setMobileMenuOpen(false)}>Tatuadores</MobileNavLink>
           <MobileNavLink to="/" hash="como-funciona" onClick={() => setMobileMenuOpen(false)}>Como funciona</MobileNavLink>
           <MobileNavLink to={tatuadorHref as any} onClick={() => setMobileMenuOpen(false)}>Sou Tatuador</MobileNavLink>
+          <MobileNavLink to="/" hash="faq" onClick={() => setMobileMenuOpen(false)}>FAQ</MobileNavLink>
           
           <div className="w-full h-px bg-white/5 max-w-[200px]" />
           
