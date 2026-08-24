@@ -29,7 +29,9 @@ function Index() {
           <HowItWorks />
           <Guarantee />
           <SocialProof />
+          <TestimonialVideo />
           <Urgency />
+          <FAQ />
           <FinalCTA />
         </Suspense>
       </main>
