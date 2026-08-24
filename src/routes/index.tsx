@@ -9,6 +9,8 @@ const Guarantee = lazy(() => import("@/components/landing/Guarantee").then(m => 
 const SocialProof = lazy(() => import("@/components/landing/SocialProof").then(m => ({ default: m.SocialProof })));
 const Urgency = lazy(() => import("@/components/landing/Urgency").then(m => ({ default: m.Urgency })));
 const FinalCTA = lazy(() => import("@/components/landing/FinalCTA").then(m => ({ default: m.FinalCTA })));
+const TestimonialVideo = lazy(() => import("@/components/landing/TestimonialVideo").then(m => ({ default: m.TestimonialVideo })));
+const FAQ = lazy(() => import("@/components/landing/FAQ").then(m => ({ default: m.FAQ })));
 const Footer = lazy(() => import("@/components/landing/Footer").then(m => ({ default: m.Footer })));
 
 export const Route = createFileRoute("/")({
