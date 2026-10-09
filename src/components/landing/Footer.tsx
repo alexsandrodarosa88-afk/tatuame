@@ -55,9 +55,7 @@ export function Footer() {
           <div className="space-y-6">
             <h4 className="font-display text-xs font-black text-white uppercase tracking-[0.3em]">Tatuadores</h4>
             <nav className="flex flex-col gap-3">
-              <Link to="/tatuador-acesso" className="text-muted-foreground font-bold text-sm uppercase tracking-widest hover:text-primary transition-colors">Área do Artista</Link>
-              <Link to="/cadastro-tatuador" className="text-muted-foreground font-bold text-sm uppercase tracking-widest hover:text-primary transition-colors">Seja Parceiro</Link>
-              <Link to="/login" search={{ next: "/tatuador" }} className="text-muted-foreground font-bold text-sm uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
+              <Link to="/cadastro-tatuador" className="text-muted-foreground font-bold text-sm uppercase tracking-widest hover:text-primary transition-colors">FAÇA PARTE DO TATUAME</Link>
             </nav>
           </div>
         </div>

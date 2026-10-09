@@ -84,12 +84,10 @@ function SignupPage() {
         <div className="space-y-6">
           <header className="space-y-2">
             <h1 className="font-display text-4xl font-black text-white italic uppercase leading-none">
-              {next === "/tatuador" ? "Cadastro Artista" : "Criar conta"}
+              Criar conta
             </h1>
             <p className="text-muted-foreground font-medium italic text-sm">
-              {next === "/tatuador"
-                ? "Junte-se à nossa rede exclusiva de artistas."
-                : "Acesse a elite da tatuagem brasileira."}
+              Acesse a elite da tatuagem brasileira.
             </p>
           </header>
 
@@ -156,8 +154,8 @@ function SignupPage() {
             <div className="space-y-1">
               <p className="text-[10px] font-black text-white uppercase tracking-widest">É Tatuador?</p>
               <p className="text-[9px] font-bold text-muted-foreground uppercase leading-relaxed tracking-tighter italic">
-                Crie um perfil profissional separado.{" "}
-                <Link to="/tatuador-acesso" className="text-primary hover:text-white transition-colors">Saiba mais</Link>
+                
+                <Link to="/cadastro-tatuador" className="text-primary hover:text-white transition-colors">FAÇA PARTE DO TATUAME</Link>
               </p>
             </div>
           </div>
