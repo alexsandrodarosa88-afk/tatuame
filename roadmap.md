@@ -8,6 +8,7 @@
 - [x] Confirmar criação do projeto de destino e conexão do código ao GitHub.
 - [x] Receber e inspecionar o backup do banco; inclui seções de cadastros, autenticação e dados financeiros.
 - [x] Excluir fotos e documentos antigos do escopo, por solicitação do usuário.
+- [ ] Orientar o usuário a localizar a conexão do banco novo e preencher o formulário seguro.
 - [ ] Preparar restauração segura no destino e hospedagem externa — acesso ao destino e hospedagem ainda pendentes.
 - [ ] Restaurar e conferir cadastros, compras, pagamentos, créditos e números da sorte, preservando vínculos e valores.
 - [ ] Testar acesso de clientes/admin, novas compras, confirmação de pagamentos, atualização instantânea e callbacks no destino.
