@@ -6,6 +6,9 @@
 
 ## Migração para hospedagem externa e projeto próprio
 - [x] Confirmar criação do projeto de destino e conexão do código ao GitHub.
-- [ ] Preservar uma exportação dos dados e arquivos do Cloud antes de qualquer troca — aguarda exportação pelo usuário.
-- [ ] Preparar acesso seguro ao destino e hospedagem externa — aguarda exportação e credenciais pelo formulário seguro.
-- [ ] Copiar e verificar cadastros, compras, pagamentos e arquivos antes de alterar o domínio — depende das etapas anteriores.
+- [x] Receber e inspecionar o backup do banco; inclui seções de cadastros, autenticação e dados financeiros.
+- [x] Excluir fotos e documentos antigos do escopo, por solicitação do usuário.
+- [ ] Preparar restauração segura no destino e hospedagem externa — acesso ao destino e hospedagem ainda pendentes.
+- [ ] Restaurar e conferir cadastros, compras, pagamentos, créditos e números da sorte, preservando vínculos e valores.
+- [ ] Testar acesso de clientes/admin, novas compras, confirmação de pagamentos, atualização instantânea e callbacks no destino.
+- [ ] Alterar o domínio somente após validação; manter o Cloud ativo até a migração ser verificada.
