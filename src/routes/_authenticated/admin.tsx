@@ -19,11 +19,7 @@ const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/campanhas", label: "Campanhas", icon: Megaphone },
   { to: "/admin/tatuadores", label: "Tatuadores", icon: Palette },
   { to: "/admin/aplicacoes", label: "Cadastros", icon: UserPlus },
-  { to: "/admin/rateios", label: "Rateios", icon: Wallet },
-  { to: "/admin/saques", label: "Saques", icon: Banknote },
-  { to: "/admin/divulgacao", label: "Divulgação", icon: Megaphone },
   { to: "/admin/estilos", label: "Estilos", icon: Sparkles },
-  { to: "/admin/mensalidades", label: "Mensalidades", icon: CreditCard },
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];
 

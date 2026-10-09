@@ -15,6 +15,13 @@ const Footer = lazy(() => import("@/components/landing/Footer").then(m => ({ def
 
 export const Route = createFileRoute("/")({
   component: Index,
+  head: () => ({ meta: [
+    { title: "TATUAME — Campanhas e tatuadores parceiros" },
+    { name: "description", content: "Participe das campanhas TATUAME e conheça nossos tatuadores parceiros." },
+    { property: "og:title", content: "TATUAME — Campanhas e tatuadores parceiros" },
+    { property: "og:description", content: "Campanhas de tatuagem e artistas participantes do TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 function Index() {

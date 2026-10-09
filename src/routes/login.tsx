@@ -59,11 +59,6 @@ function LoginPage() {
             <p className="text-muted-foreground font-medium italic text-sm">Bem-vindo de volta ao universo TATUAME.</p>
           </header>
 
-          {next === "/tatuador" && (
-            <div className="glass bg-primary/5 border-primary/20 p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest leading-relaxed text-white">
-              <span className="text-primary">Área do Artista.</span> Faça o login para acessar seu painel profissional.
-            </div>
-          )}
 
           <Button onClick={google} variant="outline" className="w-full h-12 glass font-bold uppercase tracking-widest text-xs transition-premium">
             Entrar com Google
@@ -106,8 +101,8 @@ function LoginPage() {
             <div className="space-y-1">
               <p className="text-[10px] font-black text-white uppercase tracking-widest">Sou Artista</p>
               <p className="text-[9px] font-bold text-muted-foreground uppercase leading-relaxed tracking-tighter italic">
-                A conta de artista é exclusiva para tatuadores.{" "}
-                <Link to="/tatuador-acesso" className="text-primary hover:text-white transition-colors">Cadastrar Estúdio</Link>
+                
+                <Link to="/cadastro-tatuador" className="text-primary hover:text-white transition-colors">FAÇA PARTE DO TATUAME</Link>
               </p>
             </div>
           </div>

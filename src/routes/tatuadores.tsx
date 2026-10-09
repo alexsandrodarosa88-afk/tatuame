@@ -5,8 +5,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Instagram, MapPin, MessageCircle, Search, Filter, X, CalendarClock } from "lucide-react";
-import { AvailabilityDialog } from "@/components/artists/AvailabilityDialog";
+import { Instagram, MapPin, MessageCircle, Search, Filter, X } from "lucide-react";
 
 export const Route = createFileRoute("/tatuadores")({
   head: () => ({
@@ -252,17 +251,7 @@ function ArtistCard({ artist }: { artist: Artist }) {
               </a>
             </Button>
           )}
-          <AvailabilityDialog
-            artistId={artist.id}
-            artistName={artist.name}
-            whatsapp={artist.whatsapp}
-            bookingNotes={artist.booking_notes}
-            trigger={
-              <Button variant="ghost" className="flex-1 h-10 glass rounded-xl text-[9px] font-black uppercase tracking-widest hover:text-white hover:bg-primary transition-premium border-white/5">
-                <CalendarClock className="h-3.5 w-3.5 mr-1.5" /> HORÁRIOS
-              </Button>
-            }
-          />
+
         </div>
       </div>
     </Card>

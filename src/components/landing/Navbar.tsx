@@ -4,19 +4,16 @@ import { Link, useRouter } from "@tanstack/react-router";
 import logoTatuame from "@/assets/tatuame-logo-new.png.asset.json";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-admin";
-import { useArtist } from "@/hooks/use-artist";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 
 export function Navbar() {
   const { user } = useAuth();
   const { isAdmin } = useIsAdmin();
-  const { artist, application } = useArtist();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  const isArtist = !!artist || !!application;
-  const tatuadorHref = user ? "/tatuador" : "/tatuador-acesso";
+
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -33,7 +30,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-10">
+        <nav className="hidden lg:flex items-center gap-6">
           <NavLink to="/" hash="campanhas">Campanhas</NavLink>
           <NavLink to="/tatuadores">Artistas</NavLink>
           <NavLink to="/" hash="como-funciona">Como funciona</NavLink>
@@ -42,12 +39,13 @@ export function Navbar() {
           
           <div className="h-4 w-px bg-white/10 mx-2" />
           
-          <Link to={tatuadorHref as any} className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-premium flex items-center gap-2">
+          <Link to="/cadastro-tatuador" className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-premium flex items-center gap-2">
             <Brush className="h-4 w-4" /> Sou Tatuador
           </Link>
         </nav>
 
-        <div className="flex items-center gap-3 relative z-10">
+        <div className="flex items-center gap-2 relative z-10">
+          <Button asChild size="sm" variant="outline" className="h-11 max-w-[135px] whitespace-normal px-2 text-[10px] font-bold leading-tight sm:max-w-none sm:px-4 sm:text-xs"><Link to="/cadastro-tatuador"><Brush className="hidden h-4 w-4 shrink-0 sm:block" />FAÇA PARTE DO TATUAME</Link></Button>
           {user ? (
             <div className="flex items-center gap-2">
               {isAdmin && (
@@ -68,7 +66,7 @@ export function Navbar() {
                 <Link to="/login" search={{ next: "/" }}>Entrar</Link>
               </Button>
               
-              <Button asChild size="lg" className="h-11 md:h-12 px-6 md:px-8 bg-white text-black hover:bg-primary hover:text-white font-black uppercase italic tracking-tighter transition-premium shadow-elegant rounded-xl">
+              <Button asChild size="lg" className="h-11 md:h-12 px-3 md:px-6 bg-white text-black hover:bg-primary hover:text-white font-black uppercase italic tracking-tighter transition-premium shadow-elegant rounded-xl">
                 <Link to="/cadastro" search={{ next: "/" }}>
                   <span className="md:hidden">PARTICIPAR</span>
                   <span className="hidden md:inline">GARANTIR VAGA</span>
@@ -93,7 +91,7 @@ export function Navbar() {
           <MobileNavLink to="/" hash="campanhas" onClick={() => setMobileMenuOpen(false)}>Campanhas</MobileNavLink>
           <MobileNavLink to="/tatuadores" onClick={() => setMobileMenuOpen(false)}>Tatuadores</MobileNavLink>
           <MobileNavLink to="/" hash="como-funciona" onClick={() => setMobileMenuOpen(false)}>Como funciona</MobileNavLink>
-          <MobileNavLink to={tatuadorHref as any} onClick={() => setMobileMenuOpen(false)}>Sou Tatuador</MobileNavLink>
+          <MobileNavLink to="/cadastro-tatuador" onClick={() => setMobileMenuOpen(false)}>FAÇA PARTE DO TATUAME</MobileNavLink>
           <MobileNavLink to="/" hash="faq" onClick={() => setMobileMenuOpen(false)}>FAQ</MobileNavLink>
           
           <div className="w-full h-px bg-white/5 max-w-[200px]" />
