@@ -8,10 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2, Power, Upload, Loader2, ShieldCheck, Gift, FileText, KeyRound, UserX, UserPlus } from "lucide-react";
-import { UserAcceptancesDialog } from "@/components/admin/UserAcceptancesDialog";
-import { useServerFn } from "@tanstack/react-start";
-import { adminUpdateUserPassword, adminDeleteUser, adminCreateArtistAccount } from "@/lib/admin-users.functions";
+import { Pencil, Plus, Trash2, Power, Upload, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/tatuadores")({ component: AdminTatuadores });
 
@@ -24,7 +21,6 @@ type Artist = {
   subscription_next_due?: string | null;
 };
 
-type SubInfo = { last_paid_at: string | null; last_amount: number | null; next_due: string | null };
 
 const empty = {
   name: "", photo_url: "", bio: "", styles: [] as string[],
@@ -33,45 +29,17 @@ const empty = {
 
 function AdminTatuadores() {
   const [rows, setRows] = useState<Artist[]>([]);
-  const [subs, setSubs] = useState<Record<string, SubInfo>>({});
   const [styles, setStyles] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Artist | null>(null);
   const [form, setForm] = useState<any>(empty);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [acceptUser, setAcceptUser] = useState<{ userId: string; name: string } | null>(null);
-  const [pwdArtist, setPwdArtist] = useState<Artist | null>(null);
-  const [pwd, setPwd] = useState("");
-  const [pwdSaving, setPwdSaving] = useState(false);
-  const updatePwd = useServerFn(adminUpdateUserPassword);
-  const deleteUserFn = useServerFn(adminDeleteUser);
-  const createArtistAccountFn = useServerFn(adminCreateArtistAccount);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [createForm, setCreateForm] = useState<any>({
-    email: "", password: "", fullName: "", cpf: "", phone: "",
-    cidade: "", address: "", instagram: "", grantFreeMonth: false,
-  });
-  const [creating, setCreating] = useState(false);
 
   const load = async () => {
     const { data } = await supabase.from("tattoo_artists").select("*").order("name");
     if (data) {
       setRows(data as Artist[]);
-      const ids = (data as Artist[]).map((a) => a.id);
-      if (ids.length) {
-        const { data: sub } = await supabase
-          .from("artist_subscriptions")
-          .select("artist_id, paid_at, amount, due_date, status")
-          .in("artist_id", ids)
-          .eq("status", "paid")
-          .order("paid_at", { ascending: false });
-        const map: Record<string, SubInfo> = {};
-        (sub ?? []).forEach((s: any) => {
-          if (!map[s.artist_id]) map[s.artist_id] = { last_paid_at: s.paid_at, last_amount: Number(s.amount), next_due: s.due_date };
-        });
-        setSubs(map);
-      }
     }
   };
   useEffect(() => {
@@ -149,62 +117,18 @@ function AdminTatuadores() {
     toast.success("Excluído."); load();
   };
 
-  const removeUserAccount = async (a: Artist) => {
-    if (!a.user_id) { toast.error("Sem conta de usuário vinculada."); return; }
-    if (!confirm(`Excluir definitivamente a conta de ${a.name}? Isto remove o login, perfil e cadastro de tatuador. Esta ação não pode ser desfeita.`)) return;
-    try {
-      await deleteUserFn({ data: { userId: a.user_id } });
-      toast.success("Conta excluída.");
-      load();
-    } catch (e: any) {
-      toast.error(e.message || "Erro ao excluir conta.");
-    }
-  };
-
-  const savePwd = async () => {
-    if (!pwdArtist?.user_id) return;
-    if (pwd.length < 6) { toast.error("Senha deve ter pelo menos 6 caracteres."); return; }
-    setPwdSaving(true);
-    try {
-      await updatePwd({ data: { userId: pwdArtist.user_id, newPassword: pwd } });
-      toast.success("Senha redefinida.");
-      setPwdArtist(null); setPwd("");
-    } catch (e: any) {
-      toast.error(e.message || "Erro.");
-    } finally { setPwdSaving(false); }
-  };
 
   const toggleActive = async (a: Artist) => {
     await supabase.from("tattoo_artists").update({ is_active: !a.is_active }).eq("id", a.id);
     load();
   };
 
-  const unblock = async (a: Artist) => {
-    if (!confirm(`Desbloquear ${a.name}? Faturas pendentes atrasadas serão canceladas e ele poderá gerar nova mensalidade.`)) return;
-    const { error } = await supabase.rpc("admin_unblock_artist", { _artist_id: a.id });
-    if (error) { toast.error("Erro ao desbloquear: " + error.message); return; }
-    toast.success("Tatuador desbloqueado.");
-    load();
-  };
-
-  const toggleLifetime = async (a: Artist) => {
-    const next = !a.is_lifetime_free;
-    const patch: any = { is_lifetime_free: next };
-    if (next) patch.subscription_status = "active";
-    const { error } = await supabase.from("tattoo_artists").update(patch).eq("id", a.id);
-    if (error) { toast.error("Erro: " + error.message); return; }
-    toast.success(next ? "Marcado como vitalício gratuito." : "Vitalício removido.");
-    load();
-  };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Tatuadores ({rows.length})</h1>
         <div className="flex gap-2">
-        <Button variant="outline" onClick={() => setCreateOpen(true)}>
-          <UserPlus className="h-4 w-4 mr-1" /> Criar conta de tatuador
-        </Button>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button onClick={openNew}><Plus className="h-4 w-4 mr-1" /> Novo tatuador</Button></DialogTrigger>
           <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
@@ -279,52 +203,9 @@ function AdminTatuadores() {
                 <h3 className="font-semibold truncate">{a.name}</h3>
                 <p className="text-xs text-muted-foreground truncate">{(a.styles ?? []).join(" • ") || "—"}</p>
                 <p className="text-xs text-muted-foreground truncate">{[a.city, a.state].filter(Boolean).join("/") || "—"}</p>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {a.is_lifetime_free && <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/15 text-green-600 dark:text-green-400 font-medium">Vitalício</span>}
-                  {a.subscription_status === "blocked" && <span className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/15 text-destructive font-medium">Bloqueado</span>}
-                  {a.subscription_status === "active" && !a.is_lifetime_free && <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/15 text-primary font-medium">Ativo</span>}
-                  {subs[a.id]?.last_paid_at && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-medium" title={`R$ ${subs[a.id].last_amount?.toFixed(2)}`}>
-                      Mensalidade paga {new Date(subs[a.id].last_paid_at!).toLocaleDateString("pt-BR")}
-                    </span>
-                  )}
-                  {!subs[a.id]?.last_paid_at && !a.is_lifetime_free && a.subscription_status === "active" && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-medium">
-                      Mês grátis até {a.subscription_next_due ? new Date(a.subscription_next_due).toLocaleDateString("pt-BR") : ""}
-                    </span>
-                  )}
-                  {!subs[a.id]?.last_paid_at && !a.is_lifetime_free && a.subscription_status !== "active" && a.subscription_status !== "blocked" && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-600 dark:text-amber-400 font-medium">
-                      Sem pagamento
-                    </span>
-                  )}
-                </div>
                 <div className="flex gap-1 mt-1">
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(a)}><Pencil className="h-3.5 w-3.5" /></Button>
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => toggleActive(a)}><Power className="h-3.5 w-3.5" /></Button>
-                  <Button size="icon" variant="ghost" className="h-7 w-7" title={a.is_lifetime_free ? "Remover vitalício" : "Marcar vitalício gratuito"} onClick={() => toggleLifetime(a)}>
-                    <Gift className={`h-3.5 w-3.5 ${a.is_lifetime_free ? "text-green-500" : ""}`} />
-                  </Button>
-                  {a.subscription_status === "blocked" && (
-                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Desbloquear" onClick={() => unblock(a)}>
-                      <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                    </Button>
-                  )}
-                  {a.user_id && (
-                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Ver termos aceitos" onClick={() => setAcceptUser({ userId: a.user_id!, name: a.name })}>
-                      <FileText className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                  {a.user_id && (
-                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Redefinir senha" onClick={() => setPwdArtist(a)}>
-                      <KeyRound className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                  {a.user_id && (
-                    <Button size="icon" variant="ghost" className="h-7 w-7" title="Excluir conta de usuário" onClick={() => removeUserAccount(a)}>
-                      <UserX className="h-3.5 w-3.5 text-destructive" />
-                    </Button>
-                  )}
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => remove(a.id)}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
                 </div>
               </div>
@@ -333,67 +214,6 @@ function AdminTatuadores() {
         ))}
         {rows.length === 0 && <p className="text-muted-foreground text-center py-10 col-span-full">Nenhum tatuador cadastrado.</p>}
       </div>
-      <UserAcceptancesDialog
-        open={!!acceptUser}
-        onOpenChange={(v) => !v && setAcceptUser(null)}
-        userId={acceptUser?.userId ?? null}
-        userName={acceptUser?.name}
-      />
-      <Dialog open={!!pwdArtist} onOpenChange={(v) => { if (!v) { setPwdArtist(null); setPwd(""); } }}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>Redefinir senha</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <p className="text-xs text-muted-foreground">{pwdArtist?.name}</p>
-            <div><Label>Nova senha</Label><Input type="text" value={pwd} onChange={(e) => setPwd(e.target.value)} placeholder="Mínimo 6 caracteres" /></div>
-            <Button className="w-full" disabled={pwdSaving} onClick={savePwd}>{pwdSaving ? "Salvando..." : "Redefinir senha"}</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>Criar conta de tatuador</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <p className="text-xs text-muted-foreground">
-              A conta é criada já aprovada. No primeiro acesso, o tatuador será obrigado a definir uma senha pessoal.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="md:col-span-2"><Label>Nome completo *</Label><Input value={createForm.fullName} onChange={(e) => setCreateForm({ ...createForm, fullName: e.target.value })} /></div>
-              <div><Label>Email (login) *</Label><Input type="email" value={createForm.email} onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })} /></div>
-              <div><Label>Senha temporária *</Label><Input type="text" value={createForm.password} onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })} placeholder="mín. 6 caracteres" /></div>
-              <div><Label>CPF</Label><Input value={createForm.cpf} onChange={(e) => setCreateForm({ ...createForm, cpf: e.target.value })} /></div>
-              <div><Label>Telefone / WhatsApp</Label><Input value={createForm.phone} onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })} /></div>
-              <div><Label>Cidade</Label><Input value={createForm.cidade} onChange={(e) => setCreateForm({ ...createForm, cidade: e.target.value })} /></div>
-              <div><Label>Instagram</Label><Input value={createForm.instagram} onChange={(e) => setCreateForm({ ...createForm, instagram: e.target.value })} placeholder="@tatuador" /></div>
-              <div className="md:col-span-2"><Label>Endereço do estúdio</Label><Input value={createForm.address} onChange={(e) => setCreateForm({ ...createForm, address: e.target.value })} /></div>
-            </div>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={createForm.grantFreeMonth} onChange={(e) => setCreateForm({ ...createForm, grantFreeMonth: e.target.checked })} />
-              Conceder 1 mês de mensalidade grátis
-            </label>
-            <Button
-              className="w-full"
-              disabled={creating}
-              onClick={async () => {
-                if (!createForm.email || !createForm.password || !createForm.fullName) { toast.error("Preencha nome, email e senha."); return; }
-                if (String(createForm.password).length < 6) { toast.error("Senha mínima de 6 caracteres."); return; }
-                setCreating(true);
-                try {
-                  await createArtistAccountFn({ data: createForm });
-                  toast.success("Conta de tatuador criada. Envie o login e a senha temporária para o tatuador.");
-                  setCreateOpen(false);
-                  setCreateForm({ email: "", password: "", fullName: "", cpf: "", phone: "", cidade: "", address: "", instagram: "", grantFreeMonth: false });
-                  load();
-                } catch (e: any) {
-                  toast.error(e.message || "Erro ao criar conta.");
-                } finally { setCreating(false); }
-              }}
-            >
-              {creating ? "Criando..." : "Criar conta de tatuador"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

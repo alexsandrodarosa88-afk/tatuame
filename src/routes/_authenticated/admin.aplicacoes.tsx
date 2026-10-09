@@ -34,7 +34,7 @@ function AdminAplicacoes() {
    supabase.from("artist_applications").select("id,full_name,email,address,status,created_at,notes,phone,instagram").order("created_at", { ascending: false }),
   ]);
   if (current.error || legacy.error) toast.error("Não foi possível carregar os cadastros.");
-  else setRows([...(current.data ?? []), ...(legacy.data ?? []).map(row => ({ ...row, legacy: true }))].sort((a,b) => b.created_at.localeCompare(a.created_at)));
+  else setRows([...(current.data ?? []).filter((row): row is typeof row & { status: Application["status"] } => row.status === "pending" || row.status === "approved" || row.status === "rejected"), ...(legacy.data ?? []).map(row => ({ ...row, legacy: true }))].sort((a,b) => b.created_at.localeCompare(a.created_at)));
   setLoading(false);
  };
  useEffect(() => {
