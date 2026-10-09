@@ -4,7 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { useRealtimeCallback } from "@/hooks/use-realtime-invalidate";
 
-export const Route = createFileRoute("/_authenticated/admin/vendas")({ component: AdminVendas });
+export const Route = createFileRoute("/_authenticated/admin/vendas")({
+  head: () => ({ meta: [
+    { title: "Vendas — Admin | TATUAME" },
+    { name: "description", content: "Vendas — Admin no TATUAME." },
+    { property: "og:title", content: "Vendas — Admin | TATUAME" },
+    { property: "og:description", content: "Vendas — Admin no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AdminVendas });
 
 type Row = {
   id: string; user_id: string; status: string; total_amount: number; created_at: string; paid_at: string | null;

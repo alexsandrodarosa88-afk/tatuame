@@ -11,6 +11,13 @@ import { z } from "zod";
 import { Brush } from "lucide-react";
 
 export const Route = createFileRoute("/cadastro")({
+  head: () => ({ meta: [
+    { title: "Cadastro de cliente | TATUAME" },
+    { name: "description", content: "Cadastro de cliente no TATUAME." },
+    { property: "og:title", content: "Cadastro de cliente | TATUAME" },
+    { property: "og:description", content: "Cadastro de cliente no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }),
   component: SignupPage,
   validateSearch: (s: Record<string, unknown>) => ({ next: typeof s.next === "string" ? s.next : undefined }),
 });

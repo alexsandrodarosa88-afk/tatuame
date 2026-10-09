@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Loader2, Wallet } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/admin/saques")({ component: AdminSaques });
+export const Route = createFileRoute("/_authenticated/admin/saques")({
+  head: () => ({ meta: [
+    { title: "Histórico de saques — Admin | TATUAME" },
+    { name: "description", content: "Histórico de saques — Admin no TATUAME." },
+    { property: "og:title", content: "Histórico de saques — Admin | TATUAME" },
+    { property: "og:description", content: "Histórico de saques — Admin no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AdminSaques });
 
 type Row = {
   id: string; artist_id: string; amount: number; status: string;

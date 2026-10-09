@@ -8,7 +8,14 @@ import { Loader2, Megaphone, Check, X, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
-export const Route = createFileRoute("/_authenticated/admin/divulgacao")({ component: AdminDivulgacao });
+export const Route = createFileRoute("/_authenticated/admin/divulgacao")({
+  head: () => ({ meta: [
+    { title: "Histórico de divulgação — Admin | TATUAME" },
+    { name: "description", content: "Histórico de divulgação — Admin no TATUAME." },
+    { property: "og:title", content: "Histórico de divulgação — Admin | TATUAME" },
+    { property: "og:description", content: "Histórico de divulgação — Admin no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AdminDivulgacao });
 
 function AdminDivulgacao() {
   const listFn = useServerFn(adminListPromotionQueue);

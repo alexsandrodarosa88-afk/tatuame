@@ -13,7 +13,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/_authenticated/carrinho")({ component: CartPage });
+export const Route = createFileRoute("/_authenticated/carrinho")({
+  head: () => ({ meta: [
+    { title: "Carrinho | TATUAME" },
+    { name: "description", content: "Carrinho no TATUAME." },
+    { property: "og:title", content: "Carrinho | TATUAME" },
+    { property: "og:description", content: "Carrinho no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: CartPage });
 
 const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 

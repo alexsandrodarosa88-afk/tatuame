@@ -10,6 +10,13 @@ import { toast } from "sonner";
 import { Brush } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
+  head: () => ({ meta: [
+    { title: "Acessar conta | TATUAME" },
+    { name: "description", content: "Acessar conta no TATUAME." },
+    { property: "og:title", content: "Acessar conta | TATUAME" },
+    { property: "og:description", content: "Acessar conta no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }),
   component: LoginPage,
   validateSearch: (s: Record<string, unknown>) => ({ next: typeof s.next === "string" ? s.next : undefined }),
 });

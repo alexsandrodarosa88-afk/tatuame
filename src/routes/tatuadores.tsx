@@ -10,6 +10,7 @@ import { Instagram, MapPin, MessageCircle, Search, Filter, X } from "lucide-reac
 export const Route = createFileRoute("/tatuadores")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
       { title: "Artistas TATUAME — Curadoria de Elite" },
       { name: "description", content: "Conheça os tatuadores parceiros do TATUAME. Filtre por estilo, cidade ou estado e encontre o artista ideal para sua próxima tatuagem." },
       { property: "og:title", content: "Artistas TATUAME — Curadoria de Elite" },

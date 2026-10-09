@@ -11,7 +11,14 @@ import { toast } from "sonner";
 import { Upload, Save } from "lucide-react";
 import { useInvalidateSiteSettings } from "@/hooks/use-site-settings";
 
-export const Route = createFileRoute("/_authenticated/admin/configuracoes")({ component: AdminConfig });
+export const Route = createFileRoute("/_authenticated/admin/configuracoes")({
+  head: () => ({ meta: [
+    { title: "Configurações — Admin | TATUAME" },
+    { name: "description", content: "Configurações — Admin no TATUAME." },
+    { property: "og:title", content: "Configurações — Admin | TATUAME" },
+    { property: "og:description", content: "Configurações — Admin no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AdminConfig });
 
 type FieldType = "text" | "textarea" | "image";
 type ImageSpec = {

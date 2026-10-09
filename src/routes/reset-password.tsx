@@ -7,7 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/reset-password")({ component: ResetPasswordPage });
+export const Route = createFileRoute("/reset-password")({
+  head: () => ({ meta: [
+    { title: "Redefinir senha | TATUAME" },
+    { name: "description", content: "Redefinir senha no TATUAME." },
+    { property: "og:title", content: "Redefinir senha | TATUAME" },
+    { property: "og:description", content: "Redefinir senha no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: ResetPasswordPage });
 
 function ResetPasswordPage() {
   const navigate = useNavigate();

@@ -9,7 +9,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from "sonner";
 import { Plus, Check, Loader2, TrendingUp, Users, Percent, Wallet } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/admin/rateios")({ component: AdminRateios });
+export const Route = createFileRoute("/_authenticated/admin/rateios")({
+  head: () => ({ meta: [
+    { title: "Histórico de rateios — Admin | TATUAME" },
+    { name: "description", content: "Histórico de rateios — Admin no TATUAME." },
+    { property: "og:title", content: "Histórico de rateios — Admin | TATUAME" },
+    { property: "og:description", content: "Histórico de rateios — Admin no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AdminRateios });
 
 type Artist = { id: string; name: string };
 type Payout = {

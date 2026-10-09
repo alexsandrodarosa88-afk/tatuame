@@ -7,7 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Filter } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/admin/")({ component: AdminOverview });
+export const Route = createFileRoute("/_authenticated/admin/")({ component: AdminOverview,
+  head: () => ({ meta: [
+    { title: "Visão geral — Admin TATUAME" },
+    { name: "description", content: "Controle de campanhas, vendas e participantes TATUAME." },
+    { property: "og:title", content: "Visão geral — Admin TATUAME" },
+    { property: "og:description", content: "Visão geral administrativa do TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 type Campaign = {
   id: string; title: string | null; status: string;

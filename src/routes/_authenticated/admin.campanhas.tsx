@@ -11,7 +11,14 @@ import { toast } from "sonner";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useRealtimeCallback } from "@/hooks/use-realtime-invalidate";
 
-export const Route = createFileRoute("/_authenticated/admin/campanhas")({ component: AdminCampanhas });
+export const Route = createFileRoute("/_authenticated/admin/campanhas")({
+  head: () => ({ meta: [
+    { title: "Campanhas — Admin | TATUAME" },
+    { name: "description", content: "Campanhas — Admin no TATUAME." },
+    { property: "og:title", content: "Campanhas — Admin | TATUAME" },
+    { property: "og:description", content: "Campanhas — Admin no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AdminCampanhas });
 
 type Campaign = {
   id: string; code: string; title: string | null; description: string | null; status: string;
