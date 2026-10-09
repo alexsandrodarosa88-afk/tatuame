@@ -8,8 +8,11 @@
 - [x] Confirmar criação do projeto de destino e conexão do código ao GitHub.
 - [x] Receber e inspecionar o backup do banco; inclui seções de cadastros, autenticação e dados financeiros.
 - [x] Excluir fotos e documentos antigos do escopo, por solicitação do usuário.
-- [ ] Orientar o usuário a localizar a conexão do banco novo e preencher o formulário seguro.
-- [ ] Preparar restauração segura no destino e hospedagem externa — acesso ao destino e hospedagem ainda pendentes.
+- [x] Orientar o usuário a localizar a conexão do banco novo e preencher o formulário seguro.
+- [x] Validar conexão com o destino e confirmar que está vazio (sem tabelas da aplicação e sem contas).
+- [ ] Preparar restauração segura no destino — restauração de contas e dados ainda não executada.
+- [ ] Configurar hospedagem externa — aguarda escolha e acesso à hospedagem; preservar integração de pagamentos e acesso dos usuários.
 - [ ] Restaurar e conferir cadastros, compras, pagamentos, créditos e números da sorte, preservando vínculos e valores.
 - [ ] Testar acesso de clientes/admin, novas compras, confirmação de pagamentos, atualização instantânea e callbacks no destino.
 - [ ] Alterar o domínio somente após validação; manter o Cloud ativo até a migração ser verificada.
+- [ ] Desconectar o Cloud somente após todos os testes e a troca verificada; exclusão é irreversível e realizada pelo administrador do workspace.
