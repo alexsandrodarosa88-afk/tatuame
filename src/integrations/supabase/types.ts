@@ -203,6 +203,78 @@ export type Database = {
         }
         Relationships: []
       }
+      artist_partner_applications: {
+        Row: {
+          address: string
+          artist_id: string | null
+          city: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          instagram: string
+          notes: string | null
+          postal_code: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          state: string
+          status: string
+          styles: string[]
+          whatsapp: string
+        }
+        Insert: {
+          address: string
+          artist_id?: string | null
+          city: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          instagram: string
+          notes?: string | null
+          postal_code: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          state: string
+          status?: string
+          styles: string[]
+          whatsapp: string
+        }
+        Update: {
+          address?: string
+          artist_id?: string | null
+          city?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          instagram?: string
+          notes?: string | null
+          postal_code?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          state?: string
+          status?: string
+          styles?: string[]
+          whatsapp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artist_partner_applications_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "tattoo_artists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "artist_partner_applications_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "tattoo_artists_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_payouts: {
         Row: {
           amount: number
@@ -1214,6 +1286,10 @@ export type Database = {
       reject_artist_application: {
         Args: { _application_id: string; _reason?: string }
         Returns: boolean
+      }
+      review_partner_application: {
+        Args: { _application_id: string; _approve: boolean; _notes?: string }
+        Returns: string
       }
       tattoo_artists_billing_unchanged: {
         Args: {
