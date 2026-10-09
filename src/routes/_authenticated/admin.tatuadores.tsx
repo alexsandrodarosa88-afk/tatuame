@@ -10,7 +10,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2, Power, Upload, Loader2 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/admin/tatuadores")({ component: AdminTatuadores });
+export const Route = createFileRoute("/_authenticated/admin/tatuadores")({
+  head: () => ({ meta: [
+    { title: "Tatuadores parceiros — Admin | TATUAME" },
+    { name: "description", content: "Tatuadores parceiros — Admin no TATUAME." },
+    { property: "og:title", content: "Tatuadores parceiros — Admin | TATUAME" },
+    { property: "og:description", content: "Tatuadores parceiros — Admin no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AdminTatuadores });
 
 type Artist = {
   id: string; name: string; photo_url: string | null; bio: string | null;

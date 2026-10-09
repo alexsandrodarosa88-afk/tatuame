@@ -7,7 +7,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Plus, Power, Trash2, Loader2 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/admin/estilos")({ component: AdminEstilos });
+export const Route = createFileRoute("/_authenticated/admin/estilos")({
+  head: () => ({ meta: [
+    { title: "Estilos — Admin | TATUAME" },
+    { name: "description", content: "Estilos — Admin no TATUAME." },
+    { property: "og:title", content: "Estilos — Admin | TATUAME" },
+    { property: "og:description", content: "Estilos — Admin no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AdminEstilos });
 
 type Style = { id: string; name: string; sort_order: number; is_active: boolean };
 

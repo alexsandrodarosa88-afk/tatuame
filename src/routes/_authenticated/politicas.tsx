@@ -7,7 +7,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, FileText } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/politicas")({ component: PoliticasPage });
+export const Route = createFileRoute("/_authenticated/politicas")({
+  head: () => ({ meta: [
+    { title: "Políticas de participação | TATUAME" },
+    { name: "description", content: "Políticas de participação no TATUAME." },
+    { property: "og:title", content: "Políticas de participação | TATUAME" },
+    { property: "og:description", content: "Políticas de participação no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: PoliticasPage });
 
 function PoliticasPage() {
   const statusFn = useServerFn(getMyPolicyStatus);

@@ -9,7 +9,14 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, Copy, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/checkout/$orderId")({ component: CheckoutStatusPage });
+export const Route = createFileRoute("/checkout/$orderId")({
+  head: () => ({ meta: [
+    { title: "Status do pedido | TATUAME" },
+    { name: "description", content: "Status do pedido no TATUAME." },
+    { property: "og:title", content: "Status do pedido | TATUAME" },
+    { property: "og:description", content: "Status do pedido no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: CheckoutStatusPage });
 
 const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 

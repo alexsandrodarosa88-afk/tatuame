@@ -12,7 +12,14 @@ import { toast } from "sonner";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { useRealtimeInvalidate } from "@/hooks/use-realtime-invalidate";
 
-export const Route = createFileRoute("/_authenticated/campanhas")({ component: CampanhasPage });
+export const Route = createFileRoute("/_authenticated/campanhas")({
+  head: () => ({ meta: [
+    { title: "Minhas campanhas | TATUAME" },
+    { name: "description", content: "Minhas campanhas no TATUAME." },
+    { property: "og:title", content: "Minhas campanhas | TATUAME" },
+    { property: "og:description", content: "Minhas campanhas no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: CampanhasPage });
 
 const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 

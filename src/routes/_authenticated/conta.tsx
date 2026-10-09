@@ -8,7 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Ticket, Wallet, User as UserIcon, FileText, ArrowRight, History, CreditCard } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/conta")({ component: AccountPage });
+export const Route = createFileRoute("/_authenticated/conta")({
+  head: () => ({ meta: [
+    { title: "Minha conta | TATUAME" },
+    { name: "description", content: "Minha conta no TATUAME." },
+    { property: "og:title", content: "Minha conta | TATUAME" },
+    { property: "og:description", content: "Minha conta no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AccountPage });
 
 const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const formatDate = (s: string) => new Date(s).toLocaleDateString("pt-BR");

@@ -10,7 +10,14 @@ import { FileText, X, Pencil, Trash2, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/_authenticated/admin/clientes")({ component: AdminClientes });
+export const Route = createFileRoute("/_authenticated/admin/clientes")({
+  head: () => ({ meta: [
+    { title: "Clientes — Admin | TATUAME" },
+    { name: "description", content: "Clientes — Admin no TATUAME." },
+    { property: "og:title", content: "Clientes — Admin | TATUAME" },
+    { property: "og:description", content: "Clientes — Admin no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AdminClientes });
 
 type Profile = { id: string; email: string | null; nome_completo: string | null; telefone: string | null; cpf: string | null; cidade: string | null; created_at: string };
 

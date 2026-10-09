@@ -9,7 +9,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from "sonner";
 import { Plus, Check, Trash2 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/admin/mensalidades")({ component: AdminMensalidades });
+export const Route = createFileRoute("/_authenticated/admin/mensalidades")({
+  head: () => ({ meta: [
+    { title: "Histórico de mensalidades — Admin | TATUAME" },
+    { name: "description", content: "Histórico de mensalidades — Admin no TATUAME." },
+    { property: "og:title", content: "Histórico de mensalidades — Admin | TATUAME" },
+    { property: "og:description", content: "Histórico de mensalidades — Admin no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }), component: AdminMensalidades });
 
 type Sub = {
   id: string; artist_id: string; reference_month: string; amount: number;

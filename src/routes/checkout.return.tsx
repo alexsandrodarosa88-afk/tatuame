@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/checkout/return")({
+  head: () => ({ meta: [
+    { title: "Retorno do pagamento | TATUAME" },
+    { name: "description", content: "Retorno do pagamento no TATUAME." },
+    { property: "og:title", content: "Retorno do pagamento | TATUAME" },
+    { property: "og:description", content: "Retorno do pagamento no TATUAME." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }),
   validateSearch: (search: Record<string, unknown>) => ({
     order_id: typeof search.order_id === "string" ? search.order_id : undefined,
     session_id: typeof search.session_id === "string" ? search.session_id : undefined,
