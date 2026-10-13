@@ -323,6 +323,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_mercadopago_payment: {
+        Args: {
+          _amount: number
+          _order_id: string
+          _payment_id: string
+          _status: string
+        }
+        Returns: undefined
+      }
       campaign_sold: { Args: { _campaign_id: string }; Returns: number }
       create_order: {
         Args: { _campaign_id: string; _quantity: number }
