@@ -1,3 +1,4 @@
 # Architecture rules
-- Artist onboarding uses a public, schema-validated questionnaire stored separately from Auth accounts; only authenticated admins review and publish applicants, preventing client-account conflicts.
-- Preserve existing artist records and financial history when retiring artist-owned screens; provider callbacks remain available for already-issued payments.
+- Artist onboarding is a public form inserting into artist_applications (no Auth accounts for artists); admins approve and copy public fields into the artists table, so private contact data never reaches visitors.
+- Orders are created only via the create_order RPC and become paid only by admin update; a DB trigger generates lucky numbers on payment, keeping pricing and numbering server-side.
+- Admin rights come solely from user_roles checked with has_role in RLS; site texts live in the single-row site_settings JSON so the admin can edit them without code changes.
