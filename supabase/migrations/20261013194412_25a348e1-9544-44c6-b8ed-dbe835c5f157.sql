@@ -1,0 +1,10 @@
+DROP VIEW public.public_artists;
+CREATE TABLE public.artists (id uuid PRIMARY KEY REFERENCES public.artist_applications(id) ON DELETE CASCADE, full_name text NOT NULL, instagram text NOT NULL, city text NOT NULL, state text NOT NULL, photo_url text, created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT ON public.artists TO anon; GRANT SELECT, INSERT, UPDATE, DELETE ON public.artists TO authenticated; GRANT ALL ON public.artists TO service_role;
+ALTER TABLE public.artists ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "artists public read" ON public.artists FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "artists admin write" ON public.artists FOR ALL TO authenticated USING (public.has_role(auth.uid(),'admin')) WITH CHECK (public.has_role(auth.uid(),'admin'));
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.generate_lucky_numbers() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated;
