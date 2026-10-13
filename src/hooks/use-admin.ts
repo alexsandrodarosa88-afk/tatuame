@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/lib/db";
 import { useAuth } from "./use-auth";
 
 export function useIsAdmin() {
@@ -10,16 +10,8 @@ export function useIsAdmin() {
   useEffect(() => {
     if (authLoading) return;
     if (!user) { setIsAdmin(false); setLoading(false); return; }
-    (async () => {
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-      setIsAdmin(!!data);
-      setLoading(false);
-    })();
+    db.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
+      .then(({ data }: any) => { setIsAdmin(!!data); setLoading(false); });
   }, [user, authLoading]);
 
   return { isAdmin, loading: loading || authLoading };
