@@ -35,7 +35,7 @@ export function Navbar() {
               <Button asChild size="sm"><Link to="/conta">Minha conta</Link></Button>
             </>
           ) : (
-            <Button asChild size="sm"><Link to="/login">Entrar</Link></Button>
+            <Button asChild size="sm"><Link to="/login" search={{ next: undefined }}>Entrar</Link></Button>
           )}
           <button aria-label="Menu" onClick={() => setOpen(!open)} className="grid h-9 w-9 place-items-center rounded-md border md:hidden">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
