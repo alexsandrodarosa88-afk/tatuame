@@ -62,6 +62,44 @@ export type Database = {
         }
         Relationships: []
       }
+      artists: {
+        Row: {
+          city: string
+          created_at: string
+          full_name: string
+          id: string
+          instagram: string
+          photo_url: string | null
+          state: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          full_name: string
+          id: string
+          instagram: string
+          photo_url?: string | null
+          state: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          instagram?: string
+          photo_url?: string | null
+          state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "artists_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "artist_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaigns: {
         Row: {
           created_at: string
@@ -270,33 +308,7 @@ export type Database = {
       }
     }
     Views: {
-      public_artists: {
-        Row: {
-          city: string | null
-          full_name: string | null
-          id: string | null
-          instagram: string | null
-          photo_url: string | null
-          state: string | null
-        }
-        Insert: {
-          city?: string | null
-          full_name?: string | null
-          id?: string | null
-          instagram?: string | null
-          photo_url?: string | null
-          state?: string | null
-        }
-        Update: {
-          city?: string | null
-          full_name?: string | null
-          id?: string | null
-          instagram?: string | null
-          photo_url?: string | null
-          state?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       campaign_sold: { Args: { _campaign_id: string }; Returns: number }

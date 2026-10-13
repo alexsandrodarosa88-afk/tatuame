@@ -1,207 +1,58 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { getMyParticipations, getMyCredits, getMyProfile, reconcileMyPendingOrders } from "@/lib/cart.functions";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Ticket, Wallet, User as UserIcon, FileText, ArrowRight, History, CreditCard } from "lucide-react";
+import { Navbar } from "@/components/site/Navbar";
+import { db, BRL, loadSettings } from "@/lib/db";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/_authenticated/conta")({
+  component: Conta,
   head: () => ({ meta: [
-    { title: "Minha conta | TATUAME" },
-    { name: "description", content: "Minha conta no TATUAME." },
-    { property: "og:title", content: "Minha conta | TATUAME" },
-    { property: "og:description", content: "Minha conta no TATUAME." },
+    { title: "Minha conta | TATUAME" }, { name: "description", content: "Suas compras e números da sorte." },
+    { property: "og:title", content: "Minha conta | TATUAME" }, { property: "og:description", content: "Suas compras e números da sorte." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
-  ] }), component: AccountPage });
+  ] }),
+});
 
-const formatBRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-const formatDate = (s: string) => new Date(s).toLocaleDateString("pt-BR");
-
-function AccountPage() {
-  const partsFn = useServerFn(getMyParticipations);
-  const credFn = useServerFn(getMyCredits);
-  const profFn = useServerFn(getMyProfile);
-  const reconcileFn = useServerFn(reconcileMyPendingOrders);
-  const qc = useQueryClient();
-  const { data: parts } = useQuery({ queryKey: ["participations"], queryFn: () => partsFn() });
-  const { data: credits } = useQuery({ queryKey: ["credits"], queryFn: () => credFn() });
-  const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => profFn() });
-
+function Conta() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const settings = useQuery({ queryKey: ["settings"], queryFn: loadSettings });
+  const orders = useQuery({
+    queryKey: ["my-orders", user?.id],
+    queryFn: async () => (await db.from("orders").select("*, campaigns(title), lucky_numbers(number)").eq("user_id", user!.id).order("created_at", { ascending: false })).data ?? [],
+  });
   useEffect(() => {
-    let cancelled = false;
-    reconcileFn()
-      .then((r) => {
-        if (!cancelled && r?.confirmed && r.confirmed > 0) {
-          qc.invalidateQueries({ queryKey: ["participations"] });
-          qc.invalidateQueries({ queryKey: ["credits"] });
-        }
-      })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, [reconcileFn, qc]);
-
-  const totalCredit = (credits ?? []).reduce((a, c) => a + (Number(c.amount) - Number(c.used_amount)), 0);
-
-  const now = Date.now();
-  const isEnded = (p: any) => p.campaigns?.status === "closed" || (p.campaigns?.ends_at && new Date(p.campaigns.ends_at).getTime() < now);
-  const ativos = (parts ?? []).filter((p: any) => !isEnded(p));
-  const historico = (parts ?? []).filter(isEnded);
+    const ch = supabase.channel("my-orders").on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: `user_id=eq.${user!.id}` }, () => orders.refetch()).subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user?.id]);
+  const wpp = settings.data?.whatsapp?.replace(/\D/g, "");
+  const signOut = async () => { await supabase.auth.signOut(); navigate({ to: "/", replace: true }); };
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-5xl animate-fade-in">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-        <div className="space-y-2">
-          <div className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Minha Área</div>
-          <h1 className="font-display text-4xl md:text-5xl font-black text-white italic uppercase leading-none">
-            Olá, <span className="text-glow">{profile?.nome_completo?.split(" ")[0] || "Usuário"}</span>
-          </h1>
+    <div className="min-h-screen"><Navbar />
+      <main className="mx-auto max-w-4xl space-y-8 px-4 py-12">
+        <div className="flex items-center justify-between"><h1 className="text-4xl">Minha conta</h1><Button variant="outline" onClick={signOut}>Sair</Button></div>
+        <div className="space-y-4">
+          {orders.data?.length ? orders.data.map((o: any) => (
+            <div key={o.id} className="space-y-3 rounded-2xl border bg-card p-5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-xl">{o.campaigns?.title}</h2>
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${o.status === "pago" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{o.status === "pago" ? "Pago" : o.status === "cancelado" ? "Cancelado" : "Aguardando pagamento"}</span>
+              </div>
+              <p className="text-sm text-muted-foreground">{o.quantity} cota(s) · {BRL(o.total)}</p>
+              {o.status === "pendente" && wpp && (
+                <Button asChild size="sm"><a target="_blank" rel="noreferrer" href={`https://wa.me/${wpp}?text=${encodeURIComponent(`Olá! Quero pagar meu pedido ${o.id.slice(0, 8)} (${o.quantity} cotas, ${BRL(o.total)}).`)}`}>Pagar pelo WhatsApp</a></Button>
+              )}
+              {!!o.lucky_numbers?.length && (
+                <div className="flex flex-wrap gap-2">{o.lucky_numbers.map((n: any) => <span key={n.number} className="rounded-md border bg-background px-2 py-1 font-mono text-sm">{String(n.number).padStart(4, "0")}</span>)}</div>
+              )}
+            </div>
+          )) : <p className="text-muted-foreground">Você ainda não tem compras.</p>}
         </div>
-        <Button asChild variant="outline" className="glass h-10 px-6 font-bold uppercase tracking-widest text-xs">
-          <Link to="/politicas"><FileText className="h-4 w-4 mr-2" /> Políticas da Plataforma</Link>
-        </Button>
-      </header>
-
-      {/* Overview Cards */}
-      <div className="grid md:grid-cols-3 gap-6 mb-12">
-        <Card className="glass p-8 relative overflow-hidden group transition-premium hover:border-primary/40">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -z-10" />
-          <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-4">
-            <Wallet className="h-4 w-4 text-primary" /> Crédito Disponível
-          </div>
-          <div className="font-display text-4xl font-black text-white italic tracking-tighter tabular-nums">
-            {formatBRL(totalCredit)}
-          </div>
-          <p className="text-[10px] font-bold text-muted-foreground uppercase mt-4 italic">Válidos por 12 meses</p>
-        </Card>
-        
-        <Card className="glass p-8 relative overflow-hidden group transition-premium hover:border-primary/40">
-          <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-4">
-            <Ticket className="h-4 w-4 text-primary" /> Números Ativos
-          </div>
-          <div className="font-display text-4xl font-black text-white italic tracking-tighter tabular-nums">
-            {ativos.length}
-          </div>
-          <p className="text-[10px] font-bold text-muted-foreground uppercase mt-4 italic">Participando agora</p>
-        </Card>
-
-        <Card className="glass p-8 relative overflow-hidden group transition-premium hover:border-primary/40">
-          <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-4">
-            <CreditCard className="h-4 w-4 text-primary" /> Uso do Crédito
-          </div>
-          <div className="font-display text-4xl font-black text-white italic tracking-tighter">70%</div>
-          <p className="text-[10px] font-bold text-muted-foreground uppercase mt-4 italic">Limite por tatuagem</p>
-        </Card>
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-12">
-        {/* Left Column: Participations */}
-        <div className="lg:col-span-2 space-y-12">
-          <section>
-            <h2 className="font-display text-2xl font-black text-white italic uppercase mb-6 flex items-center gap-3">
-              <Ticket className="h-6 w-6 text-primary" /> Sorteios em Aberto
-            </h2>
-            
-            {ativos.length === 0 ? (
-              <Card className="glass p-12 text-center rounded-[2rem]">
-                <p className="text-muted-foreground font-medium italic mb-6">Você ainda não tem participações ativas.</p>
-                <Button asChild className="bg-primary hover:bg-[oklch(0.6_0.23_27)] text-primary-foreground font-black italic uppercase h-12 px-8">
-                  <Link to="/campanhas">Explorar Campanhas <ArrowRight className="ml-2 h-4 w-4" /></Link>
-                </Button>
-              </Card>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-4">
-                {ativos.map((p: any) => (
-                  <ParticipationCard key={p.id} participation={p} />
-                ))}
-              </div>
-            )}
-          </section>
-
-          {historico.length > 0 && (
-            <section>
-              <h2 className="font-display text-2xl font-black text-white italic uppercase mb-6 flex items-center gap-3">
-                <History className="h-6 w-6 text-muted-foreground" /> Histórico
-              </h2>
-              <div className="space-y-3">
-                {historico.map((p: any) => (
-                  <ParticipationCard key={p.id} participation={p} isHistory />
-                ))}
-              </div>
-            </section>
-          )}
-        </div>
-
-        {/* Right Column: Profile & Info */}
-        <aside className="space-y-6">
-          <Card className="glass p-8 rounded-[2rem]">
-            <h3 className="font-display text-xs font-black text-white uppercase tracking-[0.3em] mb-6 flex items-center gap-2">
-              <UserIcon className="h-4 w-4 text-primary" /> Perfil Verificado
-            </h3>
-            {profile && (
-              <div className="space-y-6">
-                <ProfileItem label="Email" value={profile.email} />
-                <ProfileItem label="CPF" value={profile.cpf} />
-                <ProfileItem label="Telefone" value={profile.telefone} />
-                <ProfileItem label="Cidade" value={profile.cidade} />
-                <Button variant="outline" className="w-full h-11 glass text-[10px] font-black uppercase tracking-widest hover:text-primary transition-premium">
-                  Editar Dados
-                </Button>
-              </div>
-            )}
-          </Card>
-
-          <Card className="glass p-8 rounded-[2rem] border-primary/20 bg-primary/5">
-            <h3 className="font-display text-xs font-black text-white uppercase tracking-[0.3em] mb-4">Central de Ajuda</h3>
-            <p className="text-[11px] text-muted-foreground font-medium italic mb-6">Dúvidas sobre o funcionamento das campanhas ou créditos?</p>
-            <Button variant="link" className="p-0 h-auto text-[10px] font-black uppercase tracking-widest text-primary hover:text-white transition-colors">
-              Falar com Suporte <ArrowRight className="ml-2 h-3 w-3" />
-            </Button>
-          </Card>
-        </aside>
-      </div>
+      </main>
     </div>
   );
 }
-
-function ParticipationCard({ participation, isHistory }: { participation: any, isHistory?: boolean }) {
-  return (
-    <Card className={`glass rounded-2xl p-6 transition-premium hover:border-primary/40 group ${isHistory ? 'opacity-60' : ''}`}>
-      <div className="flex justify-between items-start gap-4 mb-4">
-        <div className="space-y-1">
-          {participation.campaigns?.code && (
-            <span className="inline-block px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase font-mono tracking-tighter">
-              {participation.campaigns.code}
-            </span>
-          )}
-          <h4 className="font-display text-lg font-black text-white italic uppercase tracking-tight leading-tight group-hover:text-primary transition-colors">
-            {participation.campaigns?.title || "Campanha Tatuame"}
-          </h4>
-        </div>
-        <div className="text-right shrink-0">
-          <div className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Cota</div>
-          <div className={`font-display text-3xl font-black italic tracking-tighter tabular-nums leading-none ${isHistory ? 'text-muted-foreground' : 'text-primary text-glow'}`}>
-            {String(participation.lucky_number).padStart(3, "0")}
-          </div>
-        </div>
-      </div>
-      
-      <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[10px] font-bold text-muted-foreground uppercase italic">
-        <span>{isHistory ? 'Sorteio Realizado' : 'Aguardando Sorteio'}</span>
-        <span>{isHistory ? formatDate(participation.campaigns?.ends_at) : 'Em progresso'}</span>
-      </div>
-    </Card>
-  );
-}
-
-function ProfileItem({ label, value }: { label: string, value: string | null }) {
-  return (
-    <div className="space-y-1">
-      <div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">{label}</div>
-      <div className="text-sm font-bold text-white truncate">{value || "—"}</div>
-    </div>
-  );
-}
-

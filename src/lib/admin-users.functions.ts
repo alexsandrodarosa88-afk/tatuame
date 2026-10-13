@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function assertAdmin(supabase: any, userId: string) {
-  const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  const { data: roles } = await (supabase as any).from("user_roles").select("role").eq("user_id", userId);
   const isAdmin = (roles ?? []).some((r: any) => r.role === "admin");
   if (!isAdmin) throw new Error("Acesso negado");
 }
@@ -33,11 +33,7 @@ export const adminDeleteUser = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.userId === context.userId) throw new Error("Você não pode excluir sua própria conta");
-    // Cascading deletes via auth.users FK should handle related rows for tables that reference auth.users.
-    // For other tables, clean up first.
-    await supabaseAdmin.from("tattoo_artists").delete().eq("user_id", data.userId);
-    await supabaseAdmin.from("profiles").delete().eq("id", data.userId);
-    await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
+    await (supabaseAdmin as any).from("orders").delete().eq("user_id", data.userId);
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
     if (error) throw new Error("Erro ao excluir usuário: " + error.message);
     return { ok: true };
@@ -59,7 +55,7 @@ export const adminUpdateProfile = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { userId, email, ...profilePatch } = data;
-    const { error: pErr } = await supabaseAdmin.from("profiles").update({
+    const { error: pErr } = await (supabaseAdmin as any).from("profiles").update({
       ...profilePatch,
       ...(email ? { email } : {}),
       updated_at: new Date().toISOString(),

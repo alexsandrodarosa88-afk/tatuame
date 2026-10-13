@@ -74,16 +74,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TATUAME — Sua próxima tatuagem por muito menos" },
-      { name: "description", content: "Compre créditos, receba números promocionais e desbloqueie upgrades exclusivos. Seu dinheiro nunca se perde — vira crédito de tatuagem." },
+      { title: "TATUAME — Campanhas de tatuagem premium" },
+      { name: "description", content: "Campanhas de tatuagem com artistas selecionados de todo o Brasil." },
       { name: "author", content: "TATUAME" },
-      { property: "og:title", content: "TATUAME — Sua próxima tatuagem por muito menos" },
-      { property: "og:description", content: "Compre créditos, receba números promocionais e desbloqueie upgrades exclusivos. Seu dinheiro nunca se perde — vira crédito de tatuagem." },
+      { property: "og:title", content: "TATUAME — Campanhas de tatuagem premium" },
+      { property: "og:description", content: "Campanhas de tatuagem com artistas selecionados de todo o Brasil." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@tatuame" },
-      { name: "twitter:title", content: "TATUAME — Sua próxima tatuagem por muito menos" },
-      { name: "twitter:description", content: "Compre créditos, receba números promocionais e desbloqueie upgrades exclusivos. Seu dinheiro nunca se perde — vira crédito de tatuagem." },
+      { name: "twitter:title", content: "TATUAME — Campanhas de tatuagem premium" },
+      { name: "twitter:description", content: "Campanhas de tatuagem com artistas selecionados de todo o Brasil." },
     ],
     links: [
       { rel: "icon", type: "image/png", href: "/favicon.png" },
@@ -95,7 +95,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&display=swap",
       },
     ],
   }),
@@ -107,7 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className="dark">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
