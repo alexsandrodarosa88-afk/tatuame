@@ -17,6 +17,13 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CampanhaIdRouteImport } from './routes/campanha.$id'
 import { Route as AuthenticatedContaRouteImport } from './routes/_authenticated/conta'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminVendasRouteImport } from './routes/_authenticated/admin.vendas'
+import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
+import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
+import { Route as AuthenticatedAdminCampanhasRouteImport } from './routes/_authenticated/admin.campanhas'
+import { Route as AuthenticatedAdminArtistasRouteImport } from './routes/_authenticated/admin.artistas'
 
 const SejaArtistaRoute = SejaArtistaRouteImport.update({
   id: '/seja-artista',
@@ -57,6 +64,46 @@ const AuthenticatedContaRoute = AuthenticatedContaRouteImport.update({
   path: '/conta',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminVendasRoute =
+  AuthenticatedAdminVendasRouteImport.update({
+    id: '/vendas',
+    path: '/vendas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminConfiguracoesRoute =
+  AuthenticatedAdminConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminClientesRoute =
+  AuthenticatedAdminClientesRouteImport.update({
+    id: '/clientes',
+    path: '/clientes',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCampanhasRoute =
+  AuthenticatedAdminCampanhasRouteImport.update({
+    id: '/campanhas',
+    path: '/campanhas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminArtistasRoute =
+  AuthenticatedAdminArtistasRouteImport.update({
+    id: '/artistas',
+    path: '/artistas',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -64,8 +111,15 @@ export interface FileRoutesByFullPath {
   '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/seja-artista': typeof SejaArtistaRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/conta': typeof AuthenticatedContaRoute
   '/campanha/$id': typeof CampanhaIdRoute
+  '/admin/artistas': typeof AuthenticatedAdminArtistasRoute
+  '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/vendas': typeof AuthenticatedAdminVendasRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +129,12 @@ export interface FileRoutesByTo {
   '/seja-artista': typeof SejaArtistaRoute
   '/conta': typeof AuthenticatedContaRoute
   '/campanha/$id': typeof CampanhaIdRoute
+  '/admin/artistas': typeof AuthenticatedAdminArtistasRoute
+  '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
+  '/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/vendas': typeof AuthenticatedAdminVendasRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -84,8 +144,15 @@ export interface FileRoutesById {
   '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/seja-artista': typeof SejaArtistaRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/conta': typeof AuthenticatedContaRoute
   '/campanha/$id': typeof CampanhaIdRoute
+  '/_authenticated/admin/artistas': typeof AuthenticatedAdminArtistasRoute
+  '/_authenticated/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
+  '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
+  '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/_authenticated/admin/vendas': typeof AuthenticatedAdminVendasRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -95,8 +162,15 @@ export interface FileRouteTypes {
     | '/cadastro-tatuador'
     | '/login'
     | '/seja-artista'
+    | '/admin'
     | '/conta'
     | '/campanha/$id'
+    | '/admin/artistas'
+    | '/admin/campanhas'
+    | '/admin/clientes'
+    | '/admin/configuracoes'
+    | '/admin/vendas'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +180,12 @@ export interface FileRouteTypes {
     | '/seja-artista'
     | '/conta'
     | '/campanha/$id'
+    | '/admin/artistas'
+    | '/admin/campanhas'
+    | '/admin/clientes'
+    | '/admin/configuracoes'
+    | '/admin/vendas'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -114,8 +194,15 @@ export interface FileRouteTypes {
     | '/cadastro-tatuador'
     | '/login'
     | '/seja-artista'
+    | '/_authenticated/admin'
     | '/_authenticated/conta'
     | '/campanha/$id'
+    | '/_authenticated/admin/artistas'
+    | '/_authenticated/admin/campanhas'
+    | '/_authenticated/admin/clientes'
+    | '/_authenticated/admin/configuracoes'
+    | '/_authenticated/admin/vendas'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,14 +273,86 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/vendas': {
+      id: '/_authenticated/admin/vendas'
+      path: '/vendas'
+      fullPath: '/admin/vendas'
+      preLoaderRoute: typeof AuthenticatedAdminVendasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/configuracoes': {
+      id: '/_authenticated/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/clientes': {
+      id: '/_authenticated/admin/clientes'
+      path: '/clientes'
+      fullPath: '/admin/clientes'
+      preLoaderRoute: typeof AuthenticatedAdminClientesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/campanhas': {
+      id: '/_authenticated/admin/campanhas'
+      path: '/campanhas'
+      fullPath: '/admin/campanhas'
+      preLoaderRoute: typeof AuthenticatedAdminCampanhasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/artistas': {
+      id: '/_authenticated/admin/artistas'
+      path: '/artistas'
+      fullPath: '/admin/artistas'
+      preLoaderRoute: typeof AuthenticatedAdminArtistasRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminArtistasRoute: typeof AuthenticatedAdminArtistasRoute
+  AuthenticatedAdminCampanhasRoute: typeof AuthenticatedAdminCampanhasRoute
+  AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
+  AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
+  AuthenticatedAdminVendasRoute: typeof AuthenticatedAdminVendasRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminArtistasRoute: AuthenticatedAdminArtistasRoute,
+  AuthenticatedAdminCampanhasRoute: AuthenticatedAdminCampanhasRoute,
+  AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
+  AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
+  AuthenticatedAdminVendasRoute: AuthenticatedAdminVendasRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedContaRoute: typeof AuthenticatedContaRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedContaRoute: AuthenticatedContaRoute,
 }
 

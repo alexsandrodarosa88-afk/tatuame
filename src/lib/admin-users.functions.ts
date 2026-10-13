@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 async function assertAdmin(supabase: any, userId: string) {
-  const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  const { data: roles } = await (supabase as any).from("user_roles").select("role").eq("user_id", userId);
   const isAdmin = (roles ?? []).some((r: any) => r.role === "admin");
   if (!isAdmin) throw new Error("Acesso negado");
 }
@@ -55,7 +55,7 @@ export const adminUpdateProfile = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { userId, email, ...profilePatch } = data;
-    const { error: pErr } = await supabaseAdmin.from("profiles").update({
+    const { error: pErr } = await (supabaseAdmin as any).from("profiles").update({
       ...profilePatch,
       ...(email ? { email } : {}),
       updated_at: new Date().toISOString(),
