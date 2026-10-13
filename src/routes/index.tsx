@@ -115,7 +115,7 @@ function Index() {
         )}
 
         <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-          <div className="grid items-center gap-8 rounded-3xl bg-ink p-8 text-ink-foreground md:grid-cols-[1fr,auto] md:p-14">
+          <div className="grid items-center gap-8 rounded-3xl bg-ink p-8 text-ink-foreground md:grid-cols-[1fr_auto] md:p-14">
             <div className="space-y-3">
               <h2 className="text-3xl md:text-5xl">Seja um artista TATUAME</h2>
               <p className="max-w-xl opacity-75">Faça parte da nossa rede de tatuadores. Envie seus dados e nossa equipe entra em contato pelo WhatsApp.</p>

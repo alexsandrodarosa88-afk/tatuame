@@ -29,7 +29,7 @@ function AdminLayout() {
           <Button asChild size="sm" variant="ghost"><Link to="/">Ver site</Link></Button>
         </div>
       </header>
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 md:grid-cols-[200px,1fr]">
+      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 md:grid-cols-[200px_1fr]">
         <nav className="flex gap-1 overflow-x-auto md:flex-col">
           {nav.map(({ to, label, icon: I, exact }) => {
             const active = exact ? path === to : path.startsWith(to);
