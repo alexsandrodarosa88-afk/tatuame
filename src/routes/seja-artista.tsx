@@ -45,10 +45,15 @@ function Page() {
     const p = schema.safeParse(form);
     if (!p.success) { const n: Record<string, string> = {}; p.error.issues.forEach((i) => (n[String(i.path[0])] = i.message)); setErrors(n); return; }
     setLoading(true); setErrors({});
-    const { error } = await db.from("artist_applications").insert(p.data);
-    setLoading(false);
-    if (error) return setErrors({ submit: "Não foi possível enviar. Tente novamente." });
-    setDone(true);
+    try {
+      const { error } = await db.from("artist_applications").insert(p.data);
+      if (error) throw error;
+      setDone(true);
+    } catch {
+      setErrors({ submit: "Não foi possível enviar. Tente novamente." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
