@@ -14,8 +14,11 @@ const label: Record<string, string> = { pendente: "Em análise", aprovado: "Apro
 function Page() {
   const q = useQuery({
     queryKey: ["admin-apps"],
+    refetchInterval: 10000,
     queryFn: async () => {
       const [a, p] = await Promise.all([db.from("artist_applications").select("*").order("created_at", { ascending: false }), db.from("artists").select("id")]);
+      if (a.error) throw a.error;
+      if (p.error) throw p.error;
       const pub = new Set((p.data ?? []).map((x: any) => x.id));
       return (a.data ?? []).map((x: any) => ({ ...x, isPublic: pub.has(x.id) }));
     },
@@ -33,14 +36,22 @@ function Page() {
     <div className="space-y-6">
       <h1 className="text-3xl">Artistas</h1>
       <div className="space-y-3">
+        {q.isLoading && <p className="text-muted-foreground" role="status">Carregando cadastros...</p>}
+        {q.isError && <div role="alert" className="space-y-2"><p className="text-destructive">Não foi possível carregar os cadastros.</p><Button variant="outline" onClick={() => q.refetch()}>Tentar novamente</Button></div>}
         {q.data?.map((a: any) => {
-          const wpp = a.whatsapp.length <= 11 ? `55${a.whatsapp}` : a.whatsapp;
+          const digits = String(a.whatsapp ?? "").replace(/\D/g, "");
+          const wpp = digits.length <= 11 ? `55${digits}` : digits;
           return (
             <div key={a.id} className="space-y-3 rounded-2xl border bg-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div><p className="font-semibold">{a.full_name} <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs">{label[a.status]}{a.isPublic && " · no site"}</span></p>
-                  <p className="text-sm text-muted-foreground">{a.instagram} · {a.email} · WhatsApp {a.whatsapp}</p>
-                  <p className="text-sm text-muted-foreground">{a.studio_address} — {a.city}/{a.state}</p></div>
+                  <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+                    <div><dt className="text-muted-foreground">Instagram</dt><dd className="break-words">{a.instagram}</dd></div>
+                    <div><dt className="text-muted-foreground">Email</dt><dd className="break-all"><a className="text-primary underline" href={`mailto:${a.email}`}>{a.email}</a></dd></div>
+                    <div><dt className="text-muted-foreground">WhatsApp</dt><dd>{a.whatsapp}</dd></div>
+                    <div><dt className="text-muted-foreground">Cidade / Estado</dt><dd className="break-words">{a.city} / {a.state}</dd></div>
+                    <div className="sm:col-span-2"><dt className="text-muted-foreground">Endereço completo do estúdio</dt><dd className="whitespace-pre-line break-words">{a.studio_address}</dd></div>
+                  </dl></div>
                 <p className="text-xs text-muted-foreground">{new Date(a.created_at).toLocaleString("pt-BR")}</p>
               </div>
               <div className="flex flex-wrap gap-2">
