@@ -46,7 +46,9 @@ function Page() {
     const path = `${crypto.randomUUID()}-${file.name.replace(/[^\w.]/g, "")}`;
     const { error } = await supabase.storage.from("site-images").upload(path, file);
     if (error) return toast.error("Falha ao enviar foto");
-    const url = supabase.storage.from("site-images").getPublicUrl(path).data.publicUrl;
+    const { data } = await supabase.storage.from("site-images").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+    const url = data?.signedUrl;
+    if (!url) return toast.error("Falha ao gerar link da foto");
     setEdit((e) => e && { ...e, image_url: url });
   };
   const num = (k: keyof C) => (e: React.ChangeEvent<HTMLInputElement>) => setEdit((x) => x && { ...x, [k]: Number(e.target.value) });
