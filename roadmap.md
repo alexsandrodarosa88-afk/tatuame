@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Testar compra completa no Mercado Pago, notificação automática e números exclusivos — verificar testes seguros e registrar bloqueios de acesso ou pagamento
 - [x] Estrutura nova do banco, conta ADM, visual claro premium, painel ADM, formulário "Seja um artista TATUAME", remoção do acesso de tatuadores
 - [x] Mostrar todos os dados enviados pelo formulário em ADM → Artistas, com email e WhatsApp para contato
 - [ ] Verificar envio e leitura no ADM de ponta a ponta — sessão autenticada indisponível no projeto externo
