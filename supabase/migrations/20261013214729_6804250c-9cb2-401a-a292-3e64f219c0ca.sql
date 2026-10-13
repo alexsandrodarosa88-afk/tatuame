@@ -1,0 +1,2 @@
+ALTER POLICY "public sees active campaigns" ON public.campaigns TO authenticated;
+CREATE POLICY "visitors see active campaigns" ON public.campaigns FOR SELECT TO anon USING (status IN ('ativa','encerrada'));
