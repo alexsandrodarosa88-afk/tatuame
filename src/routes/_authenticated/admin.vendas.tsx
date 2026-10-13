@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/admin/vendas")({
 function Page() {
   const q = useQuery({
     queryKey: ["admin-orders"],
+    refetchInterval: 10000,
     queryFn: async () => {
       const { data: orders } = await db.from("orders").select("*, campaigns(title), lucky_numbers(number)").order("created_at", { ascending: false });
       const ids = [...new Set((orders ?? []).map((o: any) => o.user_id))];
@@ -44,11 +45,13 @@ function Page() {
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div><p className="font-semibold">{o.profile?.nome_completo || o.profile?.email || "Cliente"}</p><p className="text-sm text-muted-foreground">{o.campaigns?.title} · {o.quantity} cota(s) · {BRL(o.total)} · {new Date(o.created_at).toLocaleString("pt-BR")}</p><p className="text-xs text-muted-foreground">{o.profile?.email} {o.profile?.telefone && `· ${o.profile.telefone}`}</p></div>
               <div className="flex flex-wrap gap-2">
-                {o.status === "pendente" && <><Button size="sm" onClick={() => setStatus(o.id, "pago")}>Confirmar pagamento</Button><Button size="sm" variant="outline" onClick={() => setStatus(o.id, "cancelado")}>Cancelar</Button></>}
+                {o.status === "pendente" && !o.mp_preference_id && <><Button size="sm" onClick={() => setStatus(o.id, "pago")}>Confirmar pagamento</Button><Button size="sm" variant="outline" onClick={() => setStatus(o.id, "cancelado")}>Cancelar</Button></>}
+                {o.status === "pendente" && o.mp_preference_id && <span className="text-xs text-muted-foreground">Aguardando confirmação do Mercado Pago</span>}
                 {o.status !== "pendente" && <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold">{o.status === "pago" ? `Pago ${o.paid_at ? new Date(o.paid_at).toLocaleDateString("pt-BR") : ""}` : "Cancelado"}</span>}
                 <Button size="sm" variant="ghost" onClick={() => remove(o.id)}>Excluir</Button>
               </div>
             </div>
+            {o.mp_payment_id && <p className="text-xs text-muted-foreground">Mercado Pago · Pagamento {o.mp_payment_id} · {o.mp_payment_status}</p>}
             {!!o.lucky_numbers?.length && <p className="font-mono text-xs text-muted-foreground">Números: {o.lucky_numbers.map((n: any) => String(n.number).padStart(4, "0")).join(", ")}</p>}
           </div>
         ))}

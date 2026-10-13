@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Navbar, Footer } from "@/components/site/Navbar";
 import { db, BRL } from "@/lib/db";
 import { useAuth } from "@/hooks/use-auth";
+import { useServerFn } from "@tanstack/react-start";
+import { startMercadoPagoCheckout } from "@/lib/mercadopago.functions";
 
 export const Route = createFileRoute("/campanha/$id")({
   component: Page,
@@ -23,6 +25,7 @@ function Page() {
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const [busy, setBusy] = useState(false);
+  const checkout = useServerFn(startMercadoPagoCheckout);
   const q = useQuery({ queryKey: ["campaign", id], queryFn: async () => (await db.from("campaigns").select("*").eq("id", id).maybeSingle()).data });
   const c = q.data;
   if (q.isLoading) return <div className="min-h-screen"><Navbar /><p className="p-10 text-center text-muted-foreground">Carregando...</p></div>;
@@ -31,11 +34,15 @@ function Page() {
   const buy = async () => {
     if (!user) return navigate({ to: "/login", search: { next: `/campanha/${id}` } });
     setBusy(true);
-    const { error } = await db.rpc("create_order", { _campaign_id: id, _quantity: qty });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    toast.success("Pedido criado! Veja como pagar na sua conta.");
-    navigate({ to: "/conta" });
+    try {
+      const { data: orderId, error } = await db.rpc("create_order", { _campaign_id: id, _quantity: qty });
+      if (error) throw error;
+      const result = await checkout({ data: { orderId } });
+      if ("error" in result) throw new Error(result.error);
+      window.location.assign(result.url);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível abrir o pagamento. Seu pedido pode ser retomado em Minha conta.");
+    } finally { setBusy(false); }
   };
 
   return (
@@ -59,7 +66,7 @@ function Page() {
                 </div>
               </div>
               <div className="flex items-center justify-between text-lg"><span>Total</span><strong>{BRL(Number(c.quota_price) * qty)}</strong></div>
-              <Button className="w-full" size="lg" disabled={busy} onClick={buy}>{busy ? "Processando..." : "Comprar cotas"}</Button>
+               <Button className="w-full" size="lg" disabled={busy} onClick={buy}>{busy ? "Abrindo pagamento..." : "Comprar cotas com Mercado Pago"}</Button>
             </div>
           ) : <p className="rounded-2xl border bg-card p-6 text-muted-foreground">Esta campanha está encerrada.</p>}
         </div>
