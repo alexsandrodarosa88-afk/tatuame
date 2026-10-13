@@ -198,6 +198,10 @@ export type Database = {
           campaign_id: string
           created_at: string
           id: string
+          mp_checkout_url: string | null
+          mp_payment_id: string | null
+          mp_payment_status: string | null
+          mp_preference_id: string | null
           paid_at: string | null
           quantity: number
           status: string
@@ -209,6 +213,10 @@ export type Database = {
           campaign_id: string
           created_at?: string
           id?: string
+          mp_checkout_url?: string | null
+          mp_payment_id?: string | null
+          mp_payment_status?: string | null
+          mp_preference_id?: string | null
           paid_at?: string | null
           quantity: number
           status?: string
@@ -220,6 +228,10 @@ export type Database = {
           campaign_id?: string
           created_at?: string
           id?: string
+          mp_checkout_url?: string | null
+          mp_payment_id?: string | null
+          mp_payment_status?: string | null
+          mp_preference_id?: string | null
           paid_at?: string | null
           quantity?: number
           status?: string
