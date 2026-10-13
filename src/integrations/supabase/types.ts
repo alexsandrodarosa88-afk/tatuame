@@ -14,16 +14,306 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      artist_applications: {
+        Row: {
+          city: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          instagram: string
+          photo_url: string | null
+          published: boolean
+          state: string
+          status: string
+          studio_address: string
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          instagram: string
+          photo_url?: string | null
+          published?: boolean
+          state: string
+          status?: string
+          studio_address: string
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          instagram?: string
+          photo_url?: string | null
+          published?: boolean
+          state?: string
+          status?: string
+          studio_address?: string
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
+      campaigns: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_percent: number | null
+          ends_at: string | null
+          id: string
+          image_url: string | null
+          kind: string
+          prize: string | null
+          quota_price: number
+          starts_at: string | null
+          status: string
+          title: string
+          total_quotas: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_percent?: number | null
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          kind?: string
+          prize?: string | null
+          quota_price?: number
+          starts_at?: string | null
+          status?: string
+          title: string
+          total_quotas?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_percent?: number | null
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          kind?: string
+          prize?: string | null
+          quota_price?: number
+          starts_at?: string | null
+          status?: string
+          title?: string
+          total_quotas?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      lucky_numbers: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          number: number
+          order_id: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          number: number
+          order_id: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          number?: number
+          order_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lucky_numbers_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lucky_numbers_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          paid_at: string | null
+          quantity: number
+          status: string
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          quantity: number
+          status?: string
+          total: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          quantity?: number
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          cidade: string | null
+          cpf: string | null
+          created_at: string
+          email: string | null
+          id: string
+          nome_completo: string | null
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          cidade?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id: string
+          nome_completo?: string | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cidade?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nome_completo?: string | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          data: Json
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          data?: Json
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          data?: Json
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      public_artists: {
+        Row: {
+          city: string | null
+          full_name: string | null
+          id: string | null
+          instagram: string | null
+          photo_url: string | null
+          state: string | null
+        }
+        Insert: {
+          city?: string | null
+          full_name?: string | null
+          id?: string | null
+          instagram?: string | null
+          photo_url?: string | null
+          state?: string | null
+        }
+        Update: {
+          city?: string | null
+          full_name?: string | null
+          id?: string | null
+          instagram?: string | null
+          photo_url?: string | null
+          state?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      campaign_sold: { Args: { _campaign_id: string }; Returns: number }
+      create_order: {
+        Args: { _campaign_id: string; _quantity: number }
+        Returns: string
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +440,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
