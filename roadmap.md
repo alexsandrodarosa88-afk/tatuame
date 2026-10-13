@@ -1,5 +1,8 @@
 # Roadmap
-- [ ] Testar compra completa no Mercado Pago, notificação automática e números exclusivos — verificar testes seguros e registrar bloqueios de acesso ou pagamento
+- [ ] Testar compra completa e entrega real da notificação Mercado Pago — bloqueado por ausência de sessão de cliente disponível, credenciais de teste e publicação (endereço publicado retorna 404)
+- [x] Corrigir leitura pública das campanhas; testar quantidade/preço e encaminhamento ao login pelo navegador
+- [x] Testar transacionalmente 3+2 cotas: números únicos, confirmação duplicada, valor incorreto, lotação e estorno; registros de teste desfeitos
+- [x] Testar assinaturas válidas/falsas e rejeição local de notificações sem assinatura (401); conta Mercado Pago responde 200
 - [x] Estrutura nova do banco, conta ADM, visual claro premium, painel ADM, formulário "Seja um artista TATUAME", remoção do acesso de tatuadores
 - [x] Mostrar todos os dados enviados pelo formulário em ADM → Artistas, com email e WhatsApp para contato
 - [ ] Verificar envio e leitura no ADM de ponta a ponta — sessão autenticada indisponível no projeto externo
