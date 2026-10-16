@@ -20,6 +20,29 @@ type C = { id?: string; title: string; description: string; prize: string; kind:
 const blank: C = { title: "", description: "", prize: "", kind: "simples", image_url: "", quota_price: 10, total_quotas: 1000, display_percent: 0, status: "rascunho", ends_at: "" };
 const statusLabel: Record<string, string> = { rascunho: "Rascunho", ativa: "Ativa", encerrada: "Encerrada" };
 
+function NumbersCheck({ id, total }: { id: string; total: number }) {
+  const q = useQuery({
+    queryKey: ["numbers-check", id],
+    refetchInterval: 15000,
+    queryFn: async () => {
+      const nums: number[] = [];
+      for (let from = 0; ; from += 1000) {
+        const { data } = await db.from("lucky_numbers").select("number").eq("campaign_id", id).range(from, from + 999);
+        nums.push(...(data ?? []).map((r: any) => r.number));
+        if (!data || data.length < 1000) break;
+      }
+      return { count: nums.length, dups: nums.length - new Set(nums).size };
+    },
+  });
+  if (!q.data) return null;
+  const ok = q.data.dups === 0;
+  return (
+    <p className={`text-xs font-medium ${ok ? "text-primary" : "text-destructive"}`}>
+      {ok ? "Números conferidos: nenhum repetido" : `Atenção: ${q.data.dups} número(s) repetido(s)`} · {q.data.count} gerados · {Math.max(0, total - q.data.count)} restantes
+    </p>
+  );
+}
+
 function Page() {
   const list = useQuery({ queryKey: ["admin-campaigns"], queryFn: async () => (await db.from("campaigns").select("*").order("created_at", { ascending: false })).data ?? [] });
   const [edit, setEdit] = useState<C | null>(null);
@@ -64,6 +87,7 @@ function Page() {
             <div className="min-w-0 flex-1">
               <p className="truncate font-semibold">{c.title}</p>
               <p className="text-sm text-muted-foreground">{c.kind === "premium" ? "Premium" : "Simples"} · {BRL(c.quota_price)} · {statusLabel[c.status] ?? c.status}</p>
+              <NumbersCheck id={c.id} total={c.total_quotas} />
             </div>
             <Button size="icon" variant="outline" aria-label="Editar" onClick={() => setEdit({ ...blank, ...c, description: c.description ?? "", prize: c.prize ?? "", image_url: c.image_url ?? "", display_percent: c.display_percent ?? 0, ends_at: c.ends_at ? c.ends_at.slice(0, 16) : "" })}><Pencil className="h-4 w-4" /></Button>
             <Button size="icon" variant="outline" aria-label="Excluir" onClick={() => remove(c.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
