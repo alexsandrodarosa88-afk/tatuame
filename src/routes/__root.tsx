@@ -11,6 +11,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeColors } from "@/lib/site-content";
 
 function NotFoundComponent() {
   return (
@@ -124,6 +125,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeColors />
       <Outlet />
       <Toaster position="top-center" richColors closeButton />
     </QueryClientProvider>
