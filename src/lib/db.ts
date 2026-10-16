@@ -22,3 +22,12 @@ export async function loadSettings(): Promise<SiteSettings> {
   const { data } = await db.from("site_settings").select("data").eq("id", 1).maybeSingle();
   return (data?.data ?? {}) as SiteSettings;
 }
+
+/** % mostrado ao público: base do ADM + % real vendido (sobe a cada cota paga). */
+export async function withPublicPercent<T extends { id: string; display_percent?: number | null; total_quotas: number; status?: string }>(c: T) {
+  const { data } = await db.rpc("campaign_sold", { _campaign_id: c.id });
+  const sold = Number(data ?? 0);
+  const real = c.total_quotas > 0 ? (sold / c.total_quotas) * 100 : 0;
+  const pct = c.status === "encerrada" ? 100 : Math.min(100, Math.round(((c.display_percent ?? 0) + real) * 10) / 10);
+  return { ...c, public_percent: pct };
+}
