@@ -13,12 +13,15 @@ export const startMercadoPagoCheckout = createServerFn({ method: "POST" })
       const { data: order, error } = await context.supabase.from("orders").select("*, campaigns(title)").eq("id", data.orderId).eq("user_id", context.userId).single();
       if (error || !order) throw new Error("Pedido não encontrado");
       if (order.status !== "pendente") throw new Error("Este pedido não está aguardando pagamento");
-      if (order.mp_checkout_url) return { url: order.mp_checkout_url };
       if (Number(order.total) <= 0) throw new Error("O valor do pedido precisa ser maior que zero");
       const { mercadoPagoRequest } = await import("./mercadopago.server");
       const origin = new URL(getRequest().url).origin;
+      // Cartão de crédito só para compras a partir de R$ 50,00; abaixo disso, apenas Pix.
+      const allowCard = Number(order.total) >= 50;
+      const excluded = ["debit_card", "ticket", "atm", "prepaid_card", ...(allowCard ? [] : ["credit_card"])];
       const result = await mercadoPagoRequest("/checkout/preferences", token, {
         items: [{ id: order.campaign_id, title: `${order.campaigns?.title || "TATUAME"} — ${order.quantity} cotas`, quantity: 1, unit_price: Number(order.total), currency_id: "BRL" }],
+        payment_methods: { excluded_payment_types: excluded.map((id) => ({ id })), installments: allowCard ? 12 : 1 },
         external_reference: order.id,
         metadata: { tatuame_order_id: order.id },
         back_urls: { success: `${origin}/conta`, pending: `${origin}/conta`, failure: `${origin}/conta` },
