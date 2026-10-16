@@ -24,7 +24,7 @@ export async function loadSettings(): Promise<SiteSettings> {
 }
 
 /** % mostrado ao público: base do ADM + % real vendido (sobe a cada cota paga). */
-export async function withPublicPercent<T extends { id: string; display_percent?: number | null; total_quotas: number; status?: string }>(c: T) {
+export async function withPublicPercent(c: any) {
   const { data } = await db.rpc("campaign_sold", { _campaign_id: c.id });
   const sold = Number(data ?? 0);
   const real = c.total_quotas > 0 ? (sold / c.total_quotas) * 100 : 0;

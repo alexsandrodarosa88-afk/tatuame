@@ -108,7 +108,7 @@ function Page() {
               <div className="space-y-1 sm:col-span-2"><Label>Descrição</Label><Textarea rows={4} value={edit.description} onChange={txt("description")} /></div>
               <div className="space-y-1"><Label>Valor da cota (R$)</Label><Input type="number" step="0.01" min="0" value={edit.quota_price} onChange={num("quota_price")} /></div>
               <div className="space-y-1"><Label>Total de cotas</Label><Input type="number" min="1" value={edit.total_quotas} onChange={num("total_quotas")} /></div>
-              <div className="space-y-1"><Label>% vendido mostrado ao público</Label><Input type="number" min="0" max="100" value={edit.display_percent} onChange={num("display_percent")} /></div>
+              <div className="space-y-1"><Label>% inicial mostrado ao público (soma com as vendas reais)</Label><Input type="number" min="0" max="100" value={edit.display_percent} onChange={num("display_percent")} /></div>
               <div className="space-y-1"><Label>Encerra em</Label><Input type="datetime-local" value={edit.ends_at} onChange={txt("ends_at")} /></div>
               <div className="space-y-2 sm:col-span-2"><Label>Foto</Label>
                 {edit.image_url && <img src={edit.image_url} alt="" className="h-32 rounded-lg object-cover" />}
