@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,12 @@ function Login() {
   const { next } = Route.useSearch();
   const navigate = useNavigate();
   const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const go = () => navigate({ to: (next ?? "/conta") as any });
+    supabase.auth.getSession().then(({ data }) => { if (data.session) go(); });
+    const { data: sub } = supabase.auth.onAuthStateChange((ev, session) => { if (session && (ev === "SIGNED_IN" || ev === "PASSWORD_RECOVERY")) go(); });
+    return () => sub.subscription.unsubscribe();
+  }, []);
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
@@ -30,7 +36,7 @@ function Login() {
   };
   const reset = async () => {
     if (!email) return toast.error("Digite seu email primeiro.");
-    await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${window.location.origin}/conta` });
+    await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${window.location.origin}/login` });
     toast.success("Enviamos um link para seu email.");
   };
   return (
