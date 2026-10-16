@@ -40,7 +40,7 @@ function Signup() {
     if (!p.success) return toast.error(p.error.issues[0].message);
     setLoading(true);
     const { email, password, ...meta } = p.data;
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/conta`, data: meta } });
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/login`, data: meta } });
     setLoading(false);
     if (error) return toast.error(error.message);
     if (data.session) navigate({ to: "/conta" });
