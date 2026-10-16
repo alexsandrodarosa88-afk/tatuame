@@ -18,7 +18,7 @@ export type Database = {
         Row: {
           city: string
           created_at: string
-          email: string
+          email: string | null
           full_name: string
           id: string
           instagram: string
@@ -26,14 +26,15 @@ export type Database = {
           published: boolean
           state: string
           status: string
-          studio_address: string
+          studio_address: string | null
+          styles: string[]
           updated_at: string
           whatsapp: string
         }
         Insert: {
           city: string
           created_at?: string
-          email: string
+          email?: string | null
           full_name: string
           id?: string
           instagram: string
@@ -41,14 +42,15 @@ export type Database = {
           published?: boolean
           state: string
           status?: string
-          studio_address: string
+          studio_address?: string | null
+          styles?: string[]
           updated_at?: string
           whatsapp: string
         }
         Update: {
           city?: string
           created_at?: string
-          email?: string
+          email?: string | null
           full_name?: string
           id?: string
           instagram?: string
@@ -56,7 +58,8 @@ export type Database = {
           published?: boolean
           state?: string
           status?: string
-          studio_address?: string
+          studio_address?: string | null
+          styles?: string[]
           updated_at?: string
           whatsapp?: string
         }
@@ -71,6 +74,7 @@ export type Database = {
           instagram: string
           photo_url: string | null
           state: string
+          styles: string[]
         }
         Insert: {
           city: string
@@ -80,6 +84,7 @@ export type Database = {
           instagram: string
           photo_url?: string | null
           state: string
+          styles?: string[]
         }
         Update: {
           city?: string
@@ -89,6 +94,7 @@ export type Database = {
           instagram?: string
           photo_url?: string | null
           state?: string
+          styles?: string[]
         }
         Relationships: [
           {
