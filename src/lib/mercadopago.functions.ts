@@ -26,7 +26,7 @@ export const startMercadoPagoCheckout = createServerFn({ method: "POST" })
         metadata: { tatuame_order_id: order.id },
         back_urls: { success: `${origin}/conta`, pending: `${origin}/conta`, failure: `${origin}/conta` },
         ...(origin.startsWith("https://") ? { auto_return: "approved", notification_url: `${origin}/api/public/mercadopago/webhook` } : {}),
-      }, order.id);
+      }, `${order.id}-pm`);
       if (typeof result.init_point !== "string" || !/^https:\/\/[a-z0-9.-]*mercadopago\.com\.br\//.test(result.init_point)) throw new Error("Mercado Pago não retornou um link válido");
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { error: saveError } = await supabaseAdmin.from("orders").update({ mp_preference_id: result.id, mp_checkout_url: result.init_point }).eq("id", order.id).eq("status", "pendente");
