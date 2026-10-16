@@ -13,6 +13,9 @@ export type SiteSettings = {
   hero_subtitle?: string;
   whatsapp?: string;
   faq?: { q: string; a: string }[];
+  texts?: Record<string, string>;
+  images?: Record<string, string>;
+  colors?: Record<string, string>;
 };
 
 export async function loadSettings(): Promise<SiteSettings> {

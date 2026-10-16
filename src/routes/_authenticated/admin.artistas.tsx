@@ -1,3 +1,9 @@
+import { useState } from "react";
+import { Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { BRAZIL_STATES } from "@/lib/db";
+import { TATTOO_STYLES } from "@/lib/site-content";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -31,10 +37,39 @@ function Page() {
     toast.success(status === "aprovado" ? "Aprovado e publicado no site" : "Cadastro atualizado"); q.refetch();
   };
   const unpublish = async (a: any) => { await db.from("artists").delete().eq("id", a.id); await db.from("artist_applications").update({ published: false }).eq("id", a.id); q.refetch(); };
-  const remove = async (id: string) => { if (!confirm("Excluir este cadastro?")) return; await db.from("artist_applications").delete().eq("id", id); q.refetch(); };
+  const remove = async (id: string) => { if (!confirm("Excluir este cadastro?")) return; await db.from("artists").delete().eq("id", id); await db.from("artist_applications").delete().eq("id", id); q.refetch(); };
+  const [form, setForm] = useState({ full_name: "", instagram: "", city: "", state: "", whatsapp: "", styles: [] as string[] });
+  const [show, setShow] = useState(false);
+  const add = async () => {
+    const f = form;
+    if (!f.full_name.trim() || !f.instagram.trim() || !f.city.trim() || !f.state || !f.whatsapp.trim() || !f.styles.length) return toast.error("Preencha todos os campos e escolha ao menos um estilo");
+    const id = crypto.randomUUID();
+    const { error } = await db.from("artist_applications").insert({ id, full_name: f.full_name.trim(), instagram: f.instagram.trim(), city: f.city.trim(), state: f.state, whatsapp: f.whatsapp.trim(), styles: f.styles, status: "aprovado", published: true });
+    if (error) return toast.error(error.message);
+    const r = await db.from("artists").insert({ id, full_name: f.full_name.trim(), instagram: f.instagram.trim(), city: f.city.trim(), state: f.state, styles: f.styles });
+    if (r.error) return toast.error(r.error.message);
+    toast.success("Artista adicionado e publicado no site");
+    setForm({ full_name: "", instagram: "", city: "", state: "", whatsapp: "", styles: [] }); setShow(false); q.refetch();
+  };
+  const toggle = (st: string) => setForm((f) => ({ ...f, styles: f.styles.includes(st) ? f.styles.filter((x) => x !== st) : [...f.styles, st] }));
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl">Artistas</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2"><h1 className="text-3xl">Artistas</h1><Button onClick={() => setShow(!show)}><Plus className="mr-1 h-4 w-4" />Adicionar artista</Button></div>
+      {show && (
+        <div className="space-y-4 rounded-2xl border bg-card p-5">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1"><Label>Nome</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
+            <div className="space-y-1"><Label>Instagram</Label><Input value={form.instagram} placeholder="@usuario" onChange={(e) => setForm({ ...form, instagram: e.target.value })} /></div>
+            <div className="space-y-1"><Label>Cidade</Label><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
+            <div className="space-y-1"><Label>Estado</Label><select className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })}><option value="">Selecione</option>{BRAZIL_STATES.map((u) => <option key={u}>{u}</option>)}</select></div>
+            <div className="space-y-1 sm:col-span-2"><Label>WhatsApp</Label><Input value={form.whatsapp} placeholder="(11) 99999-9999" onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} /></div>
+          </div>
+          <div className="space-y-2"><Label>Estilos de tatuagem ({form.styles.length} selecionados)</Label>
+            <div className="flex flex-wrap gap-2">{TATTOO_STYLES.map((st) => { const on = form.styles.includes(st); return <button type="button" key={st} onClick={() => toggle(st)} className={`rounded-full border px-3 py-1 text-xs ${on ? "border-primary bg-primary text-primary-foreground" : "bg-background hover:border-primary"}`}>{st}</button>; })}</div>
+          </div>
+          <Button onClick={add}>Salvar e publicar no site</Button>
+        </div>
+      )}
       <div className="space-y-3">
         {q.isLoading && <p className="text-muted-foreground" role="status">Carregando cadastros...</p>}
         {q.isError && <div role="alert" className="space-y-2"><p className="text-destructive">Não foi possível carregar os cadastros.</p><Button variant="outline" onClick={() => q.refetch()}>Tentar novamente</Button></div>}

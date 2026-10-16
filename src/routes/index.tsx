@@ -5,9 +5,9 @@ import { ArrowRight, Instagram, MapPin, Ticket, Sparkles, ShieldCheck } from "lu
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Navbar, Footer } from "@/components/site/Navbar";
-import { db, BRL, loadSettings } from "@/lib/db";
+import { db, BRL } from "@/lib/db";
 import { supabase } from "@/integrations/supabase/client";
-import hero from "@/assets/hero-tattoo.jpg";
+import { useSite } from "@/lib/site-content";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -29,7 +29,7 @@ export const campaignsQuery = {
 };
 
 function Index() {
-  const settings = useQuery({ queryKey: ["settings"], queryFn: loadSettings });
+  const { s, t, img } = useSite();
   const campaigns = useQuery(campaignsQuery);
   const artists = useQuery({ queryKey: ["artists"], queryFn: async () => (await db.from("artists").select("*").order("created_at", { ascending: false })).data ?? [] });
 
@@ -38,27 +38,26 @@ function Index() {
     return () => { supabase.removeChannel(ch); };
   }, []);
 
-  const s = settings.data ?? {};
   return (
     <div className="min-h-screen">
       <Navbar />
       <main>
         <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:py-24">
           <div className="space-y-6">
-            <span className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground"><Sparkles className="h-3.5 w-3.5 text-primary" /> Campanhas oficiais</span>
-            <h1 className="text-4xl leading-[1.05] md:text-6xl">{s.hero_title || "Sua próxima tattoo pode sair por uma cota."}</h1>
-            <p className="max-w-md text-lg text-muted-foreground">{s.hero_subtitle || "Campanhas exclusivas com os melhores artistas do Brasil."}</p>
+            <span className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground"><Sparkles className="h-3.5 w-3.5 text-primary" /> {t("hero_badge")}</span>
+            <h1 className="text-4xl leading-[1.05] md:text-6xl">{t("hero_title")}</h1>
+            <p className="max-w-md text-lg text-muted-foreground">{t("hero_subtitle")}</p>
             <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg"><a href="#campanhas">Ver campanhas <ArrowRight className="ml-1 h-4 w-4" /></a></Button>
-              <Button asChild size="lg" variant="outline"><Link to="/seja-artista">Seja um artista</Link></Button>
+              <Button asChild size="lg"><a href="#campanhas">{t("hero_btn1")} <ArrowRight className="ml-1 h-4 w-4" /></a></Button>
+              <Button asChild size="lg" variant="outline"><Link to="/seja-artista">{t("hero_btn2")}</Link></Button>
             </div>
           </div>
-          <img src={hero} alt="Tatuagem realizada por artista TATUAME" className="aspect-[4/5] w-full rounded-2xl object-cover shadow-soft" />
+          <img src={img("hero")} alt="Tatuagem realizada por artista TATUAME" className="aspect-[4/5] w-full rounded-2xl object-cover shadow-soft" />
         </section>
 
         <section id="campanhas" className="border-t bg-card py-16 md:py-24">
           <div className="mx-auto max-w-6xl px-4">
-            <h2 className="mb-10 text-3xl md:text-4xl">Campanhas</h2>
+            <h2 className="mb-10 text-3xl md:text-4xl">{t("campaigns_title")}</h2>
             {campaigns.data?.length ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {campaigns.data.map((c) => (
@@ -71,25 +70,25 @@ function Index() {
                       </div>
                       <h3 className="text-xl">{c.title}</h3>
                       <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${c.display_percent ?? 0}%` }} /></div>
-                      <p className="text-sm text-muted-foreground">Cota a partir de <strong className="text-foreground">{BRL(c.quota_price)}</strong></p>
+                      <p className="text-sm text-muted-foreground">{t("campaigns_price")} <strong className="text-foreground">{BRL(c.quota_price)}</strong></p>
                     </div>
                   </Link>
                 ))}
               </div>
-            ) : <p className="text-muted-foreground">Novas campanhas em breve.</p>}
+            ) : <p className="text-muted-foreground">{t("campaigns_empty")}</p>}
           </div>
         </section>
 
         <section id="como-funciona" className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-          <h2 className="mb-10 text-3xl md:text-4xl">Como funciona</h2>
+          <h2 className="mb-10 text-3xl md:text-4xl">{t("how_title")}</h2>
           <div className="grid gap-6 md:grid-cols-3">
-            {[{ i: Ticket, t: "Escolha a campanha", d: "Selecione a campanha e a quantidade de cotas." },
-              { i: ShieldCheck, t: "Pagamento confirmado", d: "Após a confirmação, seus números da sorte aparecem na sua conta." },
-              { i: Sparkles, t: "Sorteio e tattoo", d: "O vencedor faz a tatuagem com um artista TATUAME." }].map(({ i: I, t, d }, n) => (
-              <div key={t} className="rounded-2xl border bg-card p-6">
+            {[{ i: Ticket, t: t("how1_t"), d: t("how1_d") },
+              { i: ShieldCheck, t: t("how2_t"), d: t("how2_d") },
+              { i: Sparkles, t: t("how3_t"), d: t("how3_d") }].map(({ i: I, t: title, d }, n) => (
+              <div key={n} className="rounded-2xl border bg-card p-6">
                 <I className="mb-4 h-6 w-6 text-primary" />
                 <p className="text-xs text-muted-foreground">0{n + 1}</p>
-                <h3 className="mb-2 text-xl">{t}</h3>
+                <h3 className="mb-2 text-xl">{title}</h3>
                 <p className="text-sm text-muted-foreground">{d}</p>
               </div>
             ))}
@@ -99,7 +98,7 @@ function Index() {
         {!!artists.data?.length && (
           <section id="artistas" className="border-t bg-card py-16 md:py-24">
             <div className="mx-auto max-w-6xl px-4">
-              <h2 className="mb-10 text-3xl md:text-4xl">Artistas TATUAME</h2>
+              <h2 className="mb-10 text-3xl md:text-4xl">{t("artists_title")}</h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {artists.data.map((a: any) => (
                   <div key={a.id} className="rounded-2xl border bg-background p-5">
@@ -107,6 +106,7 @@ function Index() {
                     <h3 className="text-lg">{a.full_name}</h3>
                     <p className="flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5" />{a.city} — {a.state}</p>
                     <a href={`https://instagram.com/${a.instagram.replace("@", "")}`} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm text-primary"><Instagram className="h-3.5 w-3.5" />{a.instagram}</a>
+                    {!!a.styles?.length && <p className="mt-2 text-xs text-muted-foreground">{a.styles.join(" · ")}</p>}
                   </div>
                 ))}
               </div>
@@ -117,16 +117,16 @@ function Index() {
         <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="grid items-center gap-8 rounded-3xl bg-ink p-8 text-ink-foreground md:grid-cols-[1fr_auto] md:p-14">
             <div className="space-y-3">
-              <h2 className="text-3xl md:text-5xl">Seja um artista TATUAME</h2>
-              <p className="max-w-xl opacity-75">Faça parte da nossa rede de tatuadores. Envie seus dados e nossa equipe entra em contato pelo WhatsApp.</p>
+              <h2 className="text-3xl md:text-5xl">{t("cta_title")}</h2>
+              <p className="max-w-xl opacity-75">{t("cta_text")}</p>
             </div>
-            <Button asChild size="lg"><Link to="/seja-artista">Quero participar</Link></Button>
+            <Button asChild size="lg"><Link to="/seja-artista">{t("cta_btn")}</Link></Button>
           </div>
         </section>
 
         {!!s.faq?.length && (
           <section id="faq" className="mx-auto max-w-3xl px-4 pb-24">
-            <h2 className="mb-8 text-3xl md:text-4xl">Dúvidas frequentes</h2>
+            <h2 className="mb-8 text-3xl md:text-4xl">{t("faq_title")}</h2>
             <Accordion type="single" collapsible>
               {s.faq.map((f, i) => (
                 <AccordionItem key={i} value={String(i)}><AccordionTrigger className="text-left">{f.q}</AccordionTrigger><AccordionContent className="text-muted-foreground">{f.a}</AccordionContent></AccordionItem>
