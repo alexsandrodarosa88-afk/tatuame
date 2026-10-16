@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.campaign_sold(uuid) TO anon, authenticated;

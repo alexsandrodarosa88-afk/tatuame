@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar, Footer } from "@/components/site/Navbar";
-import { db, BRL } from "@/lib/db";
+import { db, BRL, withPublicPercent } from "@/lib/db";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { startMercadoPagoCheckout } from "@/lib/mercadopago.functions";
@@ -26,7 +26,7 @@ function Page() {
   const [qty, setQty] = useState(1);
   const [busy, setBusy] = useState(false);
   const checkout = useServerFn(startMercadoPagoCheckout);
-  const q = useQuery({ queryKey: ["campaign", id], queryFn: async () => (await db.from("campaigns").select("*").eq("id", id).maybeSingle()).data });
+  const q = useQuery({ queryKey: ["campaign", id], queryFn: async () => { const d = (await db.from("campaigns").select("*").eq("id", id).maybeSingle()).data as any; return d ? withPublicPercent(d) : null; }, refetchInterval: 15000 });
   const c = q.data;
   if (q.isLoading) return <div className="min-h-screen"><Navbar /><p className="p-10 text-center text-muted-foreground">Carregando...</p></div>;
   if (!c) return <div className="min-h-screen"><Navbar /><p className="p-10 text-center">Campanha não encontrada. <Link to="/" className="text-primary">Voltar</Link></p></div>;
@@ -54,7 +54,7 @@ function Page() {
           <h1 className="text-4xl">{c.title}</h1>
           {c.prize && <p className="text-lg"><strong>Prêmio:</strong> {c.prize}</p>}
           {c.description && <p className="whitespace-pre-line text-muted-foreground">{c.description}</p>}
-          <div className="space-y-2"><div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${c.display_percent ?? 0}%` }} /></div><p className="text-sm text-muted-foreground">{c.display_percent ?? 0}% vendido</p></div>
+          <div className="space-y-2"><div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${c.public_percent ?? 0}%` }} /></div><p className="text-sm text-muted-foreground">{c.public_percent ?? 0}% vendido</p></div>
           {c.status === "ativa" ? (
             <div className="space-y-4 rounded-2xl border bg-card p-6">
               <div className="flex items-center justify-between">

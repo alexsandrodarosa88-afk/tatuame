@@ -5,7 +5,7 @@ import { ArrowRight, Instagram, MapPin, Ticket, Sparkles, ShieldCheck } from "lu
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Navbar, Footer } from "@/components/site/Navbar";
-import { db, BRL } from "@/lib/db";
+import { db, BRL, withPublicPercent } from "@/lib/db";
 import { supabase } from "@/integrations/supabase/client";
 import { useSite } from "@/lib/site-content";
 
@@ -24,17 +24,17 @@ export const campaignsQuery = {
   queryKey: ["public-campaigns"],
   queryFn: async () => {
     const { data } = await db.from("campaigns").select("*").in("status", ["ativa", "encerrada"]).order("created_at", { ascending: false });
-    return (data ?? []) as any[];
+    return Promise.all(((data ?? []) as any[]).map(withPublicPercent));
   },
 };
 
 function Index() {
   const { s, t, img } = useSite();
-  const campaigns = useQuery(campaignsQuery);
+  const campaigns = useQuery({ ...campaignsQuery, refetchInterval: 15000 });
   const artists = useQuery({ queryKey: ["artists"], queryFn: async () => (await db.from("artists").select("*").order("created_at", { ascending: false })).data ?? [] });
 
   useEffect(() => {
-    const ch = supabase.channel("home-campaigns").on("postgres_changes", { event: "*", schema: "public", table: "campaigns" }, () => campaigns.refetch()).subscribe();
+    const ch = supabase.channel("home-campaigns").on("postgres_changes", { event: "*", schema: "public", table: "campaigns" }, () => campaigns.refetch()).on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => campaigns.refetch()).subscribe();
     return () => { supabase.removeChannel(ch); };
   }, []);
 
@@ -69,7 +69,7 @@ function Index() {
                         {c.status === "encerrada" && <span className="text-muted-foreground">Encerrada</span>}
                       </div>
                       <h3 className="text-xl">{c.title}</h3>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${c.display_percent ?? 0}%` }} /></div>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${c.public_percent ?? 0}%` }} /></div>
                       <p className="text-sm text-muted-foreground">{t("campaigns_price")} <strong className="text-foreground">{BRL(c.quota_price)}</strong></p>
                     </div>
                   </Link>
