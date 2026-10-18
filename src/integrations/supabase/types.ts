@@ -157,6 +157,47 @@ export type Database = {
         }
         Relationships: []
       }
+      draws: {
+        Row: {
+          campaign_id: string | null
+          campaign_title: string
+          created_at: string
+          drawn_at: string
+          id: string
+          live_url: string | null
+          winner_name: string | null
+          winning_number: number | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          campaign_title: string
+          created_at?: string
+          drawn_at?: string
+          id?: string
+          live_url?: string | null
+          winner_name?: string | null
+          winning_number?: number | null
+        }
+        Update: {
+          campaign_id?: string | null
+          campaign_title?: string
+          created_at?: string
+          drawn_at?: string
+          id?: string
+          live_url?: string | null
+          winner_name?: string | null
+          winning_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "draws_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lucky_numbers: {
         Row: {
           campaign_id: string

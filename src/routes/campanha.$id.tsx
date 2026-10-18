@@ -2,13 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar, Footer } from "@/components/site/Navbar";
 import { db, BRL, withPublicPercent } from "@/lib/db";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { startMercadoPagoCheckout } from "@/lib/mercadopago.functions";
+import { useSite } from "@/lib/site-content";
 
 export const Route = createFileRoute("/campanha/$id")({
   component: Page,
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/campanha/$id")({
 function Page() {
   const { id } = Route.useParams();
   const { user } = useAuth();
+  const { t } = useSite();
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const [busy, setBusy] = useState(false);
@@ -69,6 +71,7 @@ function Page() {
                <Button className="w-full" size="lg" disabled={busy} onClick={buy}>{busy ? "Abrindo pagamento..." : "Comprar cotas com Mercado Pago"}</Button>
             </div>
           ) : <p className="rounded-2xl border bg-card p-6 text-muted-foreground">Esta campanha está encerrada.</p>}
+          <p className="flex items-start gap-2 rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm"><Radio className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>{t("campaign_live_notice")} <Link to="/sorteios" className="font-semibold text-primary underline-offset-4 hover:underline">Ver sorteios</Link></span></p>
         </div>
       </main>
       <Footer />

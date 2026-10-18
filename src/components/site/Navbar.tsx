@@ -16,6 +16,7 @@ export function Navbar() {
       <a href="/#campanhas" onClick={() => setOpen(false)} className="hover:text-primary">{t("nav_campaigns")}</a>
       <a href="/#artistas" onClick={() => setOpen(false)} className="hover:text-primary">{t("nav_artists")}</a>
       <a href="/#como-funciona" onClick={() => setOpen(false)} className="hover:text-primary">{t("nav_how")}</a>
+      <Link to="/sorteios" onClick={() => setOpen(false)} className="hover:text-primary">{t("nav_draws")}</Link>
       <a href="/#faq" onClick={() => setOpen(false)} className="hover:text-primary">{t("nav_faq")}</a>
     </>
   );

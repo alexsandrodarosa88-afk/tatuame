@@ -98,6 +98,7 @@ function Page() {
 
       <section className="space-y-4 rounded-2xl border bg-card p-5">
         <div className="space-y-1"><Label>WhatsApp de contato (com DDD e 55)</Label><Input value={s.whatsapp ?? ""} onChange={(e) => setS({ ...s, whatsapp: e.target.value.replace(/\D/g, "") })} placeholder="5511999999999" /></div>
+        <div className="space-y-1"><Label>Link do Instagram do TATUAME (onde ficam as lives)</Label><Input value={s.instagram ?? ""} onChange={(e) => setS({ ...s, instagram: e.target.value.trim() })} placeholder="https://instagram.com/tatuame" /></div>
       </section>
 
       <section className="space-y-4 rounded-2xl border bg-card p-5">
