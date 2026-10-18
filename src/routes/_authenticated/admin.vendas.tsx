@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { db, BRL } from "@/lib/db";
+import { db, BRL, formatLuckyNumber } from "@/lib/db";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/vendas")({
@@ -16,7 +16,7 @@ function Page() {
     queryKey: ["admin-orders"],
     refetchInterval: 10000,
     queryFn: async () => {
-      const { data: orders } = await db.from("orders").select("*, campaigns(title), lucky_numbers(number)").order("created_at", { ascending: false });
+      const { data: orders } = await db.from("orders").select("*, campaigns(title, total_quotas), lucky_numbers(number)").order("created_at", { ascending: false });
       const ids = [...new Set((orders ?? []).map((o: any) => o.user_id))];
       const { data: profiles } = ids.length ? await db.from("profiles").select("id,nome_completo,email,telefone").in("id", ids) : { data: [] };
       const map = Object.fromEntries((profiles ?? []).map((p: any) => [p.id, p]));
@@ -52,7 +52,7 @@ function Page() {
               </div>
             </div>
             {o.mp_payment_id && <p className="text-xs text-muted-foreground">Mercado Pago · Pagamento {o.mp_payment_id} · {o.mp_payment_status}</p>}
-            {!!o.lucky_numbers?.length && <p className="font-mono text-xs text-muted-foreground">Números: {o.lucky_numbers.map((n: any) => String(n.number).padStart(4, "0")).join(", ")}</p>}
+            {!!o.lucky_numbers?.length && <p className="font-mono text-xs text-muted-foreground">Números: {o.lucky_numbers.map((n: any) => formatLuckyNumber(n.number, o.campaigns?.total_quotas)).join(", ")}</p>}
           </div>
         ))}
         {q.data?.length === 0 && <p className="text-muted-foreground">Nenhuma venda ainda.</p>}

@@ -32,3 +32,7 @@ export async function withPublicPercent(c: any) {
   const pct = c.status === "encerrada" ? 100 : Math.min(100, Math.round(((c.display_percent ?? 0) + real) * 10) / 10);
   return { ...c, public_percent: pct };
 }
+
+/** Número da sorte com zeros à esquerda conforme o total de cotas (300 -> 001). */
+export const formatLuckyNumber = (n: number, total?: number | null) =>
+  String(n).padStart(String(total && total > 0 ? total : n).length, "0");
