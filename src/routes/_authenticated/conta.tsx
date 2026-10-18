@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/site/Navbar";
-import { db, BRL } from "@/lib/db";
+import { db, BRL, formatLuckyNumber } from "@/lib/db";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { startMercadoPagoCheckout, refreshMercadoPagoPayment } from "@/lib/mercadopago.functions";
@@ -31,7 +31,7 @@ function Conta() {
     refetchInterval: 10000,
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await db.from("orders").select("*, campaigns(title), lucky_numbers(number)").eq("user_id", user.id).order("created_at", { ascending: false });
+      const { data, error } = await db.from("orders").select("*, campaigns(title, total_quotas), lucky_numbers(number)").eq("user_id", user.id).order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -97,7 +97,7 @@ function Conta() {
                 {o.mp_preference_id && <Button size="sm" variant="outline" disabled={busy === o.id} onClick={() => verify(o.id)}>Verificar pagamento</Button>}
               </div>}
               {!!o.lucky_numbers?.length && (
-                <div className="flex flex-wrap gap-2">{o.lucky_numbers.map((n: any) => <span key={n.number} className="rounded-md border bg-background px-2 py-1 font-mono text-sm">{String(n.number).padStart(4, "0")}</span>)}</div>
+                <div className="flex flex-wrap gap-2">{o.lucky_numbers.map((n: any) => <span key={n.number} className="rounded-md border bg-background px-2 py-1 font-mono text-sm">{formatLuckyNumber(n.number, o.campaigns?.total_quotas)}</span>)}</div>
               )}
             </div>
           )) : !orders.isLoading && !orders.isError && <p className="text-muted-foreground">Você ainda não tem compras.</p>}
