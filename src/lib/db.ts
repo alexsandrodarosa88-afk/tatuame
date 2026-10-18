@@ -12,6 +12,7 @@ export type SiteSettings = {
   hero_title?: string;
   hero_subtitle?: string;
   whatsapp?: string;
+  instagram?: string;
   faq?: { q: string; a: string }[];
   texts?: Record<string, string>;
   images?: Record<string, string>;

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, Megaphone, ShoppingBag, Users, Palette, Settings } from "lucide-react";
+import { LayoutDashboard, Megaphone, ShoppingBag, Users, Palette, Settings, Radio } from "lucide-react";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { Button } from "@/components/ui/button";
 
@@ -12,6 +12,7 @@ const nav = [
   { to: "/admin/vendas", label: "Vendas", icon: ShoppingBag },
   { to: "/admin/clientes", label: "Clientes", icon: Users },
   { to: "/admin/artistas", label: "Artistas", icon: Palette },
+  { to: "/admin/sorteios", label: "Sorteios", icon: Radio },
   { to: "/admin/configuracoes", label: "Site", icon: Settings },
 ];
 
