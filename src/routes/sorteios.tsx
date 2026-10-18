@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Instagram, PlayCircle, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar, Footer } from "@/components/site/Navbar";
-import { db } from "@/lib/db";
+import { db, formatLuckyNumber } from "@/lib/db";
 import { useSite } from "@/lib/site-content";
 
 export const Route = createFileRoute("/sorteios")({
