@@ -15,6 +15,7 @@ import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as CadastroTatuadorRouteImport } from './routes/cadastro-tatuador'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SejaArtistaRouteImport } from './routes/seja-artista'
+import { Route as SorteiosRouteImport } from './routes/sorteios'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedContaRouteImport } from './routes/_authenticated/conta'
 import { Route as CampanhaIdRouteImport } from './routes/campanha.$id'
@@ -23,6 +24,7 @@ import { Route as AuthenticatedAdminArtistasRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminCampanhasRouteImport } from './routes/_authenticated/admin.campanhas'
 import { Route as AuthenticatedAdminClientesRouteImport } from './routes/_authenticated/admin.clientes'
 import { Route as AuthenticatedAdminConfiguracoesRouteImport } from './routes/_authenticated/admin.configuracoes'
+import { Route as AuthenticatedAdminSorteiosRouteImport } from './routes/_authenticated/admin.sorteios'
 import { Route as AuthenticatedAdminVendasRouteImport } from './routes/_authenticated/admin.vendas'
 import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago/webhook'
 
@@ -53,6 +55,11 @@ const LoginRoute = LoginRouteImport.update({
 const SejaArtistaRoute = SejaArtistaRouteImport.update({
   id: '/seja-artista',
   path: '/seja-artista',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SorteiosRoute = SorteiosRouteImport.update({
+  id: '/sorteios',
+  path: '/sorteios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -99,6 +106,12 @@ const AuthenticatedAdminConfiguracoesRoute =
     path: '/configuracoes',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminSorteiosRoute =
+  AuthenticatedAdminSorteiosRouteImport.update({
+    id: '/sorteios',
+    path: '/sorteios',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminVendasRoute =
   AuthenticatedAdminVendasRouteImport.update({
     id: '/vendas',
@@ -118,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/seja-artista': typeof SejaArtistaRoute
+  '/sorteios': typeof SorteiosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/conta': typeof AuthenticatedContaRoute
   '/campanha/$id': typeof CampanhaIdRoute
@@ -125,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/sorteios': typeof AuthenticatedAdminSorteiosRoute
   '/admin/vendas': typeof AuthenticatedAdminVendasRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/mercadopago/webhook': typeof ApiPublicMercadopagoWebhookRoute
@@ -135,12 +150,14 @@ export interface FileRoutesByTo {
   '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/seja-artista': typeof SejaArtistaRoute
+  '/sorteios': typeof SorteiosRoute
   '/conta': typeof AuthenticatedContaRoute
   '/campanha/$id': typeof CampanhaIdRoute
   '/admin/artistas': typeof AuthenticatedAdminArtistasRoute
   '/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/admin/sorteios': typeof AuthenticatedAdminSorteiosRoute
   '/admin/vendas': typeof AuthenticatedAdminVendasRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/mercadopago/webhook': typeof ApiPublicMercadopagoWebhookRoute
@@ -153,6 +170,7 @@ export interface FileRoutesById {
   '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/seja-artista': typeof SejaArtistaRoute
+  '/sorteios': typeof SorteiosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/conta': typeof AuthenticatedContaRoute
   '/campanha/$id': typeof CampanhaIdRoute
@@ -160,6 +178,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/campanhas': typeof AuthenticatedAdminCampanhasRoute
   '/_authenticated/admin/clientes': typeof AuthenticatedAdminClientesRoute
   '/_authenticated/admin/configuracoes': typeof AuthenticatedAdminConfiguracoesRoute
+  '/_authenticated/admin/sorteios': typeof AuthenticatedAdminSorteiosRoute
   '/_authenticated/admin/vendas': typeof AuthenticatedAdminVendasRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/mercadopago/webhook': typeof ApiPublicMercadopagoWebhookRoute
@@ -172,6 +191,7 @@ export interface FileRouteTypes {
     | '/cadastro-tatuador'
     | '/login'
     | '/seja-artista'
+    | '/sorteios'
     | '/admin'
     | '/conta'
     | '/campanha/$id'
@@ -179,6 +199,7 @@ export interface FileRouteTypes {
     | '/admin/campanhas'
     | '/admin/clientes'
     | '/admin/configuracoes'
+    | '/admin/sorteios'
     | '/admin/vendas'
     | '/admin/'
     | '/api/public/mercadopago/webhook'
@@ -189,12 +210,14 @@ export interface FileRouteTypes {
     | '/cadastro-tatuador'
     | '/login'
     | '/seja-artista'
+    | '/sorteios'
     | '/conta'
     | '/campanha/$id'
     | '/admin/artistas'
     | '/admin/campanhas'
     | '/admin/clientes'
     | '/admin/configuracoes'
+    | '/admin/sorteios'
     | '/admin/vendas'
     | '/admin'
     | '/api/public/mercadopago/webhook'
@@ -206,6 +229,7 @@ export interface FileRouteTypes {
     | '/cadastro-tatuador'
     | '/login'
     | '/seja-artista'
+    | '/sorteios'
     | '/_authenticated/admin'
     | '/_authenticated/conta'
     | '/campanha/$id'
@@ -213,6 +237,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/campanhas'
     | '/_authenticated/admin/clientes'
     | '/_authenticated/admin/configuracoes'
+    | '/_authenticated/admin/sorteios'
     | '/_authenticated/admin/vendas'
     | '/_authenticated/admin/'
     | '/api/public/mercadopago/webhook'
@@ -225,6 +250,7 @@ export interface RootRouteChildren {
   CadastroTatuadorRoute: typeof CadastroTatuadorRoute
   LoginRoute: typeof LoginRoute
   SejaArtistaRoute: typeof SejaArtistaRoute
+  SorteiosRoute: typeof SorteiosRoute
   CampanhaIdRoute: typeof CampanhaIdRoute
   ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
 }
@@ -271,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/seja-artista'
       fullPath: '/seja-artista'
       preLoaderRoute: typeof SejaArtistaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sorteios': {
+      id: '/sorteios'
+      path: '/sorteios'
+      fullPath: '/sorteios'
+      preLoaderRoute: typeof SorteiosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -329,6 +362,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminConfiguracoesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/sorteios': {
+      id: '/_authenticated/admin/sorteios'
+      path: '/sorteios'
+      fullPath: '/admin/sorteios'
+      preLoaderRoute: typeof AuthenticatedAdminSorteiosRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/vendas': {
       id: '/_authenticated/admin/vendas'
       path: '/vendas'
@@ -351,6 +391,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCampanhasRoute: typeof AuthenticatedAdminCampanhasRoute
   AuthenticatedAdminClientesRoute: typeof AuthenticatedAdminClientesRoute
   AuthenticatedAdminConfiguracoesRoute: typeof AuthenticatedAdminConfiguracoesRoute
+  AuthenticatedAdminSorteiosRoute: typeof AuthenticatedAdminSorteiosRoute
   AuthenticatedAdminVendasRoute: typeof AuthenticatedAdminVendasRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
@@ -360,6 +401,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCampanhasRoute: AuthenticatedAdminCampanhasRoute,
   AuthenticatedAdminClientesRoute: AuthenticatedAdminClientesRoute,
   AuthenticatedAdminConfiguracoesRoute: AuthenticatedAdminConfiguracoesRoute,
+  AuthenticatedAdminSorteiosRoute: AuthenticatedAdminSorteiosRoute,
   AuthenticatedAdminVendasRoute: AuthenticatedAdminVendasRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
@@ -388,6 +430,7 @@ const rootRouteChildren: RootRouteChildren = {
   CadastroTatuadorRoute: CadastroTatuadorRoute,
   LoginRoute: LoginRoute,
   SejaArtistaRoute: SejaArtistaRoute,
+  SorteiosRoute: SorteiosRoute,
   CampanhaIdRoute: CampanhaIdRoute,
   ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
 }
