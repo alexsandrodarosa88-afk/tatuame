@@ -1,0 +1,1 @@
+ALTER TABLE public.artist_applications ADD COLUMN IF NOT EXISTS photo_url text;
