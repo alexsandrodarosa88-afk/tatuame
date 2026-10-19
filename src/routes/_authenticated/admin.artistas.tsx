@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BRAZIL_STATES } from "@/lib/db";
@@ -39,17 +40,26 @@ function Page() {
   const unpublish = async (a: any) => { await db.from("artists").delete().eq("id", a.id); await db.from("artist_applications").update({ published: false }).eq("id", a.id); q.refetch(); };
   const remove = async (id: string) => { if (!confirm("Excluir este cadastro?")) return; await db.from("artists").delete().eq("id", id); await db.from("artist_applications").delete().eq("id", id); q.refetch(); };
   const [form, setForm] = useState({ full_name: "", instagram: "", city: "", state: "", whatsapp: "", styles: [] as string[] });
+  const [photo, setPhoto] = useState<File | null>(null);
   const [show, setShow] = useState(false);
   const add = async () => {
     const f = form;
     if (!f.full_name.trim() || !f.instagram.trim() || !f.city.trim() || !f.state || !f.whatsapp.trim() || !f.styles.length) return toast.error("Preencha todos os campos e escolha ao menos um estilo");
     const id = crypto.randomUUID();
-    const { error } = await db.from("artist_applications").insert({ id, full_name: f.full_name.trim(), instagram: f.instagram.trim(), city: f.city.trim(), state: f.state, whatsapp: f.whatsapp.trim(), styles: f.styles, status: "aprovado", published: true });
+    let photo_url: string | null = null;
+    if (photo) {
+      const path = `artists/${id}`;
+      const up = await supabase.storage.from("site-images").upload(path, photo);
+      if (up.error) return toast.error("Não foi possível enviar a foto");
+      const { data } = await supabase.storage.from("site-images").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      photo_url = data?.signedUrl ?? null;
+    }
+    const { error } = await db.from("artist_applications").insert({ id, full_name: f.full_name.trim(), instagram: f.instagram.trim(), city: f.city.trim(), state: f.state, whatsapp: f.whatsapp.trim(), styles: f.styles, photo_url, status: "aprovado", published: true });
     if (error) return toast.error(error.message);
-    const r = await db.from("artists").insert({ id, full_name: f.full_name.trim(), instagram: f.instagram.trim(), city: f.city.trim(), state: f.state, styles: f.styles });
+    const r = await db.from("artists").insert({ id, full_name: f.full_name.trim(), instagram: f.instagram.trim(), city: f.city.trim(), state: f.state, styles: f.styles, photo_url });
     if (r.error) return toast.error(r.error.message);
     toast.success("Artista adicionado e publicado no site");
-    setForm({ full_name: "", instagram: "", city: "", state: "", whatsapp: "", styles: [] }); setShow(false); q.refetch();
+    setForm({ full_name: "", instagram: "", city: "", state: "", whatsapp: "", styles: [] }); setPhoto(null); setShow(false); q.refetch();
   };
   const toggle = (st: string) => setForm((f) => ({ ...f, styles: f.styles.includes(st) ? f.styles.filter((x) => x !== st) : [...f.styles, st] }));
   return (
@@ -63,6 +73,9 @@ function Page() {
             <div className="space-y-1"><Label>Cidade</Label><Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
             <div className="space-y-1"><Label>Estado</Label><select className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })}><option value="">Selecione</option>{BRAZIL_STATES.map((u) => <option key={u}>{u}</option>)}</select></div>
             <div className="space-y-1 sm:col-span-2"><Label>WhatsApp</Label><Input value={form.whatsapp} placeholder="(11) 99999-9999" onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} /></div>
+            <div className="space-y-1 sm:col-span-2"><Label>Foto do artista</Label>
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm"><Upload className="h-4 w-4" />{photo ? photo.name : "Escolher foto"}<input type="file" accept="image/*" className="hidden" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} /></label>
+            </div>
           </div>
           <div className="space-y-2"><Label>Estilos de tatuagem ({form.styles.length} selecionados)</Label>
             <div className="flex flex-wrap gap-2">{TATTOO_STYLES.map((st) => { const on = form.styles.includes(st); return <button type="button" key={st} onClick={() => toggle(st)} className={`rounded-full border px-3 py-1 text-xs ${on ? "border-primary bg-primary text-primary-foreground" : "bg-background hover:border-primary"}`}>{st}</button>; })}</div>
@@ -79,14 +92,14 @@ function Page() {
           return (
             <div key={a.id} className="space-y-3 rounded-2xl border bg-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <div><p className="font-semibold">{a.full_name} <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs">{label[a.status]}{a.isPublic && " · no site"}</span></p>
+                <div className="flex items-start gap-3">{a.photo_url && <img src={a.photo_url} alt={a.full_name} className="h-14 w-14 rounded-xl object-cover" />}<div><p className="font-semibold">{a.full_name} <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs">{label[a.status]}{a.isPublic && " · no site"}</span></p>
                   <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
                     <div><dt className="text-muted-foreground">Instagram</dt><dd className="break-words">{a.instagram}</dd></div>
                     <div><dt className="text-muted-foreground">Email</dt><dd className="break-all"><a className="text-primary underline" href={`mailto:${a.email}`}>{a.email}</a></dd></div>
                     <div><dt className="text-muted-foreground">WhatsApp</dt><dd>{a.whatsapp}</dd></div>
                     <div><dt className="text-muted-foreground">Cidade / Estado</dt><dd className="break-words">{a.city} / {a.state}</dd></div>
                     <div className="sm:col-span-2"><dt className="text-muted-foreground">Endereço completo do estúdio</dt><dd className="whitespace-pre-line break-words">{a.studio_address}</dd></div>
-                  </dl></div>
+                  </dl></div></div>
                 <p className="text-xs text-muted-foreground">{new Date(a.created_at).toLocaleString("pt-BR")}</p>
               </div>
               <div className="flex flex-wrap gap-2">

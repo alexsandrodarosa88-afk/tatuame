@@ -23,8 +23,12 @@ export const Route = createFileRoute("/")({
 export const campaignsQuery = {
   queryKey: ["public-campaigns"],
   queryFn: async () => {
-    const { data } = await db.from("campaigns").select("*").in("status", ["ativa", "encerrada"]).order("created_at", { ascending: false });
-    return Promise.all(((data ?? []) as any[]).map(withPublicPercent));
+    const [{ data }, { data: all }] = await Promise.all([
+      db.from("campaigns").select("*").in("status", ["ativa", "encerrada"]).order("created_at", { ascending: false }),
+      db.from("campaigns").select("id").order("created_at", { ascending: true }),
+    ]);
+    const order = new Map(((all ?? []) as any[]).map((x, i) => [x.id, i + 1]));
+    return Promise.all(((data ?? []) as any[]).map(async (c) => ({ ...(await withPublicPercent(c)), serial: order.get(c.id) ?? 0 })));
   },
 };
 
@@ -59,13 +63,13 @@ function Index() {
           <div className="mx-auto max-w-6xl px-4">
             <h2 className="mb-10 text-3xl md:text-4xl">{t("campaigns_title")}</h2>
             {campaigns.data?.length ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {campaigns.data.map((c) => (
                   <Link key={c.id} to="/campanha/$id" params={{ id: c.id }} className="group overflow-hidden rounded-2xl border bg-background transition hover:shadow-soft">
                     <div className="aspect-[4/3] bg-muted">{c.image_url && <img src={c.image_url} alt={c.title} className="h-full w-full object-cover" />}</div>
                     <div className="space-y-3 p-5">
                       <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-widest">
-                        <span className="text-primary">{c.kind === "premium" ? "Premium" : "Simples"}</span>
+                        <span className="text-muted-foreground">Nº {String(c.serial).padStart(3, "0")}</span>
                         {c.status === "encerrada" && <span className="text-muted-foreground">Encerrada</span>}
                       </div>
                       <h3 className="text-xl">{c.title}</h3>
@@ -81,15 +85,18 @@ function Index() {
 
         <section id="como-funciona" className="mx-auto max-w-6xl px-4 py-16 md:py-24">
           <h2 className="mb-10 text-3xl md:text-4xl">{t("how_title")}</h2>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {[{ i: Ticket, t: t("how1_t"), d: t("how1_d") },
               { i: ShieldCheck, t: t("how2_t"), d: t("how2_d") },
-              { i: Sparkles, t: t("how3_t"), d: t("how3_d") }].map(({ i: I, t: title, d }, n) => (
-              <div key={n} className="rounded-2xl border bg-card p-6">
+              { i: Instagram, t: t("how3_t"), d: t("how3_d") },
+              { i: Sparkles, t: t("how4_t"), d: t("how4_d") },
+              { i: ArrowRight, t: t("how5_t"), d: t("how5_d") }].map(({ i: I, t: title, d }, n, arr) => (
+              <div key={n} className="relative rounded-2xl border bg-card p-6">
                 <I className="mb-4 h-6 w-6 text-primary" />
                 <p className="text-xs text-muted-foreground">0{n + 1}</p>
                 <h3 className="mb-2 text-xl">{title}</h3>
                 <p className="text-sm text-muted-foreground">{d}</p>
+                {n < arr.length - 1 && <ArrowRight className="absolute -right-4 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-primary lg:block" />}
               </div>
             ))}
           </div>
