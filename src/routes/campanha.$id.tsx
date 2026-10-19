@@ -28,7 +28,13 @@ function Page() {
   const [qty, setQty] = useState(1);
   const [busy, setBusy] = useState(false);
   const checkout = useServerFn(startMercadoPagoCheckout);
-  const q = useQuery({ queryKey: ["campaign", id], queryFn: async () => { const d = (await db.from("campaigns").select("*").eq("id", id).maybeSingle()).data as any; return d ? withPublicPercent(d) : null; }, refetchInterval: 15000 });
+  const q = useQuery({ queryKey: ["campaign", id], queryFn: async () => {
+    const d = (await db.from("campaigns").select("*").eq("id", id).maybeSingle()).data as any;
+    if (!d) return null;
+    const { data: all } = await db.from("campaigns").select("id").order("created_at", { ascending: true });
+    const serial = ((all ?? []) as any[]).findIndex((x) => x.id === id) + 1;
+    return { ...(await withPublicPercent(d)), serial };
+  }, refetchInterval: 15000 });
   const c = q.data;
   if (q.isLoading) return <div className="min-h-screen"><Navbar /><p className="p-10 text-center text-muted-foreground">Carregando...</p></div>;
   if (!c) return <div className="min-h-screen"><Navbar /><p className="p-10 text-center">Campanha não encontrada. <Link to="/" className="text-primary">Voltar</Link></p></div>;
@@ -52,7 +58,7 @@ function Page() {
       <main className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-2">
         <div className="aspect-[4/3] overflow-hidden rounded-3xl bg-muted">{c.image_url && <img src={c.image_url} alt={c.title} className="h-full w-full object-cover" />}</div>
         <div className="space-y-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary">{c.kind === "premium" ? "Campanha Premium" : "Campanha Simples"}</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary">Campanha Nº {String(c.serial).padStart(3, "0")}</p>
           <h1 className="text-4xl">{c.title}</h1>
           {c.prize && <p className="text-lg"><strong>Prêmio:</strong> {c.prize}</p>}
           {c.description && <p className="whitespace-pre-line text-muted-foreground">{c.description}</p>}
