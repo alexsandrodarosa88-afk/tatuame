@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BRAZIL_STATES } from "@/lib/db";
-import { TATTOO_STYLES } from "@/lib/site-content";
+import { useSite } from "@/lib/site-content";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -21,7 +23,51 @@ const label: Record<string, string> = { pendente: "Em análise", aprovado: "Apro
 type ArtistForm = { full_name: string; instagram: string; city: string; state: string; whatsapp: string; styles: string[] };
 const emptyForm: ArtistForm = { full_name: "", instagram: "", city: "", state: "", whatsapp: "", styles: [] };
 
+function StylesManager() {
+  const { styles } = useSite();
+  const qc = useQueryClient();
+  const [novo, setNovo] = useState("");
+  const saveStyles = async (list: string[]) => {
+    const { data } = await db.from("site_settings").select("data").eq("id", 1).maybeSingle();
+    const { error } = await db.from("site_settings").upsert({ id: 1, data: { ...(data?.data ?? {}), styles: list } });
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["settings"] });
+    toast.success("Estilos salvos");
+  };
+  const add = () => { const v = novo.trim(); if (!v) return; if (styles.some((x) => x.toLowerCase() === v.toLowerCase())) return toast.error("Esse estilo já existe"); saveStyles([...styles, v]); setNovo(""); };
+  const del = (st: string) => { if (confirm(`Excluir o estilo "${st}"?`)) saveStyles(styles.filter((x) => x !== st)); };
+  return (
+    <details className="rounded-2xl border bg-card p-5">
+      <summary className="cursor-pointer font-semibold">Estilos de tatuagem ({styles.length}) — adicionar ou excluir</summary>
+      <div className="mt-4 flex gap-2"><Input value={novo} placeholder="Novo estilo" onChange={(e) => setNovo(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} /><Button onClick={add}><Plus className="mr-1 h-4 w-4" />Adicionar</Button></div>
+      <div className="mt-4 flex flex-wrap gap-2">{styles.map((st) => <span key={st} className="inline-flex items-center gap-1 rounded-full border bg-background py-1 pl-3 pr-1 text-xs">{st}<button type="button" aria-label={`Excluir ${st}`} onClick={() => del(st)} className="rounded-full p-0.5 hover:bg-muted"><X className="h-3 w-3" /></button></span>)}</div>
+    </details>
+  );
+}
+
+function OrderManager({ onChange }: { onChange: () => void }) {
+  const q = useQuery({ queryKey: ["admin-artists-order"], queryFn: async () => (await db.from("artists").select("id,full_name,position,created_at").order("position").order("created_at", { ascending: false })).data ?? [] });
+  const move = async (i: number, dir: number) => {
+    const list = [...(q.data ?? [])]; const j = i + dir; if (j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    await Promise.all(list.map((a: any, n: number) => db.from("artists").update({ position: n + 1 }).eq("id", a.id)));
+    q.refetch(); onChange();
+  };
+  if (!q.data?.length) return null;
+  return (
+    <details className="rounded-2xl border bg-card p-5">
+      <summary className="cursor-pointer font-semibold">Ordem no site ({q.data.length} artistas publicados)</summary>
+      <ol className="mt-4 space-y-2">{q.data.map((a: any, i: number) => (
+        <li key={a.id} className="flex items-center justify-between rounded-xl border bg-background px-3 py-2 text-sm"><span><span className="mr-2 text-muted-foreground">{i + 1}.</span>{a.full_name}</span>
+          <span className="flex gap-1"><Button size="icon" variant="ghost" aria-label="Subir" disabled={i === 0} onClick={() => move(i, -1)}><ArrowUp className="h-4 w-4" /></Button><Button size="icon" variant="ghost" aria-label="Descer" disabled={i === q.data.length - 1} onClick={() => move(i, 1)}><ArrowDown className="h-4 w-4" /></Button></span></li>
+      ))}</ol>
+    </details>
+  );
+}
+
 function Page() {
+  const { styles: TATTOO_STYLES } = useSite();
+  const qc = useQueryClient();
   const q = useQuery({
     queryKey: ["admin-apps"],
     refetchInterval: 10000,
@@ -99,6 +145,8 @@ function Page() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2"><h1 className="text-3xl">Artistas</h1><Button onClick={startAdd}><Plus className="mr-1 h-4 w-4" />Adicionar artista</Button></div>
+      <StylesManager />
+      <OrderManager onChange={() => qc.invalidateQueries({ queryKey: ["artists"] })} />
       {show && (
         <div className="space-y-4 rounded-2xl border bg-card p-5">
           <div className="flex items-center justify-between">
