@@ -73,6 +73,7 @@ export type Database = {
           id: string
           instagram: string
           photo_url: string | null
+          position: number
           state: string
           styles: string[]
         }
@@ -83,6 +84,7 @@ export type Database = {
           id: string
           instagram: string
           photo_url?: string | null
+          position?: number
           state: string
           styles?: string[]
         }
@@ -93,6 +95,7 @@ export type Database = {
           id?: string
           instagram?: string
           photo_url?: string | null
+          position?: number
           state?: string
           styles?: string[]
         }
