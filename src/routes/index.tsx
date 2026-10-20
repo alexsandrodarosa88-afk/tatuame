@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Instagram, MapPin, Ticket, Sparkles, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -33,9 +33,14 @@ export const campaignsQuery = {
 };
 
 function Index() {
-  const { s, t, img } = useSite();
+  const { s, t, img, styles, loaded } = useSite();
+  const [city, setCity] = useState("");
+  const [style, setStyle] = useState("");
+  const [limit, setLimit] = useState(8);
   const campaigns = useQuery({ ...campaignsQuery, refetchInterval: 15000 });
-  const artists = useQuery({ queryKey: ["artists"], queryFn: async () => (await db.from("artists").select("*").order("created_at", { ascending: false })).data ?? [] });
+  const artists = useQuery({ queryKey: ["artists"], queryFn: async () => (await db.from("artists").select("*").order("position").order("created_at", { ascending: false })).data ?? [] });
+  const cities = useMemo(() => Array.from(new Set(((artists.data ?? []) as any[]).map((a) => `${a.city} — ${a.state}`))).sort(), [artists.data]);
+  const filtered = ((artists.data ?? []) as any[]).filter((a) => (!city || `${a.city} — ${a.state}` === city) && (!style || a.styles?.includes(style)));
 
   useEffect(() => {
     const ch = supabase.channel("home-campaigns").on("postgres_changes", { event: "*", schema: "public", table: "campaigns" }, () => campaigns.refetch()).on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => campaigns.refetch()).subscribe();
@@ -56,17 +61,25 @@ function Index() {
               <Button asChild size="lg" variant="outline"><Link to="/seja-artista">{t("hero_btn2")}</Link></Button>
             </div>
           </div>
-          <img src={img("hero")} alt="Tatuagem realizada por artista TATUAME" className="aspect-[4/5] w-full rounded-2xl object-cover shadow-soft" />
+          <div className="aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-muted shadow-soft ring-1 ring-border">{loaded && img("hero") && <img src={img("hero")} alt="Tatuagem realizada por artista TATUAME" fetchPriority="high" className="h-full w-full object-cover" />}</div>
         </section>
 
-        <section id="campanhas" className="border-t bg-card py-16 md:py-24">
+        <section aria-label="Garantias" className="border-y bg-card">
+          <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm sm:grid-cols-3">
+            {[[ShieldCheck, "Pagamento seguro", "Pix e cartão processados pelo Mercado Pago"], [Ticket, "Números únicos", "Cada número da sorte é exclusivo na campanha"], [Instagram, "Sorteio ao vivo", "Lives no Instagram, todas ficam salvas"]].map(([I, a, b]: any) => (
+              <div key={a} className="flex items-start gap-3"><span className="rounded-full bg-primary/10 p-2.5 text-primary"><I className="h-5 w-5" /></span><div><p className="font-semibold">{a}</p><p className="text-muted-foreground">{b}</p></div></div>
+            ))}
+          </div>
+        </section>
+
+        <section id="campanhas" className="py-16 md:py-24">
           <div className="mx-auto max-w-6xl px-4">
             <h2 className="mb-10 text-3xl md:text-4xl">{t("campaigns_title")}</h2>
             {campaigns.data?.length ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {campaigns.data.map((c) => (
-                  <Link key={c.id} to="/campanha/$id" params={{ id: c.id }} className="group overflow-hidden rounded-2xl border bg-background transition hover:shadow-soft">
-                    <div className="aspect-[4/3] bg-muted">{c.image_url && <img src={c.image_url} alt={c.title} className="h-full w-full object-cover" />}</div>
+                  <Link key={c.id} to="/campanha/$id" params={{ id: c.id }} className="group overflow-hidden rounded-2xl border bg-background transition duration-300 hover:-translate-y-1 hover:shadow-soft">
+                    <div className="aspect-[4/3] overflow-hidden bg-muted">{c.image_url && <img src={c.image_url} alt={c.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />}</div>
                     <div className="space-y-3 p-5">
                       <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-widest">
                         <span className="text-muted-foreground">Nº {String(c.serial).padStart(3, "0")}</span>
@@ -105,11 +118,18 @@ function Index() {
         {!!artists.data?.length && (
           <section id="artistas" className="border-t bg-card py-16 md:py-24">
             <div className="mx-auto max-w-6xl px-4">
-              <h2 className="mb-10 text-3xl md:text-4xl">{t("artists_title")}</h2>
+              <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+                <h2 className="text-3xl md:text-4xl">{t("artists_title")}</h2>
+                <div className="flex flex-wrap gap-2">
+                  <select aria-label="Filtrar por cidade" className="h-10 rounded-full border bg-background px-4 text-sm" value={city} onChange={(e) => { setCity(e.target.value); setLimit(8); }}><option value="">Todas as cidades</option>{cities.map((c) => <option key={c}>{c}</option>)}</select>
+                  <select aria-label="Filtrar por estilo" className="h-10 max-w-[14rem] rounded-full border bg-background px-4 text-sm" value={style} onChange={(e) => { setStyle(e.target.value); setLimit(8); }}><option value="">Todos os estilos</option>{styles.map((st) => <option key={st}>{st}</option>)}</select>
+                </div>
+              </div>
+              {!filtered.length && <p className="text-muted-foreground">Nenhum artista encontrado com esses filtros.</p>}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {artists.data.map((a: any) => (
-                  <div key={a.id} className="rounded-2xl border bg-background p-5">
-                    <div className="mb-4 aspect-square overflow-hidden rounded-xl bg-muted">{a.photo_url && <img src={a.photo_url} alt={a.full_name} className="h-full w-full object-cover" />}</div>
+                {filtered.slice(0, limit).map((a: any) => (
+                  <div key={a.id} className="group rounded-2xl border bg-background p-4 transition duration-300 hover:-translate-y-1 hover:shadow-soft">
+                    <div className="mb-4 aspect-square overflow-hidden rounded-xl bg-muted">{a.photo_url && <img src={a.photo_url} alt={a.full_name} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />}</div>
                     <h3 className="text-lg">{a.full_name}</h3>
                     <p className="flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5" />{a.city} — {a.state}</p>
                     <a href={`https://instagram.com/${a.instagram.replace("@", "")}`} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm text-primary"><Instagram className="h-3.5 w-3.5" />{a.instagram}</a>
@@ -117,6 +137,7 @@ function Index() {
                   </div>
                 ))}
               </div>
+              {filtered.length > limit && <div className="mt-10 text-center"><Button variant="outline" size="lg" onClick={() => setLimit(limit + 8)}>Mostrar mais artistas</Button></div>}
             </div>
           </section>
         )}

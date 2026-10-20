@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { loadSettings, type SiteSettings } from "@/lib/db";
-import heroDefault from "@/assets/hero-tattoo.jpg";
 import logoDefault from "@/assets/tatuame-logo-new.png.asset.json";
 
 export const TATTOO_STYLES = [
@@ -27,7 +26,7 @@ export const TEXT_FIELDS: { key: string; label: string; def: string; long?: bool
   { group: "Início", key: "hero_btn2", label: "Botão 2", def: "Seja um artista" },
   { group: "Campanhas", key: "campaigns_title", label: "Título da seção", def: "Campanhas" },
   { group: "Campanhas", key: "campaigns_empty", label: "Texto sem campanhas", def: "Novas campanhas em breve." },
-  { group: "Campanhas", key: "campaigns_price", label: "Texto do preço", def: "Cota a partir de" },
+  { group: "Campanhas", key: "campaigns_price", label: "Texto do preço", def: "Apenas" },
   { group: "Como funciona", key: "how_title", label: "Título da seção", def: "Como funciona" },
   { group: "Como funciona", key: "how1_t", label: "Passo 1 título", def: "Compre seus números" },
   { group: "Como funciona", key: "how1_d", label: "Passo 1 texto", def: "Compre quantos números quiser para os sorteios. Quanto mais números, mais chances de ganhar.", long: true },
@@ -55,7 +54,7 @@ export const TEXT_FIELDS: { key: string; label: string; def: string; long?: bool
 
 export const IMAGE_FIELDS = [
   { key: "logo", label: "Logo (topo e rodapé)", def: logoDefault.url },
-  { key: "hero", label: "Foto principal da página inicial", def: heroDefault },
+  { key: "hero", label: "Foto principal da página inicial", def: "" },
 ];
 
 export const COLOR_FIELDS = [
@@ -77,7 +76,8 @@ export function useSite() {
     return v || TEXT_FIELDS.find((f) => f.key === key)?.def || "";
   };
   const img = (key: string) => s.images?.[key] || IMAGE_FIELDS.find((f) => f.key === key)?.def || "";
-  return { s, t, img };
+  const styles: string[] = (s as any).styles?.length ? (s as any).styles : TATTOO_STYLES;
+  return { s, t, img, styles, loaded: q.isSuccess };
 }
 
 export function ThemeColors() {
