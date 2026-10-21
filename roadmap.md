@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Colocar resultados abaixo dos sorteios ativos, mostrar porcentagem restante e aviso de encerramento em 90% em todos os cartões ativos; verificar no site
 - [ ] Testar compra completa e entrega real da notificação Mercado Pago — bloqueado por ausência de sessão de cliente disponível, credenciais de teste e publicação (endereço publicado retorna 404)
 - [x] Corrigir leitura pública das campanhas; testar quantidade/preço e encaminhamento ao login pelo navegador
 - [x] Testar transacionalmente 3+2 cotas: números únicos, confirmação duplicada, valor incorreto, lotação e estorno; registros de teste desfeitos
