@@ -45,6 +45,7 @@ export const TEXT_FIELDS: { key: string; label: string; def: string; long?: bool
   { group: "Sorteios", key: "draws_empty", label: "Texto sem sorteios", def: "O primeiro sorteio acontece em breve, ao vivo no Instagram do TATUAME." },
   { group: "Sorteios", key: "draws_home_title", label: "Título dos sorteios na página inicial", def: "Últimos sorteios" },
   { group: "Sorteios", key: "draws_home_btn", label: "Botão dos sorteios na página inicial", def: "Ver todos os sorteios" },
+  { group: "Sorteios", key: "draws_home_badge", label: "Selo dos sorteios na página inicial", def: "Sorteio ao vivo no Instagram" },
   { group: "Artistas", key: "artists_title", label: "Título da seção", def: "Artistas TATUAME" },
   { group: "Seja artista", key: "cta_title", label: "Título do convite", def: "Seja um artista TATUAME" },
   { group: "Seja artista", key: "cta_text", label: "Texto do convite", def: "Faça parte da nossa rede de tatuadores. Envie seus dados e nossa equipe entra em contato pelo WhatsApp.", long: true },
