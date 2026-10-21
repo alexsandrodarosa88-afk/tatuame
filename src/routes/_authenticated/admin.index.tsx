@@ -27,7 +27,7 @@ function Overview() {
   });
   const d = q.data;
   const cards = [
-    { l: "Campanhas ativas", v: d?.active, to: "/admin/campanhas" },
+    { l: "Sorteios ativos", v: d?.active, to: "/admin/campanhas" },
     { l: "Faturado (pago)", v: d && BRL(d.revenue), to: "/admin/vendas" },
     { l: "Pedidos aguardando", v: d?.pending, to: "/admin/vendas" },
     { l: "Clientes", v: d?.clients, to: "/admin/clientes" },

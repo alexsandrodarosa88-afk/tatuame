@@ -8,11 +8,11 @@ export const Route = createFileRoute("/_authenticated/admin")({ component: Admin
 
 const nav = [
   { to: "/admin", label: "Visão geral", icon: LayoutDashboard, exact: true },
-  { to: "/admin/campanhas", label: "Campanhas", icon: Megaphone },
+  { to: "/admin/campanhas", label: "Sorteios", icon: Megaphone },
   { to: "/admin/vendas", label: "Vendas", icon: ShoppingBag },
   { to: "/admin/clientes", label: "Clientes", icon: Users },
   { to: "/admin/artistas", label: "Artistas", icon: Palette },
-  { to: "/admin/sorteios", label: "Sorteios", icon: Radio },
+  { to: "/admin/sorteios", label: "Resultados", icon: Radio },
   { to: "/admin/configuracoes", label: "Site", icon: Settings },
 ];
 

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Instagram, MapPin, Ticket, Sparkles, ShieldCheck, Trophy } from "lucide-react";
+import { ArrowRight, Instagram, MapPin, Ticket, Sparkles, ShieldCheck, Trophy, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Navbar, Footer } from "@/components/site/Navbar";
@@ -12,10 +12,10 @@ import { useSite } from "@/lib/site-content";
 export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({ meta: [
-    { title: "TATUAME — Campanhas de tatuagem com artistas premium" },
-    { name: "description", content: "Participe das campanhas TATUAME e concorra a tatuagens com artistas selecionados de todo o Brasil." },
-    { property: "og:title", content: "TATUAME — Campanhas de tatuagem com artistas premium" },
-    { property: "og:description", content: "Cotas acessíveis, artistas selecionados e campanhas transparentes." },
+    { title: "TATUAME — Sorteios de tatuagem com artistas premium" },
+    { name: "description", content: "Participe dos sorteios TATUAME e concorra a tatuagens com artistas selecionados de todo o Brasil." },
+    { property: "og:title", content: "TATUAME — Sorteios de tatuagem com artistas premium" },
+    { property: "og:description", content: "Cotas acessíveis, artistas selecionados e sorteios ao vivo." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
   ] }),
 });
@@ -42,6 +42,11 @@ function Index() {
   const artists = useQuery({ queryKey: ["artists"], queryFn: async () => (await db.from("artists").select("*").order("position").order("created_at", { ascending: false })).data ?? [] });
   const cities = useMemo(() => Array.from(new Set(((artists.data ?? []) as any[]).map((a) => `${a.city} — ${a.state}`))).sort(), [artists.data]);
   const filtered = ((artists.data ?? []) as any[]).filter((a) => (!city || `${a.city} — ${a.state}` === city) && (!style || a.styles?.includes(style)));
+
+  const all = (campaigns.data ?? []) as any[];
+  const live = all.filter((c) => c.status === "ativa");
+  const ended = all.filter((c) => c.status !== "ativa");
+  const liveGrid = live.length === 1 ? "mx-auto max-w-xl grid gap-6" : live.length === 2 ? "grid gap-6 md:grid-cols-2" : "grid gap-6 sm:grid-cols-2 xl:grid-cols-4";
 
   useEffect(() => {
     const ch = supabase.channel("home-campaigns").on("postgres_changes", { event: "*", schema: "public", table: "campaigns" }, () => campaigns.refetch()).on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => campaigns.refetch()).subscribe();
@@ -96,35 +101,60 @@ function Index() {
           <div className="aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-muted shadow-soft ring-1 ring-border">{loaded && img("hero") && <img src={img("hero")} alt="Tatuagem realizada por artista TATUAME" fetchPriority="high" className="h-full w-full object-cover" />}</div>
         </section>
 
-        <section aria-label="Garantias" className="border-y bg-card">
-          <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm sm:grid-cols-3">
-            {[[ShieldCheck, "Pagamento seguro", "Pix e cartão processados pelo Mercado Pago"], [Ticket, "Números únicos", "Cada número da sorte é exclusivo na campanha"], [Instagram, "Sorteio ao vivo", "Lives no Instagram, todas ficam salvas"]].map(([I, a, b]: any) => (
-              <div key={a} className="flex items-start gap-3"><span className="rounded-full bg-primary/10 p-2.5 text-primary"><I className="h-5 w-5" /></span><div><p className="font-semibold">{a}</p><p className="text-muted-foreground">{b}</p></div></div>
-            ))}
-          </div>
-        </section>
-
-        <section id="campanhas" className="py-16 md:py-24">
+        <section id="campanhas" className="scroll-mt-20 bg-primary/5 py-16 md:py-24">
           <div className="mx-auto max-w-6xl px-4">
-            <h2 className="mb-10 text-3xl md:text-4xl">{t("campaigns_title")}</h2>
-            {campaigns.data?.length ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {campaigns.data.map((c) => (
-                  <Link key={c.id} to="/campanha/$id" params={{ id: c.id }} className="group overflow-hidden rounded-2xl border bg-background transition duration-300 hover:-translate-y-1 hover:shadow-soft">
-                    <div className="aspect-[4/3] overflow-hidden bg-muted">{c.image_url && <img src={c.image_url} alt={c.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />}</div>
-                    <div className="space-y-3 p-5">
-                      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-widest">
-                        <span className="text-muted-foreground">Nº {String(c.serial).padStart(3, "0")}</span>
-                        {c.status === "encerrada" && <span className="text-muted-foreground">Encerrada</span>}
+            <div className="mb-10 space-y-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary-foreground"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-foreground" /> {t("campaigns_badge")}</span>
+              <h2 className="border-l-4 border-primary pl-4 text-3xl md:text-5xl">{t("campaigns_title")}</h2>
+            </div>
+            {live.length ? (
+              <div className={liveGrid}>
+                {live.map((c) => (
+                  <Link key={c.id} to="/campanha/$id" params={{ id: c.id }} className="group relative flex flex-col overflow-hidden rounded-3xl border-2 border-primary/25 bg-card shadow-soft transition duration-300 hover:-translate-y-1.5 hover:border-primary">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                      {c.image_url && <img src={c.image_url} alt={c.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />}
+                      <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-primary-foreground"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-foreground" />Sorteio ativo</span>
+                      <span className="absolute right-3 top-3 rounded-full bg-ink/85 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-ink-foreground">Nº {String(c.serial).padStart(3, "0")}</span>
+                    </div>
+                    <div className="flex flex-1 flex-col gap-3 p-5">
+                      <h3 className="text-xl leading-tight">{c.title}</h3>
+                      {c.prize && <p className="flex items-center gap-2 text-sm font-semibold"><Trophy className="h-4 w-4 shrink-0 text-primary" />Prêmio: {c.prize}</p>}
+                      {c.ends_at && <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary"><Clock className="h-3.5 w-3.5" />Encerra em {new Date(c.ends_at).toLocaleDateString("pt-BR")}</p>}
+                      <div className="mt-auto space-y-3">
+                        <div>
+                          <div className="h-3 overflow-hidden rounded-full bg-foreground/10"><div className="h-full rounded-full bg-primary shadow-[0_0_12px_var(--primary)]" style={{ width: `${Math.max(4, c.public_percent ?? 0)}%` }} /></div>
+                          <p className="mt-2 flex items-center justify-between text-xs"><span className="font-bold text-foreground">{c.public_percent ?? 0}% vendido</span><span className="font-bold text-primary">{t("campaigns_left")} {Math.max(0, (c.total_quotas ?? 0) - (c.sold ?? 0)).toLocaleString("pt-BR")} cotas</span></p>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{t("campaigns_price")} <strong className="text-3xl text-primary">{BRL(c.quota_price)}</strong> <span className="text-xs font-semibold uppercase tracking-wider">por cota</span></p>
+                        <span className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-extrabold uppercase tracking-wide text-primary-foreground shadow-soft transition group-hover:bg-primary/90">{t("campaigns_cta")} <ArrowRight className="h-4 w-4" /></span>
                       </div>
-                      <h3 className="text-xl">{c.title}</h3>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${c.public_percent ?? 0}%` }} /></div>
-                      <p className="text-sm text-muted-foreground">{t("campaigns_price")} <strong className="text-foreground">{BRL(c.quota_price)}</strong></p>
                     </div>
                   </Link>
                 ))}
               </div>
             ) : <p className="text-muted-foreground">{t("campaigns_empty")}</p>}
+
+            {!!ended.length && (
+              <div className="mt-14">
+                <h3 className="mb-5 text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("campaigns_ended_title")}</h3>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {ended.map((c) => (
+                    <Link key={c.id} to="/campanha/$id" params={{ id: c.id }} className="flex items-center gap-3 rounded-2xl border bg-card p-3 opacity-70 transition hover:opacity-100">
+                      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">{c.image_url && <img src={c.image_url} alt="" loading="lazy" className="h-full w-full object-cover" />}</div>
+                      <div className="min-w-0"><p className="truncate text-sm font-semibold">{c.title}</p><p className="text-xs text-muted-foreground">Encerrado · {c.public_percent ?? 0}% vendido</p></div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section aria-label="Garantias" className="border-y bg-card">
+          <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-sm sm:grid-cols-3">
+            {[[ShieldCheck, "Pagamento seguro", "Pix e cartão processados pelo Mercado Pago"], [Ticket, "Números únicos", "Cada número da sorte é exclusivo no sorteio"], [Instagram, "Sorteio ao vivo", "Lives no Instagram, todas ficam salvas"]].map(([I, a, b]: any) => (
+              <div key={a} className="flex items-start gap-3"><span className="rounded-full bg-primary/10 p-2.5 text-primary"><I className="h-5 w-5" /></span><div><p className="font-semibold">{a}</p><p className="text-muted-foreground">{b}</p></div></div>
+            ))}
           </div>
         </section>
 

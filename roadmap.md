@@ -13,3 +13,4 @@
 - [ ] Compra de créditos — aguardando regra de conversão, uso e valor escolhido pelo usuário
 - [ ] Copiar dados antigos (opcional) — aguardando decisão do usuário
 - [x] Editar artistas (com foto), filtros por cidade/estilo, estilos editáveis no ADM, ordem dos artistas + mostrar mais, foto principal sem a antiga, preço 'Apenas', visual mais premium
+- [x] Sorteios ativos em evidência na página inicial (depois da foto principal) e troca de 'campanha' por 'sorteio' em todo o site; textos salvos no banco atualizados

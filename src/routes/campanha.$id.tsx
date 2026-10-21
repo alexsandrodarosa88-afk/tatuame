@@ -14,8 +14,8 @@ import { useSite } from "@/lib/site-content";
 export const Route = createFileRoute("/campanha/$id")({
   component: Page,
   head: () => ({ meta: [
-    { title: "Campanha | TATUAME" }, { name: "description", content: "Detalhes da campanha TATUAME e compra de cotas." },
-    { property: "og:title", content: "Campanha | TATUAME" }, { property: "og:description", content: "Participe desta campanha TATUAME." },
+    { title: "Sorteio | TATUAME" }, { name: "description", content: "Detalhes do sorteio TATUAME e compra de cotas." },
+    { property: "og:title", content: "Sorteio | TATUAME" }, { property: "og:description", content: "Participe deste sorteio TATUAME." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
   ] }),
 });
@@ -37,7 +37,7 @@ function Page() {
   }, refetchInterval: 15000 });
   const c = q.data;
   if (q.isLoading) return <div className="min-h-screen"><Navbar /><p className="p-10 text-center text-muted-foreground">Carregando...</p></div>;
-  if (!c) return <div className="min-h-screen"><Navbar /><p className="p-10 text-center">Campanha não encontrada. <Link to="/" className="text-primary">Voltar</Link></p></div>;
+  if (!c) return <div className="min-h-screen"><Navbar /><p className="p-10 text-center">Sorteio não encontrado. <Link to="/" className="text-primary">Voltar</Link></p></div>;
 
   const buy = async () => {
     if (!user) return navigate({ to: "/login", search: { next: `/campanha/${id}` } });
@@ -58,7 +58,7 @@ function Page() {
       <main className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-2">
         <div className="aspect-[4/3] overflow-hidden rounded-3xl bg-muted">{c.image_url && <img src={c.image_url} alt={c.title} className="h-full w-full object-cover" />}</div>
         <div className="space-y-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary">Campanha Nº {String(c.serial).padStart(3, "0")}</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary">Sorteio Nº {String(c.serial).padStart(3, "0")}</p>
           <h1 className="text-4xl">{c.title}</h1>
           {c.prize && <p className="text-lg"><strong>Prêmio:</strong> {c.prize}</p>}
           {c.description && <p className="whitespace-pre-line text-muted-foreground">{c.description}</p>}
@@ -76,7 +76,7 @@ function Page() {
               <div className="flex items-center justify-between text-lg"><span>Total</span><strong>{BRL(Number(c.quota_price) * qty)}</strong></div>
                <Button className="w-full" size="lg" disabled={busy} onClick={buy}>{busy ? "Abrindo pagamento..." : "Comprar cotas com Mercado Pago"}</Button>
             </div>
-          ) : <p className="rounded-2xl border bg-card p-6 text-muted-foreground">Esta campanha está encerrada.</p>}
+          ) : <p className="rounded-2xl border bg-card p-6 text-muted-foreground">Este sorteio está encerrado.</p>}
           <p className="flex items-start gap-2 rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm"><Radio className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span>{t("campaign_live_notice")} <Link to="/sorteios" className="font-semibold text-primary underline-offset-4 hover:underline">Ver sorteios</Link></span></p>
         </div>
       </main>

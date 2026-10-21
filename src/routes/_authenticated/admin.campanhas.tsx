@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/campanhas")({
   component: Page,
-  head: () => ({ meta: [{ title: "Campanhas | Admin TATUAME" }, { name: "description", content: "Gerenciar campanhas." }, { property: "og:title", content: "Campanhas | Admin TATUAME" }, { property: "og:description", content: "Gerenciar campanhas." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Sorteios | Admin TATUAME" }, { name: "description", content: "Gerenciar sorteios." }, { property: "og:title", content: "Sorteios | Admin TATUAME" }, { property: "og:description", content: "Gerenciar sorteios." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
 });
 
 type C = { id?: string; title: string; description: string; prize: string; kind: string; image_url: string; quota_price: number; total_quotas: number; display_percent: number; status: string; ends_at: string };
@@ -57,13 +57,13 @@ function Page() {
     const { error } = id ? await db.from("campaigns").update(payload).eq("id", id) : await db.from("campaigns").insert(payload);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Campanha salva"); setEdit(null); list.refetch();
+    toast.success("Sorteio salvo"); setEdit(null); list.refetch();
   };
   const remove = async (id: string) => {
-    if (!confirm("Excluir esta campanha? As compras dela também serão apagadas.")) return;
+    if (!confirm("Excluir este sorteio? As compras dele também serão apagadas.")) return;
     const { error } = await db.from("campaigns").delete().eq("id", id);
     if (error) return toast.error(error.message);
-    toast.success("Campanha excluída"); list.refetch();
+    toast.success("Sorteio excluído"); list.refetch();
   };
   const upload = async (file: File) => {
     const path = `${crypto.randomUUID()}-${file.name.replace(/[^\w.]/g, "")}`;
@@ -79,7 +79,7 @@ function Page() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between"><h1 className="text-3xl">Campanhas</h1><Button onClick={() => setEdit({ ...blank })}><Plus className="mr-1 h-4 w-4" />Nova campanha</Button></div>
+      <div className="flex items-center justify-between"><h1 className="text-3xl">Sorteios</h1><Button onClick={() => setEdit({ ...blank })}><Plus className="mr-1 h-4 w-4" />Novo sorteio</Button></div>
       <div className="space-y-3">
         {list.data?.map((c: any) => (
           <div key={c.id} className="flex items-center gap-4 rounded-2xl border bg-card p-4">
@@ -93,12 +93,12 @@ function Page() {
             <Button size="icon" variant="outline" aria-label="Excluir" onClick={() => remove(c.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
           </div>
         ))}
-        {list.data?.length === 0 && <p className="text-muted-foreground">Nenhuma campanha ainda. Clique em “Nova campanha”.</p>}
+        {list.data?.length === 0 && <p className="text-muted-foreground">Nenhum sorteio ainda. Clique em “Novo sorteio”.</p>}
       </div>
 
       <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
-          <DialogHeader><DialogTitle>{edit?.id ? "Editar campanha" : "Nova campanha"}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{edit?.id ? "Editar sorteio" : "Novo sorteio"}</DialogTitle></DialogHeader>
           {edit && (
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1 sm:col-span-2"><Label>Título</Label><Input value={edit.title} onChange={txt("title")} /></div>
@@ -114,7 +114,7 @@ function Page() {
                 {edit.image_url && <img src={edit.image_url} alt="" className="h-32 rounded-lg object-cover" />}
                 <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm"><Upload className="h-4 w-4" />Enviar foto<input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} /></label>
               </div>
-              <Button className="sm:col-span-2" disabled={saving} onClick={save}>{saving ? "Salvando..." : "Salvar campanha"}</Button>
+              <Button className="sm:col-span-2" disabled={saving} onClick={save}>{saving ? "Salvando..." : "Salvar sorteio"}</Button>
             </div>
           )}
         </DialogContent>
