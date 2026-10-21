@@ -57,6 +57,7 @@ export const TEXT_FIELDS: { key: string; label: string; def: string; long?: bool
   { group: "Dúvidas", key: "faq_title", label: "Título da seção", def: "Dúvidas frequentes" },
   { group: "Rodapé", key: "footer_text", label: "Texto do rodapé", def: "TATUAME. Todos os direitos reservados." },
   { group: "Rodapé", key: "footer_link", label: "Link do rodapé", def: "Seja um artista TATUAME" },
+  { group: "Rodapé", key: "footer_security", label: "Aviso de pagamento seguro", def: "Pagamento seguro pelo Mercado Pago" },
 ];
 
 export const IMAGE_FIELDS = [

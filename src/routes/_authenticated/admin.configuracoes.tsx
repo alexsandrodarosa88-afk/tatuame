@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { db, loadSettings, type SiteSettings } from "@/lib/db";
 import { supabase } from "@/integrations/supabase/client";
 import { TEXT_FIELDS, IMAGE_FIELDS, COLOR_FIELDS } from "@/lib/site-content";
+import { VisualEditor } from "@/components/site/VisualEditor";
 
 export const Route = createFileRoute("/_authenticated/admin/configuracoes")({
   component: Page,
@@ -50,8 +51,9 @@ function Page() {
   const faq = s.faq ?? [];
   const setFaq = (i: number, k: "q" | "a", v: string) => setS({ ...s, faq: faq.map((f, n) => (n === i ? { ...f, [k]: v } : f)) });
   return (
-    <div className="max-w-3xl space-y-6 pb-24">
+    <div className="space-y-6 pb-24">
       <h1 className="text-3xl">Editar o site</h1>
+      <VisualEditor settings={s} onChange={setS} />
 
       <section className="space-y-4 rounded-2xl border bg-card p-5">
         <h2 className="text-xl">Fotos</h2>
