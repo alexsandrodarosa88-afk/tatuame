@@ -14,6 +14,7 @@ export function VisualRuntime() {
     let editing = editor;
     let values = s.visual?.[path] ?? {};
     const originals = new Map<Element, { text: string | null; image: string | null }>();
+    const originalDisplays = new Map<Element, string>();
     const sheet = document.createElement("style");
     sheet.dataset.visualSheet = "true";
     document.head.append(sheet);
@@ -40,7 +41,8 @@ export function VisualRuntime() {
         rules.push(`${selector}{${visualDeclarations(value)}}`);
         if (value.order !== undefined && el.parentElement) {
           const parent = el.parentElement;
-          const display = getComputedStyle(parent).display;
+          if (!originalDisplays.has(parent)) originalDisplays.set(parent, getComputedStyle(parent).display);
+          const display = originalDisplays.get(parent) ?? "block";
           if (!display.includes("flex") && !display.includes("grid")) {
             rules.push(`[data-visual-id="${parent.getAttribute("data-visual-id")}"]{display:flex;flex-direction:column}`);
           }
