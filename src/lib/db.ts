@@ -17,6 +17,7 @@ export type SiteSettings = {
   texts?: Record<string, string>;
   images?: Record<string, string>;
   colors?: Record<string, string>;
+  visual?: Record<string, Record<string, import("./visual-editor").VisualElement>>;
 };
 
 export async function loadSettings(): Promise<SiteSettings> {
