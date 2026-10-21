@@ -11,8 +11,8 @@ import { Navbar } from "@/components/site/Navbar";
 export const Route = createFileRoute("/cadastro")({
   component: Signup,
   head: () => ({ meta: [
-    { title: "Criar conta | TATUAME" }, { name: "description", content: "Crie sua conta para participar das campanhas TATUAME." },
-    { property: "og:title", content: "Criar conta | TATUAME" }, { property: "og:description", content: "Participe das campanhas TATUAME." },
+    { title: "Criar conta | TATUAME" }, { name: "description", content: "Crie sua conta para participar dos sorteios TATUAME." },
+    { property: "og:title", content: "Criar conta | TATUAME" }, { property: "og:description", content: "Participe dos sorteios TATUAME." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
   ] }),
 });
