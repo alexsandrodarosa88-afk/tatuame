@@ -1,4 +1,6 @@
 # Roadmap
+- [ ] Adicionar editor visual no ADM com seleção de elementos, fonte, cor, alinhamento, texto e posição nas páginas públicas
+- [ ] Adicionar pagamento seguro no rodapé, testar personalização pública e preservar salvamento protegido pelo ADM
 - [x] Colocar resultados abaixo dos sorteios ativos, mostrar porcentagem restante e aviso de encerramento em 90% em todos os cartões ativos; verificado nos quatro cartões e em testes de cálculo
 - [ ] Testar compra completa e entrega real da notificação Mercado Pago — bloqueado por ausência de sessão de cliente disponível, credenciais de teste e publicação (endereço publicado retorna 404)
 - [x] Corrigir leitura pública das campanhas; testar quantidade/preço e encaminhamento ao login pelo navegador
