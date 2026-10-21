@@ -76,3 +76,5 @@
 }
 
 @utility shadow-soft { box-shadow: var(--shadow-soft); }
+
+.visual-selected { outline: 2px solid var(--primary) !important; outline-offset: 3px; }

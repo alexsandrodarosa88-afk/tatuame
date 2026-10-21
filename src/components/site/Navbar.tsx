@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useIsAdmin } from "@/hooks/use-admin";
@@ -63,6 +63,7 @@ export function Footer() {
         <p className="opacity-70">© {new Date().getFullYear()} {t("footer_text")}</p>
         <Link to="/seja-artista" className="underline-offset-4 hover:underline">{t("footer_link")}</Link>
       </div>
+      <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 border-t border-ink-foreground/15 px-4 py-5 text-center text-sm font-semibold"><ShieldCheck className="h-5 w-5 shrink-0" /><span>{t("footer_security")}</span></div>
     </footer>
   );
 }

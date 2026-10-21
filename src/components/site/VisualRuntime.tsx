@@ -63,26 +63,34 @@ export function VisualRuntime() {
     };
     observer = new MutationObserver(apply);
     apply();
-    const click = (event: MouseEvent) => {
-      if (!editing) return;
-      const target = event.target instanceof Element ? event.target.closest(ELEMENTS) : null;
-      if (!target) return;
-      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
+    const select = (target: Element) => {
       document.querySelectorAll(".visual-selected").forEach((el) => el.classList.remove("visual-selected"));
       target.classList.add("visual-selected");
       const nodes = [...target.childNodes].filter((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim());
       const style = getComputedStyle(target);
       window.parent.postMessage({ type: "visual-selected", path, selector: `[data-visual-id="${target.getAttribute("data-visual-id")}"]`, tag: target.tagName.toLowerCase(), text: nodes.length === 1 ? nodes[0].textContent : null, image: target instanceof HTMLImageElement ? target.src : null, size: parseFloat(style.fontSize), parent: target.parentElement?.getAttribute("data-visual-id"), siblings: [...(target.parentElement?.children ?? [])].map((el) => ({ selector: `[data-visual-id="${el.getAttribute("data-visual-id")}"]`, label: el.tagName.toLowerCase() + " · " + (el.textContent ?? "").trim().slice(0, 45) })) }, location.origin);
     };
+    const click = (event: MouseEvent) => {
+      if (!editing) return;
+      const target = event.target instanceof Element ? event.target.closest(ELEMENTS) : null;
+      if (!target) return;
+      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
+      select(target);
+    };
     const message = (event: MessageEvent) => {
       if (!editor || event.origin !== location.origin || event.source !== window.parent) return;
       if (event.data?.type === "visual-draft") { values = event.data.values as Record<string, VisualElement>; apply(); }
       if (event.data?.type === "visual-mode") editing = !!event.data.editing;
+      if (event.data?.type === "visual-select" && validSelector(event.data.selector)) {
+        const target = document.querySelector(event.data.selector);
+        if (target) { target.scrollIntoView({ block: "center" }); select(target); }
+      }
     };
     if (editor) {
       window.addEventListener("message", message);
       document.addEventListener("click", click, true);
-      window.parent.postMessage({ type: "visual-ready", path }, location.origin);
+      const sections = [...document.querySelectorAll("main > section, header, footer")].map((el) => ({ selector: `[data-visual-id="${el.getAttribute("data-visual-id")}"]`, label: el.tagName === "HEADER" ? "Topo" : el.tagName === "FOOTER" ? "Rodapé" : el.querySelector("h1,h2,h3")?.textContent ?? el.getAttribute("aria-label") ?? "Seção" }));
+      window.parent.postMessage({ type: "visual-ready", path, sections }, location.origin);
     }
     return () => { observer.disconnect(); sheet.remove(); window.removeEventListener("message", message); document.removeEventListener("click", click, true); };
   }, [path, s.visual]);

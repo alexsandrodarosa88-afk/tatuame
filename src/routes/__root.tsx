@@ -12,6 +12,7 @@ import {
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeColors } from "@/lib/site-content";
+import { VisualRuntime } from "@/components/site/VisualRuntime";
 
 function NotFoundComponent() {
   return (
@@ -126,6 +127,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeColors />
+      <VisualRuntime />
       <Outlet />
       <Toaster position="top-center" richColors closeButton />
     </QueryClientProvider>
