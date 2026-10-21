@@ -30,7 +30,7 @@ export async function withPublicPercent(c: any) {
   const sold = Number(data ?? 0);
   const real = c.total_quotas > 0 ? (sold / c.total_quotas) * 100 : 0;
   const pct = c.status === "encerrada" ? 100 : Math.min(100, Math.round(((c.display_percent ?? 0) + real) * 10) / 10);
-  return { ...c, public_percent: pct };
+  return { ...c, public_percent: pct, sold };
 }
 
 /** Número da sorte com zeros à esquerda conforme o total de cotas (300 -> 001). */
