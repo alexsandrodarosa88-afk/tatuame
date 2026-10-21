@@ -118,14 +118,15 @@ function Index() {
                     </div>
                     <div className="flex flex-1 flex-col gap-3 p-5">
                       <h3 className="text-xl leading-tight">{c.title}</h3>
+                      {c.prize && <p className="flex items-center gap-2 text-sm font-semibold"><Trophy className="h-4 w-4 shrink-0 text-primary" />Prêmio: {c.prize}</p>}
                       {c.ends_at && <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary"><Clock className="h-3.5 w-3.5" />Encerra em {new Date(c.ends_at).toLocaleDateString("pt-BR")}</p>}
                       <div className="mt-auto space-y-3">
                         <div>
-                          <div className="h-2.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary transition-all duration-500" style={{ width: `${c.public_percent ?? 0}%` }} /></div>
-                          <p className="mt-1.5 flex items-center justify-between text-xs font-semibold text-muted-foreground"><span>{c.public_percent ?? 0}% vendido</span><span>{t("campaigns_left")} {Math.max(0, (c.total_quotas ?? 0) - (c.sold ?? 0)).toLocaleString("pt-BR")}</span></p>
+                          <div className="h-3 overflow-hidden rounded-full bg-foreground/10"><div className="h-full rounded-full bg-primary shadow-[0_0_12px_var(--primary)]" style={{ width: `${Math.max(4, c.public_percent ?? 0)}%` }} /></div>
+                          <p className="mt-2 flex items-center justify-between text-xs"><span className="font-bold text-foreground">{c.public_percent ?? 0}% vendido</span><span className="font-bold text-primary">{t("campaigns_left")} {Math.max(0, (c.total_quotas ?? 0) - (c.sold ?? 0)).toLocaleString("pt-BR")} cotas</span></p>
                         </div>
-                        <p className="text-sm text-muted-foreground">{t("campaigns_price")} <strong className="text-2xl text-primary">{BRL(c.quota_price)}</strong> <span className="text-xs uppercase tracking-wider">por cota</span></p>
-                        <span className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-bold uppercase tracking-wide text-primary-foreground transition group-hover:bg-primary/90">{t("campaigns_cta")} <ArrowRight className="h-4 w-4" /></span>
+                        <p className="text-sm text-muted-foreground">{t("campaigns_price")} <strong className="text-3xl text-primary">{BRL(c.quota_price)}</strong> <span className="text-xs font-semibold uppercase tracking-wider">por cota</span></p>
+                        <span className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-extrabold uppercase tracking-wide text-primary-foreground shadow-soft transition group-hover:bg-primary/90">{t("campaigns_cta")} <ArrowRight className="h-4 w-4" /></span>
                       </div>
                     </div>
                   </Link>
