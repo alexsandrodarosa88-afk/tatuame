@@ -22,7 +22,7 @@ function Page() {
   const camps = useQuery({ queryKey: ["admin-camps-list"], queryFn: async () => (await db.from("campaigns").select("id,title").order("created_at", { ascending: false })).data ?? [] });
   const save = async () => {
     const c = (camps.data as any[])?.find((x) => x.id === f.campaign_id);
-    if (!c) return toast.error("Escolha a campanha");
+    if (!c) return toast.error("Escolha o sorteio");
     const row = { campaign_id: c.id, campaign_title: c.title, drawn_at: f.drawn_at, winning_number: f.winning_number ? Number(f.winning_number) : null, winner_name: f.winner_name || null, live_url: f.live_url || null };
     const { error } = f.id ? await db.from("draws").update(row).eq("id", f.id) : await db.from("draws").insert(row);
     if (error) return toast.error(error.message);
@@ -37,7 +37,7 @@ function Page() {
       <h1 className="text-3xl">Sorteios</h1>
       <section className="space-y-3 rounded-2xl border bg-card p-5">
         <h2 className="text-xl">{f.id ? "Editar sorteio" : "Novo sorteio"}</h2>
-        <div className="space-y-1"><Label>Campanha</Label>
+        <div className="space-y-1"><Label>Sorteio</Label>
           <select className="h-10 w-full rounded-md border bg-background px-3" value={f.campaign_id} onChange={(e) => setF({ ...f, campaign_id: e.target.value })}>
             <option value="">Selecione</option>
             {(camps.data as any[])?.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
