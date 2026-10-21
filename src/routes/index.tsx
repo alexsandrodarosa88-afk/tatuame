@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Instagram, MapPin, Ticket, Sparkles, ShieldCheck } from "lucide-react";
+import { ArrowRight, Instagram, MapPin, Ticket, Sparkles, ShieldCheck, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Navbar, Footer } from "@/components/site/Navbar";
-import { db, BRL, withPublicPercent } from "@/lib/db";
+import { db, BRL, withPublicPercent, formatLuckyNumber } from "@/lib/db";
 import { supabase } from "@/integrations/supabase/client";
 import { useSite } from "@/lib/site-content";
 
@@ -38,6 +38,7 @@ function Index() {
   const [style, setStyle] = useState("");
   const [limit, setLimit] = useState(8);
   const campaigns = useQuery({ ...campaignsQuery, refetchInterval: 15000 });
+  const draws = useQuery({ queryKey: ["draws-home"], queryFn: async () => (await db.from("draws").select("*, campaigns(total_quotas)").order("drawn_at", { ascending: false }).limit(3)).data ?? [] });
   const artists = useQuery({ queryKey: ["artists"], queryFn: async () => (await db.from("artists").select("*").order("position").order("created_at", { ascending: false })).data ?? [] });
   const cities = useMemo(() => Array.from(new Set(((artists.data ?? []) as any[]).map((a) => `${a.city} — ${a.state}`))).sort(), [artists.data]);
   const filtered = ((artists.data ?? []) as any[]).filter((a) => (!city || `${a.city} — ${a.state}` === city) && (!style || a.styles?.includes(style)));
@@ -62,6 +63,30 @@ function Index() {
             </div>
           </div>
           <div className="aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-muted shadow-soft ring-1 ring-border">{loaded && img("hero") && <img src={img("hero")} alt="Tatuagem realizada por artista TATUAME" fetchPriority="high" className="h-full w-full object-cover" />}</div>
+        </section>
+
+        <section id="sorteios" className="bg-ink py-14 text-ink-foreground md:py-20">
+          <div className="mx-auto max-w-6xl px-4">
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+              <div className="space-y-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary-foreground"><Trophy className="h-3.5 w-3.5" /> Sorteio ao vivo no Instagram</span>
+                <h2 className="text-3xl md:text-4xl">{t("draws_home_title")}</h2>
+              </div>
+              <Button asChild size="lg" variant="outline" className="border-ink-foreground/30 bg-transparent text-ink-foreground hover:bg-ink-foreground/10"><Link to="/sorteios">{t("draws_home_btn")} <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>
+            </div>
+            {draws.data?.length ? (
+              <div className="grid gap-4 md:grid-cols-3">
+                {draws.data.slice(0, 3).map((d: any) => (
+                  <div key={d.id} className="rounded-2xl border border-ink-foreground/10 bg-background/5 p-5">
+                    <p className="text-xs uppercase tracking-widest text-ink-foreground/60">{new Date(d.drawn_at + "T12:00:00").toLocaleDateString("pt-BR")}</p>
+                    <h3 className="mt-1 text-xl">{d.campaign_title}</h3>
+                    <p className="mt-3 flex items-center gap-2 text-sm text-ink-foreground/80"><Trophy className="h-4 w-4 text-primary" />Número {d.winning_number != null ? formatLuckyNumber(d.winning_number, d.campaigns?.total_quotas) : "—"} · {(d.winner_name ?? "").trim().split(/\s+/)[0] || "—"}</p>
+                    {d.live_url && <a href={d.live_url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"><Instagram className="h-4 w-4" />Ver live</a>}
+                  </div>
+                ))}
+              </div>
+            ) : <p className="text-ink-foreground/70">{t("draws_empty")}</p>}
+          </div>
         </section>
 
         <section aria-label="Garantias" className="border-y bg-card">
