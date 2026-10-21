@@ -52,6 +52,37 @@ function Index() {
     <div className="min-h-screen">
       <Navbar />
       <main>
+        <section id="sorteios" className="bg-ink py-10 text-ink-foreground md:py-14">
+          <div className="mx-auto max-w-6xl px-4">
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+              <div className="space-y-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary-foreground"><Trophy className="h-3.5 w-3.5" /> {t("draws_home_badge")}</span>
+                <h2 className="text-3xl md:text-4xl">{t("draws_home_title")}</h2>
+              </div>
+              <Button asChild size="lg" variant="outline" className="border-ink-foreground/30 bg-transparent text-ink-foreground hover:bg-ink-foreground/10"><Link to="/sorteios">{t("draws_home_btn")} <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>
+            </div>
+            {draws.data?.length ? (
+              <div className="grid gap-4 md:grid-cols-3">
+                {draws.data.slice(0, 3).map((d: any, i: number) => (
+                  <div key={d.id} className={i === 0 ? "relative overflow-hidden rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/25 via-background/5 to-background/5 p-6 md:col-span-2 md:p-8" : "rounded-2xl border border-ink-foreground/10 bg-background/5 p-5"}>
+                    {i === 0 && <span className="absolute right-4 top-4 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-foreground">Último sorteio</span>}
+                    <p className="text-xs uppercase tracking-widest text-ink-foreground/60">{new Date(d.drawn_at + "T12:00:00").toLocaleDateString("pt-BR")}</p>
+                    <h3 className={i === 0 ? "mt-1 text-2xl md:text-3xl" : "mt-1 text-xl"}>{d.campaign_title}</h3>
+                    <div className="mt-4 flex flex-wrap items-center gap-4">
+                      <span className={i === 0 ? "inline-flex h-20 w-20 items-center justify-center rounded-full bg-primary text-xl font-extrabold text-primary-foreground shadow-soft md:h-24 md:w-24 md:text-2xl" : "inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/15 text-base font-extrabold text-primary"}>{d.winning_number != null ? formatLuckyNumber(d.winning_number, d.campaigns?.total_quotas) : "—"}</span>
+                      <div>
+                        <p className="text-xs uppercase tracking-widest text-ink-foreground/60">Ganhador(a)</p>
+                        <p className={i === 0 ? "text-xl font-semibold" : "font-semibold"}>{(d.winner_name ?? "").trim().split(/\s+/)[0] || "—"}</p>
+                      </div>
+                    </div>
+                    {d.live_url && <a href={d.live_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"><Instagram className="h-4 w-4" />Ver live</a>}
+                  </div>
+                ))}
+              </div>
+            ) : <p className="text-ink-foreground/70">{t("draws_empty")}</p>}
+          </div>
+        </section>
+
         <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:py-24">
           <div className="space-y-6">
             <span className="inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground"><Sparkles className="h-3.5 w-3.5 text-primary" /> {t("hero_badge")}</span>
@@ -63,30 +94,6 @@ function Index() {
             </div>
           </div>
           <div className="aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-muted shadow-soft ring-1 ring-border">{loaded && img("hero") && <img src={img("hero")} alt="Tatuagem realizada por artista TATUAME" fetchPriority="high" className="h-full w-full object-cover" />}</div>
-        </section>
-
-        <section id="sorteios" className="bg-ink py-14 text-ink-foreground md:py-20">
-          <div className="mx-auto max-w-6xl px-4">
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-              <div className="space-y-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary-foreground"><Trophy className="h-3.5 w-3.5" /> Sorteio ao vivo no Instagram</span>
-                <h2 className="text-3xl md:text-4xl">{t("draws_home_title")}</h2>
-              </div>
-              <Button asChild size="lg" variant="outline" className="border-ink-foreground/30 bg-transparent text-ink-foreground hover:bg-ink-foreground/10"><Link to="/sorteios">{t("draws_home_btn")} <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>
-            </div>
-            {draws.data?.length ? (
-              <div className="grid gap-4 md:grid-cols-3">
-                {draws.data.slice(0, 3).map((d: any) => (
-                  <div key={d.id} className="rounded-2xl border border-ink-foreground/10 bg-background/5 p-5">
-                    <p className="text-xs uppercase tracking-widest text-ink-foreground/60">{new Date(d.drawn_at + "T12:00:00").toLocaleDateString("pt-BR")}</p>
-                    <h3 className="mt-1 text-xl">{d.campaign_title}</h3>
-                    <p className="mt-3 flex items-center gap-2 text-sm text-ink-foreground/80"><Trophy className="h-4 w-4 text-primary" />Número {d.winning_number != null ? formatLuckyNumber(d.winning_number, d.campaigns?.total_quotas) : "—"} · {(d.winner_name ?? "").trim().split(/\s+/)[0] || "—"}</p>
-                    {d.live_url && <a href={d.live_url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"><Instagram className="h-4 w-4" />Ver live</a>}
-                  </div>
-                ))}
-              </div>
-            ) : <p className="text-ink-foreground/70">{t("draws_empty")}</p>}
-          </div>
         </section>
 
         <section aria-label="Garantias" className="border-y bg-card">
