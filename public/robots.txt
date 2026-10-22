@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /conta
+
+Sitemap: https://tatuame.com/sitemap.xml

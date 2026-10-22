@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { TEXT_FIELDS, IMAGE_FIELDS, COLOR_FIELDS } from "@/lib/site-content";
 import { VisualEditor } from "@/components/site/VisualEditor";
 
-export const Route = createFileRoute("/_authenticated/admin/configuracoes")({
+export const Route = createFileRoute("/_authenticated/admin/configuracoes")({ staticData: { sitemap: false },
   component: Page,
   head: () => ({ meta: [{ title: "Site | Admin TATUAME" }, { name: "description", content: "Textos, fotos e cores do site." }, { property: "og:title", content: "Site | Admin TATUAME" }, { property: "og:description", content: "Textos, fotos e cores do site." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
 });

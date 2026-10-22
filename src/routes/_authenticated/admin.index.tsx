@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { db, BRL } from "@/lib/db";
 
-export const Route = createFileRoute("/_authenticated/admin/")({
+export const Route = createFileRoute("/_authenticated/admin/")({ staticData: { sitemap: false },
   component: Overview,
   head: () => ({ meta: [
     { title: "Admin | TATUAME" }, { name: "description", content: "Painel administrativo TATUAME." },

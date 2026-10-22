@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { db } from "@/lib/db";
 
-export const Route = createFileRoute("/_authenticated/admin/sorteios")({
+export const Route = createFileRoute("/_authenticated/admin/sorteios")({ staticData: { sitemap: false },
   component: Page,
   head: () => ({ meta: [{ title: "Sorteios | Admin TATUAME" }, { name: "description", content: "Cadastre os sorteios realizados." }, { property: "og:title", content: "Sorteios | Admin TATUAME" }, { property: "og:description", content: "Cadastre os sorteios realizados." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
 });

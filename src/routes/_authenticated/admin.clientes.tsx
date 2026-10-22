@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { db } from "@/lib/db";
 import { adminDeleteUser, adminUpdateProfile, adminUpdateUserPassword } from "@/lib/admin-users.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/clientes")({
+export const Route = createFileRoute("/_authenticated/admin/clientes")({ staticData: { sitemap: false },
   component: Page,
   head: () => ({ meta: [{ title: "Clientes | Admin TATUAME" }, { name: "description", content: "Gerenciar clientes." }, { property: "og:title", content: "Clientes | Admin TATUAME" }, { property: "og:description", content: "Gerenciar clientes." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
 });
