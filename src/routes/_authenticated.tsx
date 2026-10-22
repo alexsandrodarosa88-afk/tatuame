@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 
-export const Route = createFileRoute("/_authenticated")({ ssr: false, component: AuthLayout });
+export const Route = createFileRoute("/_authenticated")({ staticData: { sitemap: "exclude-subtree" }, ssr: false, component: AuthLayout });
 
 function AuthLayout() {
   const { user, loading } = useAuth();

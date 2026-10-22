@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 
-export const Route = createFileRoute("/_authenticated/admin/artistas")({
+export const Route = createFileRoute("/_authenticated/admin/artistas")({ staticData: { sitemap: false },
   component: Page,
   head: () => ({ meta: [{ title: "Artistas | Admin TATUAME" }, { name: "description", content: "Cadastros de artistas." }, { property: "og:title", content: "Artistas | Admin TATUAME" }, { property: "og:description", content: "Cadastros de artistas." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
 });

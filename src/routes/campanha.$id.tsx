@@ -11,7 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { startMercadoPagoCheckout } from "@/lib/mercadopago.functions";
 import { useSite } from "@/lib/site-content";
 
-export const Route = createFileRoute("/campanha/$id")({
+export const Route = createFileRoute("/campanha/$id")({ staticData: { sitemap: false },
   component: Page,
   head: () => ({ meta: [
     { title: "Sorteio | TATUAME" }, { name: "description", content: "Detalhes do sorteio TATUAME e compra de cotas." },

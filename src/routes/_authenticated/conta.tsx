@@ -10,7 +10,7 @@ import { startMercadoPagoCheckout, refreshMercadoPagoPayment } from "@/lib/merca
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
-export const Route = createFileRoute("/_authenticated/conta")({
+export const Route = createFileRoute("/_authenticated/conta")({ staticData: { sitemap: false },
   component: Conta,
   head: () => ({ meta: [
     { title: "Minha conta | TATUAME" }, { name: "description", content: "Suas compras e números da sorte." },

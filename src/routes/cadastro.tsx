@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Navbar } from "@/components/site/Navbar";
 
-export const Route = createFileRoute("/cadastro")({
+export const Route = createFileRoute("/cadastro")({ staticData: { sitemap: false },
   component: Signup,
   head: () => ({ meta: [
     { title: "Criar conta | TATUAME" }, { name: "description", content: "Crie sua conta para participar dos sorteios TATUAME." },

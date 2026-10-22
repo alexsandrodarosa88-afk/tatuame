@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { db, BRL, formatLuckyNumber } from "@/lib/db";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/_authenticated/admin/vendas")({
+export const Route = createFileRoute("/_authenticated/admin/vendas")({ staticData: { sitemap: false },
   component: Page,
   head: () => ({ meta: [{ title: "Vendas | Admin TATUAME" }, { name: "description", content: "Pedidos e pagamentos." }, { property: "og:title", content: "Vendas | Admin TATUAME" }, { property: "og:description", content: "Pedidos e pagamentos." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
 });

@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { db, BRL } from "@/lib/db";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/_authenticated/admin/campanhas")({
+export const Route = createFileRoute("/_authenticated/admin/campanhas")({ staticData: { sitemap: false },
   component: Page,
   head: () => ({ meta: [{ title: "Sorteios | Admin TATUAME" }, { name: "description", content: "Gerenciar sorteios." }, { property: "og:title", content: "Sorteios | Admin TATUAME" }, { property: "og:description", content: "Gerenciar sorteios." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
 });

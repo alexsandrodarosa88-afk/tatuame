@@ -4,7 +4,7 @@ import { LayoutDashboard, Megaphone, ShoppingBag, Users, Palette, Settings, Radi
 import { useIsAdmin } from "@/hooks/use-admin";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/_authenticated/admin")({ component: AdminLayout });
+export const Route = createFileRoute("/_authenticated/admin")({ staticData: { sitemap: false }, component: AdminLayout });
 
 const nav = [
   { to: "/admin", label: "Visão geral", icon: LayoutDashboard, exact: true },

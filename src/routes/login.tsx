@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Navbar } from "@/components/site/Navbar";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/login")({ staticData: { sitemap: false },
   component: Login,
   validateSearch: (s: Record<string, unknown>) => ({ next: typeof s.next === "string" && s.next.startsWith("/") ? s.next : undefined }),
   head: () => ({ meta: [
