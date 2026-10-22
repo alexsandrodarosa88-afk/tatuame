@@ -15,6 +15,7 @@ import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as CadastroTatuadorRouteImport } from './routes/cadastro-tatuador'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SejaArtistaRouteImport } from './routes/seja-artista'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SorteiosRouteImport } from './routes/sorteios'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedContaRouteImport } from './routes/_authenticated/conta'
@@ -55,6 +56,11 @@ const LoginRoute = LoginRouteImport.update({
 const SejaArtistaRoute = SejaArtistaRouteImport.update({
   id: '/seja-artista',
   path: '/seja-artista',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SorteiosRoute = SorteiosRouteImport.update({
@@ -131,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/seja-artista': typeof SejaArtistaRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sorteios': typeof SorteiosRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/conta': typeof AuthenticatedContaRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/seja-artista': typeof SejaArtistaRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sorteios': typeof SorteiosRoute
   '/conta': typeof AuthenticatedContaRoute
   '/campanha/$id': typeof CampanhaIdRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/cadastro-tatuador': typeof CadastroTatuadorRoute
   '/login': typeof LoginRoute
   '/seja-artista': typeof SejaArtistaRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sorteios': typeof SorteiosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/conta': typeof AuthenticatedContaRoute
@@ -191,6 +200,7 @@ export interface FileRouteTypes {
     | '/cadastro-tatuador'
     | '/login'
     | '/seja-artista'
+    | '/sitemap.xml'
     | '/sorteios'
     | '/admin'
     | '/conta'
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/cadastro-tatuador'
     | '/login'
     | '/seja-artista'
+    | '/sitemap.xml'
     | '/sorteios'
     | '/conta'
     | '/campanha/$id'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/cadastro-tatuador'
     | '/login'
     | '/seja-artista'
+    | '/sitemap.xml'
     | '/sorteios'
     | '/_authenticated/admin'
     | '/_authenticated/conta'
@@ -250,6 +262,7 @@ export interface RootRouteChildren {
   CadastroTatuadorRoute: typeof CadastroTatuadorRoute
   LoginRoute: typeof LoginRoute
   SejaArtistaRoute: typeof SejaArtistaRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SorteiosRoute: typeof SorteiosRoute
   CampanhaIdRoute: typeof CampanhaIdRoute
   ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
@@ -297,6 +310,13 @@ declare module '@tanstack/react-router' {
       path: '/seja-artista'
       fullPath: '/seja-artista'
       preLoaderRoute: typeof SejaArtistaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sorteios': {
@@ -430,6 +450,7 @@ const rootRouteChildren: RootRouteChildren = {
   CadastroTatuadorRoute: CadastroTatuadorRoute,
   LoginRoute: LoginRoute,
   SejaArtistaRoute: SejaArtistaRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SorteiosRoute: SorteiosRoute,
   CampanhaIdRoute: CampanhaIdRoute,
   ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
