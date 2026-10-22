@@ -30,6 +30,7 @@ export async function reconcileMercadoPago(paymentId: string, token: string) {
   const account = await mercadoPagoRequest("/users/me", token);
   if (String(payment.collector_id) !== String(account.id) || payment.currency_id !== "BRL") throw new Error("Pagamento não corresponde à conta Mercado Pago do TATUAME");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: before } = await supabaseAdmin.from("orders").select("status").eq("id", payment.external_reference).maybeSingle();
   const { error } = await supabaseAdmin.rpc("apply_mercadopago_payment", {
     _order_id: payment.external_reference,
     _payment_id: String(payment.id),
@@ -37,4 +38,29 @@ export async function reconcileMercadoPago(paymentId: string, token: string) {
     _status: payment.status,
   });
   if (error) throw new Error(error.message);
+  if (before && before.status !== "pago") await sendLuckyNumbersEmail(payment.external_reference).catch((e) => console.error("Email error", e));
+}
+
+export async function sendLuckyNumbersEmail(orderId: string) {
+  const lovableKey = process.env["LOVABLE_API_KEY"];
+  const resendKey = process.env["RESEND_API_KEY"];
+  if (!lovableKey || !resendKey) return;
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: o } = await (supabaseAdmin as any).from("orders").select("status, user_id, quantity, campaigns(title, total_quotas), lucky_numbers(number)").eq("id", orderId).maybeSingle();
+  if (!o || o.status !== "pago" || !o.lucky_numbers?.length) return;
+  const { data: p } = await (supabaseAdmin as any).from("profiles").select("email, nome_completo").eq("id", o.user_id).maybeSingle();
+  if (!p?.email) return;
+  const total = o.campaigns?.total_quotas;
+  const pad = (n: number) => String(n).padStart(String(total && total > 0 ? total : n).length, "0");
+  const esc = (v: string) => v.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const nums = o.lucky_numbers.map((n: any) => n.number).sort((a: number, b: number) => a - b).map(pad);
+  const title = esc(o.campaigns?.title ?? "Sorteio TATUAME");
+  const name = esc((p.nome_completo ?? "").split(" ")[0] || "cliente");
+  const html = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#222"><h1 style="color:#c8102e">Pagamento aprovado! 🎉</h1><p>Olá, ${name}! Seu pagamento no sorteio <strong>${title}</strong> foi confirmado.</p><p>Seus números da sorte:</p><p>${nums.map((n: string) => `<span style="display:inline-block;margin:3px;padding:6px 10px;border:1px solid #c8102e;border-radius:6px;font-family:monospace;font-size:16px">${n}</span>`).join("")}</p><p>Acompanhe o sorteio ao vivo no Instagram <strong>@tatuameoficial</strong>. Seus números também ficam salvos em <a href="https://tatuame.com/conta">Minha conta</a>.</p><p>Boa sorte!<br/>Equipe TATUAME</p></div>`;
+  const res = await fetch("https://connector-gateway.lovable.dev/resend/emails", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${lovableKey}`, "X-Connection-Api-Key": resendKey },
+    body: JSON.stringify({ from: process.env["RESEND_FROM"] || "TATUAME <contato@tatuame.com>", to: [p.email], subject: `Seus números da sorte – ${o.campaigns?.title ?? "TATUAME"}`, html }),
+  });
+  if (!res.ok) throw new Error(`Resend [${res.status}]: ${await res.text()}`);
 }
