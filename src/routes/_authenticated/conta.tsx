@@ -33,7 +33,10 @@ function Conta() {
       if (!user) return [];
       const { data, error } = await db.from("orders").select("*, campaigns(title, total_quotas), lucky_numbers(number)").eq("user_id", user.id).order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      const ids = [...new Set((data ?? []).map((o: any) => o.campaign_id).filter(Boolean))];
+      const { data: draws } = ids.length ? await db.from("draws").select("campaign_id, winning_number").in("campaign_id", ids) : { data: [] };
+      const drawMap = Object.fromEntries(((draws ?? []) as any[]).filter((d) => d.winning_number != null).map((d) => [d.campaign_id, Number(d.winning_number)]));
+      return (data ?? []).map((o: any) => ({ ...o, winning: drawMap[o.campaign_id] }));
     },
   });
   useEffect(() => {
@@ -97,7 +100,15 @@ function Conta() {
                 {o.mp_preference_id && <Button size="sm" variant="outline" disabled={busy === o.id} onClick={() => verify(o.id)}>Verificar pagamento</Button>}
               </div>}
               {!!o.lucky_numbers?.length && (
-                <div className="flex flex-wrap gap-2">{o.lucky_numbers.map((n: any) => <span key={n.number} className="rounded-md border bg-background px-2 py-1 font-mono text-sm">{formatLuckyNumber(n.number, o.campaigns?.total_quotas)}</span>)}</div>
+                <div className="space-y-3">
+                  {o.winning != null && (o.lucky_numbers.some((n: any) => n.number === o.winning)
+                    ? <p className="rounded-xl border border-primary bg-primary/10 p-3 font-semibold text-primary">🏆 NÚMERO SORTEADO! Parabéns, você é o ganhador! Nossa equipe vai entrar em contato pelo WhatsApp.</p>
+                    : <p className="rounded-xl border bg-muted p-3 text-sm text-muted-foreground">Sorteio finalizado. Número sorteado: <strong>{formatLuckyNumber(o.winning, o.campaigns?.total_quotas)}</strong>. Não foi desta vez — boa sorte no próximo!</p>)}
+                  <div className="flex flex-wrap gap-2">{o.lucky_numbers.map((n: any) => {
+                    const win = o.winning != null && n.number === o.winning;
+                    return <span key={n.number} className={`rounded-md border px-2 py-1 font-mono text-sm ${win ? "border-primary bg-primary text-primary-foreground" : o.winning != null ? "bg-muted text-muted-foreground" : "bg-background"}`}>{formatLuckyNumber(n.number, o.campaigns?.total_quotas)}{o.winning != null && <span className="ml-1 font-sans text-xs">{win ? "· Número sorteado" : "· Não sorteado"}</span>}</span>;
+                  })}</div>
+                </div>
               )}
             </div>
           )) : !orders.isLoading && !orders.isError && <p className="text-muted-foreground">Você ainda não tem compras.</p>}
