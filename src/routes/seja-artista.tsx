@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Navbar, Footer } from "@/components/site/Navbar";
 import { db, BRAZIL_STATES } from "@/lib/db";
 
-export const Route = createFileRoute("/seja-artista")({
+export const Route = createFileRoute("/seja-artista")({ staticData: { sitemap: true },
   component: Page,
   head: () => ({ meta: [
     { title: "Seja um artista TATUAME — Cadastro" },

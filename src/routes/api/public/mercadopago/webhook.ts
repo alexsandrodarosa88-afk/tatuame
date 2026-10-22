@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/api/public/mercadopago/webhook")({
+export const Route = createFileRoute("/api/public/mercadopago/webhook")({ staticData: { sitemap: false },
   server: { handlers: { POST: async ({ request }) => {
     const secret = process.env["MERCADOPAGO_WEBHOOK_SECRET"];
     const token = process.env["MERCADOPAGO_ACCESS_TOKEN"];

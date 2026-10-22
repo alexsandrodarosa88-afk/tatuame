@@ -6,7 +6,7 @@ import { Navbar, Footer } from "@/components/site/Navbar";
 import { db, formatLuckyNumber } from "@/lib/db";
 import { useSite } from "@/lib/site-content";
 
-export const Route = createFileRoute("/sorteios")({
+export const Route = createFileRoute("/sorteios")({ staticData: { sitemap: true },
   component: Page,
   head: () => ({ meta: [
     { title: "Sorteios ao vivo | TATUAME" },

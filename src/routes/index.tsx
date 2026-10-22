@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSite } from "@/lib/site-content";
 import { remainingPercent, RAFFLE_CLOSING_PERCENT } from "@/lib/raffle-progress";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/")({ staticData: { sitemap: true },
   component: Index,
   head: () => ({ meta: [
     { title: "TATUAME — Sorteios de tatuagem com artistas premium" },
